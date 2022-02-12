@@ -29,6 +29,8 @@ dependencies {
 
 	//modelMapper
 	implementation 'org.modelmapper:modelmapper:2.3.8'
+    implementation 'junit:junit:4.13.1'
+	implementation 'junit:junit:4.13.1'
 
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'

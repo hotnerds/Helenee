@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +19,9 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User getUserById(Long Id) {
-        return userRepository.getById(Id);
+    public User getUserById(Long id) {
+        User member = userRepository.getById(id);
+        return member;
     }
+
 }

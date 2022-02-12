@@ -1,5 +1,6 @@
 package com.hotnerds.user.domain;
 
+import lombok.Builder;
 import lombok.Getter;
 
 import javax.persistence.Column;
@@ -9,6 +10,7 @@ import javax.persistence.Id;
 
 @Entity
 @Getter
+@Builder
 public class User {
     @Id
     @GeneratedValue
