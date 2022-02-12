@@ -1,5 +1,6 @@
 package com.hotnerds.user.domain;
 
+import com.hotnerds.common.BaseTimeEntity;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,7 +12,7 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @Builder
-public class User {
+public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue
     private Long id;
