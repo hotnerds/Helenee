@@ -1,4 +1,4 @@
-package com.hotnerds.user.common;
+package com.hotnerds.common;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
