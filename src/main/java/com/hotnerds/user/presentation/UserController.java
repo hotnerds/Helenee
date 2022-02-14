@@ -1,13 +1,11 @@
 package com.hotnerds.user.presentation;
 
 import com.hotnerds.user.application.UserService;
+import com.hotnerds.user.domain.DTO.NewUserDto;
 import com.hotnerds.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,11 +25,29 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @PostMapping("/")
+    public void createUser(@RequestBody NewUserDto requestData) { // 일단 username, email만 있는 DTO
+        User user = User.builder()
+                .username(requestData.getUsername())
+                .email(requestData.getEmail())
+                .build();
+        userService.createNewUser(user);
+
+        // should return a response
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable("id") Long id) {
         User user = userService.getUserById(id);
 
         return ResponseEntity.ok(user);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable("id") Long id) {
+        userService.deleteUserById(id);
+
+        // should return a response
     }
 
 }

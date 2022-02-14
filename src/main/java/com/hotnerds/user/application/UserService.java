@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,9 +20,23 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User getUserById(Long id) {
-        User member = userRepository.getById(id);
-        return member;
+    public void createNewUser(User user) {
+        userRepository.save(user);
+
+        // should return a response
+    }
+
+    public User getUserById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Not found : " + userId));
+
+        return user;
+    }
+
+    public void deleteUserById(Long userId) {
+        userRepository.deleteById(userId);
+
+        // should return a response
     }
 
 }
