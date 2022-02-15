@@ -1,7 +1,7 @@
 package com.hotnerds.user.presentation;
 
 import com.hotnerds.user.application.UserService;
-import com.hotnerds.user.domain.DTO.NewUserDto;
+import com.hotnerds.user.domain.Dto.NewUserDto;
 import com.hotnerds.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

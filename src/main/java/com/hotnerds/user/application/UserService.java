@@ -1,18 +1,14 @@
 package com.hotnerds.user.application;
 
-import com.hotnerds.user.domain.DTO.NewUserDto;
+import com.hotnerds.user.domain.Dto.NewUserDto;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import com.hotnerds.user.exception.UserExistsException;
 import com.hotnerds.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

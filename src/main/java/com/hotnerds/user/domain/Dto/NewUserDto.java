@@ -1,4 +1,4 @@
-package com.hotnerds.user.domain.DTO;
+package com.hotnerds.user.domain.Dto;
 
 import com.hotnerds.user.domain.User;
 import lombok.*;
