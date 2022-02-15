@@ -42,9 +42,9 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public void updateUser(Long id, UserUpdateReqDto userUpdateReqDto) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        User user = optionalUser.orElseThrow(() -> new RuntimeException());
+    public void updateUser(Long userId, UserUpdateReqDto userUpdateReqDto) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        User user = optionalUser.orElseThrow(() -> new UserNotFoundException("User ID " + userId + "가 존재하지 않습니다"));
 
         user.updateUser(userUpdateReqDto);
     }
