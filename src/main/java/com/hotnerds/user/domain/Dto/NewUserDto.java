@@ -15,7 +15,7 @@ public class NewUserDto {
         this.email = email;
     }
 
-    public NewUserDto of(User user) {
+    public static NewUserDto of(User user) {
         return NewUserDto.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
