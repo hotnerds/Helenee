@@ -41,4 +41,11 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
+    public void updateUser(Long id, UserUpdateReqDto userInfoReqDto) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        User user = optionalUser.orElseThrow();
+
+        user = userInfoReqDto.toEntity();
+    }
+
 }
