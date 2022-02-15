@@ -21,4 +21,11 @@ public class NewUserDto {
                 .email(user.getEmail())
                 .build();
     }
+
+    public User toEntity() {
+        return User.builder()
+                .username(this.getUsername())
+                .email(this.getEmail())
+                .build();
+    }
 }
