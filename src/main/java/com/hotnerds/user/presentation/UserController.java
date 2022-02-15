@@ -26,14 +26,10 @@ public class UserController {
     }
 
     @PostMapping("/")
-    public void createUser(@RequestBody NewUserDto requestData) { // 일단 username, email만 있는 DTO
-        User user = User.builder()
-                .username(requestData.getUsername())
-                .email(requestData.getEmail())
-                .build();
-        userService.createNewUser(user);
+    public ResponseEntity<Void> createUser(@RequestBody NewUserDto requestData) { // 일단 username, email만 있는 DTO
+        userService.createNewUser(requestData);
 
-        // should return a response
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
@@ -44,10 +40,10 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUserById(id);
 
-        // should return a response
+        return ResponseEntity.noContent().build();
     }
 
 }

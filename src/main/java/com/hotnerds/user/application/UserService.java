@@ -7,6 +7,7 @@ import com.hotnerds.user.exception.UserExistsException;
 import com.hotnerds.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -30,8 +31,6 @@ public class UserService {
         }
 
         userRepository.save(newUserDto.toEntity());
-
-        // should return a response
     }
 
     public User getUserById(Long userId) {
@@ -43,8 +42,6 @@ public class UserService {
 
     public void deleteUserById(Long userId) {
         userRepository.deleteById(userId);
-
-        // should return a response
     }
 
 }
