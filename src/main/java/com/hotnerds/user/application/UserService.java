@@ -1,6 +1,7 @@
 package com.hotnerds.user.application;
 
 import com.hotnerds.user.domain.Dto.NewUserDto;
+import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import com.hotnerds.user.exception.UserExistsException;
