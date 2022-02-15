@@ -2,9 +2,11 @@ package com.hotnerds.user.presentation;
 
 import com.hotnerds.user.application.UserService;
 import com.hotnerds.user.domain.Dto.NewUserDto;
+import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
 import com.hotnerds.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +47,13 @@ public class UserController {
         userService.deleteUserById(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity updateUser(@PathVariable("id") Long id, UserUpdateReqDto userInfoReqDto) {
+        userService.updateUser(id, userInfoReqDto);
+
+        return new ResponseEntity(HttpStatus.OK);
     }
 
 }
