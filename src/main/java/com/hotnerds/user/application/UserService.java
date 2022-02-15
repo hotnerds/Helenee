@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +22,8 @@ public class UserService {
     }
 
     public void createNewUser(NewUserDto newUserDto) {
-        if (userRepository.findByUsername(newUserDto.getUsername()) != null
-                || userRepository.findByEmail(newUserDto.getEmail()) != null) {
+        Optional<User> optionalUser = userRepository.findByUsernameOrEmail(newUserDto.getUsername(), newUserDto.getEmail());
+        if (!optionalUser.isEmpty()) {
             throw new UserExistsException("동일한 정보를 가진 유저가 이미 존재합니다");
         }
 
