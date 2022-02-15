@@ -4,6 +4,7 @@ import com.hotnerds.user.application.UserService;
 import com.hotnerds.user.domain.Dto.NewUserDto;
 import com.hotnerds.user.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +30,7 @@ public class UserController {
     public ResponseEntity<Void> createUser(@RequestBody NewUserDto requestData) { // 일단 username, email만 있는 DTO
         userService.createNewUser(requestData);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}")
