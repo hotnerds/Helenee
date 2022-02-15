@@ -1,6 +1,5 @@
 package com.hotnerds.user.domain.Dto;
 
-import com.hotnerds.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,11 +13,5 @@ public class UserUpdateReqDto {
     @Builder
     public UserUpdateReqDto(String username) {
         this.username = username;
-    }
-
-    public User toEntity() {
-        return User.builder()
-                .username(this.username)
-                .build();
     }
 }

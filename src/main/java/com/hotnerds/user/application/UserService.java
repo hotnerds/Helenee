@@ -42,11 +42,11 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public void updateUser(Long id, UserUpdateReqDto userInfoReqDto) {
+    public void updateUser(Long id, UserUpdateReqDto userUpdateReqDto) {
         Optional<User> optionalUser = userRepository.findById(id);
-        User user = optionalUser.orElseThrow();
+        User user = optionalUser.orElseThrow(() -> new RuntimeException());
 
-        user = userInfoReqDto.toEntity();
+        user.updateUser(userUpdateReqDto);
     }
 
 }
