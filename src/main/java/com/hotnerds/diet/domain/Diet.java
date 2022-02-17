@@ -1,5 +1,6 @@
 package com.hotnerds.diet.domain;
 
+import com.hotnerds.common.BaseTimeEntity;
 import com.hotnerds.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Diet {
+public class Diet extends BaseTimeEntity {
     @Id
     @GeneratedValue
     private Long id;
