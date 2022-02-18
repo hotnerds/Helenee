@@ -1,16 +1,15 @@
 package com.hotnerds.user.domain;
 
 import com.hotnerds.common.BaseTimeEntity;
+import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -26,6 +25,10 @@ public class User extends BaseTimeEntity {
 
     @Column(nullable = false, length = 20, unique = true)
     private String email;
+
+    @OneToMany
+    @JoinColumn(name = "DIET_ID")
+    private List<Diet> dietList;
 
     public void updateUser(UserUpdateReqDto userUpdateReqDto) {
         this.username = userUpdateReqDto.getUsername();
