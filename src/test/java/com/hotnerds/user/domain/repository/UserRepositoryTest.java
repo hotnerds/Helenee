@@ -1,6 +1,6 @@
 package com.hotnerds.user.domain.repository;
 
-import com.hotnerds.user.domain.Dto.NewUserDto;
+import com.hotnerds.user.domain.Dto.NewUserReqDto;
 import com.hotnerds.user.domain.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +19,7 @@ class UserRepositoryTest {
     @DisplayName("DB에 유저 정보 저장")
     void saveUser() {
         // given
-        User userReq = new NewUserDto("Peter", "lkslyj2@naver.com").toEntity();
+        User userReq = new NewUserReqDto("Peter", "lkslyj2@naver.com").toEntity();
 
         // when
         User userSaved = userRepository.save(userReq);
@@ -35,7 +35,7 @@ class UserRepositoryTest {
     @DisplayName("username 값으로 유저 검색")
     void findByUsername() {
         // given
-        User user1 = new NewUserDto("PeterLim", "lkslyj2@naver.com").toEntity();
+        User user1 = new NewUserReqDto("PeterLim", "lkslyj2@naver.com").toEntity();
         userRepository.save(user1);
 
         // when
@@ -51,7 +51,7 @@ class UserRepositoryTest {
     @DisplayName("email 값으로 유저 검색")
     void findByEmail() {
         // given
-        User user1 = new NewUserDto("PeterLim", "lkslyj2@naver.com").toEntity();
+        User user1 = new NewUserReqDto("PeterLim", "lkslyj2@naver.com").toEntity();
         userRepository.save(user1);
 
         // when
@@ -67,7 +67,7 @@ class UserRepositoryTest {
     @DisplayName("username 또는 email 값으로 유저 검색")
     void findByUsernameOrEmail() {
         // given
-        User user = new NewUserDto("PeterLim", "lkslyj2@naver.com").toEntity();
+        User user = new NewUserReqDto("PeterLim", "lkslyj2@naver.com").toEntity();
         userRepository.save(user);
 
         // when

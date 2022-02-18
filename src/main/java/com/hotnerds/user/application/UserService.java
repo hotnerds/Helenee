@@ -1,6 +1,6 @@
 package com.hotnerds.user.application;
 
-import com.hotnerds.user.domain.Dto.NewUserDto;
+import com.hotnerds.user.domain.Dto.NewUserReqDto;
 import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
@@ -22,13 +22,13 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public void createNewUser(NewUserDto newUserDto) {
-        Optional<User> optionalUser = userRepository.findByUsernameOrEmail(newUserDto.getUsername(), newUserDto.getEmail());
+    public void createNewUser(NewUserReqDto newUserReqDto) {
+        Optional<User> optionalUser = userRepository.findByUsernameOrEmail(newUserReqDto.getUsername(), newUserReqDto.getEmail());
         if (!optionalUser.isEmpty()) {
             throw new UserExistsException("동일한 정보를 가진 유저가 이미 존재합니다");
         }
 
-        userRepository.save(newUserDto.toEntity());
+        userRepository.save(newUserReqDto.toEntity());
     }
 
     public User getUserById(Long userId) {
