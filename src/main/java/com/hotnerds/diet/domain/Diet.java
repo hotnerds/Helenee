@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
@@ -43,6 +44,10 @@ public class Diet extends BaseTimeEntity {
 
     @Column
     private Double totalFat;
+
+    @OneToMany
+    @JoinColumn(name = "DIETFOOD_ID")
+    private List<DietFood> dietFoodList;
 
     @Builder
     public Diet(LocalDate localDate, MealTimeType mealTime, User user) {
