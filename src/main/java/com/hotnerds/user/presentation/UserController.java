@@ -53,7 +53,7 @@ public class UserController {
     public ResponseEntity updateUser(@PathVariable("id") Long id, @RequestBody UserUpdateReqDto userInfoReqDto) {
         userService.updateUser(id, userInfoReqDto);
 
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
 }

@@ -44,7 +44,8 @@ public class UserService {
 
     public void updateUser(Long userId, UserUpdateReqDto userUpdateReqDto) {
         Optional<User> optionalUser = userRepository.findById(userId);
-        User user = optionalUser.orElseThrow(() -> new UserNotFoundException("User ID " + userId + "가 존재하지 않습니다"));
+        User user = optionalUser
+                .orElseThrow(() -> new UserNotFoundException("User ID " + userId + "가 존재하지 않습니다"));
 
         user.updateUser(userUpdateReqDto);
 

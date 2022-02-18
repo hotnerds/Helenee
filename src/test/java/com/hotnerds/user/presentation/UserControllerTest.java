@@ -18,22 +18,30 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = UserController.class)
 class UserControllerTest {
 
+    @Autowired
+    private MockMvc mockMvc;
+
     @MockBean
     private UserService userService;
 
-    @BeforeEach
-    void setUp() {
-    }
-
-/*    @Test
-    void 전체유저조회_테스트() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/"))
-                .andExpect(status().isOk())
-                .andDo(print());
+    @Test
+    void getAllUser() {
     }
 
     @Test
-    void 아이디로특정유저조회_테스트() {
-    }*/
+    void createUser() {
+    }
+
+    @Test
+    void getUser() {
+    }
+
+    @Test
+    void deleteUser() {
+    }
+
+    @Test
+    void updateUser() {
+    }
 
 }
