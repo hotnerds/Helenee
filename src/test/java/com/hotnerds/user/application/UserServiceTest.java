@@ -29,7 +29,6 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    // given
     private List<NewUserReqDto> actualNewUserReqDtoList = Arrays.asList(
             NewUserReqDto.builder()
                     .username("RetepMil")
