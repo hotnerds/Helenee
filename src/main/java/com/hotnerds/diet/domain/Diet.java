@@ -17,7 +17,8 @@ import java.time.LocalDate;
 public class Diet extends BaseTimeEntity {
     @Id
     @GeneratedValue
-    private Long id;
+    @Column(name = "DIET_ID")
+    private Long dietId;
 
     @Column(nullable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -30,6 +31,18 @@ public class Diet extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name = "USER_ID")
     private User user;
+
+    @Column
+    private Double totalCalories;
+
+    @Column
+    private Double totalCarbs;
+
+    @Column
+    private Double totalProtein;
+
+    @Column
+    private Double totalFat;
 
     @Builder
     public Diet(LocalDate localDate, MealTimeType mealTime, User user) {
