@@ -23,11 +23,6 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        User user1 = User.builder().username("retepmil").email("lks@gmail.com").build();
-        User user2 = User.builder().username("peterlim").email("lyj@naver.com").build();
-
-        userService.save(user1);
-        userRepository.save(user2);
     }
 
 /*    @Test
