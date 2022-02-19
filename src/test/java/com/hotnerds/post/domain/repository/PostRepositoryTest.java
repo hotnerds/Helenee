@@ -8,7 +8,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -71,7 +78,7 @@ class PostRepositoryTest {
         postRepository.save(post);
         //when
 
-        List<Post> findPosts = postRepository.findByTitle("temp");
+        List<Post> findPosts = postRepository.findAllByTitle("temp");
 
         Post findPost = findPosts.get(0);
 
@@ -81,4 +88,31 @@ class PostRepositoryTest {
         assertThat(findPost.getWriter()).isNotNull();
     }
 
+    @Test
+    @DisplayName("특정 시간 이후에 생성된 게시글 조회")
+    public void 특정시간_이후에_생성된_게시글_조회() {
+        //given
+        User user = User.builder()
+                .username("username")
+                .email("email")
+                .build();
+
+        User savedUser = userRepository.save(user);
+
+        Post post1 = Post.builder()
+                .title("temp")
+                .content("content")
+                .writer(savedUser)
+                .build();
+
+        postRepository.save(post1);
+
+        //when
+
+        List<Post> findPosts = postRepository.findAllPostsAfter(LocalDateTime.MIN);
+
+        //then
+        assertThat(findPosts.get(0).getCreatedAt()).isAfter(LocalDateTime.MIN);
+        assertThat(findPosts.size()).isEqualTo(1);
+    }
 }

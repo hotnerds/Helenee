@@ -1,5 +1,6 @@
 package com.hotnerds.post.domain;
 
+import com.hotnerds.common.BaseTimeEntity;
 import com.hotnerds.user.domain.User;
 import lombok.*;
 import org.hibernate.mapping.Join;
@@ -11,7 +12,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Post {
+public class Post extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
