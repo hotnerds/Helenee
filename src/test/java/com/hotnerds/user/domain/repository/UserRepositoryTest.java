@@ -19,7 +19,10 @@ class UserRepositoryTest {
     @DisplayName("DB에 유저 정보 저장")
     void saveUser() {
         // given
-        User userReq = new NewUserReqDto("Peter", "lkslyj2@naver.com").toEntity();
+        User userReq = User.builder()
+                .username("Peter")
+                .email("lkslyj2@naver.com")
+                .build();
 
         // when
         User userSaved = userRepository.save(userReq);
@@ -35,39 +38,52 @@ class UserRepositoryTest {
     @DisplayName("username 값으로 유저 검색")
     void findByUsername() {
         // given
-        User user1 = new NewUserReqDto("PeterLim", "lkslyj2@naver.com").toEntity();
-        userRepository.save(user1);
+        User user = User.builder()
+                .username("Peter")
+                .email("lkslyj2@naver.com")
+                .build();
+        userRepository.save(user);
 
         // when
-        User userFound = userRepository.findByUsername(user1.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException(user1.getUsername() + "is invald username"));
+        User userFound = userRepository.findByUsername(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException(user.getUsername() + "is invald username"));
+        Optional<User> userWrongUsername = userRepository.findByUsername("Wrong Username"); // fail case condition
 
         // then
         Assertions.assertThat(userRepository.count()).isEqualTo(1);
         Assertions.assertThat(userFound).isSameAs(userFound);
+        Assertions.assertThat(userWrongUsername.isEmpty()).isEqualTo(true); // fail condition
     }
 
     @Test
     @DisplayName("email 값으로 유저 검색")
     void findByEmail() {
         // given
-        User user1 = new NewUserReqDto("PeterLim", "lkslyj2@naver.com").toEntity();
-        userRepository.save(user1);
+        User user = User.builder()
+                .username("Peter")
+                .email("lkslyj2@naver.com")
+                .build();
+        userRepository.save(user);
 
         // when
-        User userFound = userRepository.findByEmail(user1.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException(user1.getEmail() + "is invald email"));
+        User userFound = userRepository.findByEmail(user.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException(user.getEmail() + "is invald email"));
+        Optional<User> userWrongEmail = userRepository.findByUsername("Wrong Email"); // fail case condition
 
         // then
         Assertions.assertThat(userRepository.count()).isEqualTo(1);
         Assertions.assertThat(userFound).isSameAs(userFound);
+        Assertions.assertThat(userWrongEmail.isEmpty()).isEqualTo(true); // fail condition
     }
 
     @Test
     @DisplayName("username 또는 email 값으로 유저 검색")
     void findByUsernameOrEmail() {
         // given
-        User user = new NewUserReqDto("PeterLim", "lkslyj2@naver.com").toEntity();
+        User user = User.builder()
+                .username("Peter")
+                .email("lkslyj2@naver.com")
+                .build();
         userRepository.save(user);
 
         // when

@@ -34,8 +34,6 @@ class UserControllerTest {
     @MockBean
     private UserService userService;
 
-
-
     @Test
     void getAllUser() throws Exception {
         // given
