@@ -35,4 +35,10 @@ public class User extends BaseTimeEntity {
         this.username = username;
         this.email = email;
     }
+
+    public boolean equals(User anotherUserEntity) {
+        if (this == anotherUserEntity) return true;
+        return this.username.equals(anotherUserEntity.getUsername()) ||
+                this.email.equals(anotherUserEntity.getEmail());
+    }
 }
