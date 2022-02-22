@@ -6,6 +6,7 @@ import com.hotnerds.food.domain.dto.FoodResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +21,7 @@ public class FoodController {
     private final FoodService foodService;
 
     @GetMapping("/{foodId}")
-    public ResponseEntity<FoodResponseDto> getFood(Long foodId) {
+    public ResponseEntity<FoodResponseDto> getFood(@PathVariable Long foodId) {
         FoodResponseDto foodResponseDto = foodService.getFoodById(foodId);
 
         return ResponseEntity.ok(foodResponseDto);
