@@ -6,10 +6,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,38 +20,31 @@ public class Diet extends BaseTimeEntity {
     @Column(name = "DIET_ID")
     private Long dietId;
 
-    @Column(nullable = false)
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate localDate;
+    @Embedded
+    private MealDateTime mealDateTime;
 
-    @Column
-    @Enumerated(EnumType.STRING)
-    private MealTimeType mealTime;
+    @Embedded
+    private Nutrient nutrient;
 
     @ManyToOne
     @JoinColumn(name = "USER_ID")
     private User user;
 
-    @Column
-    private Double totalCalories;
-
-    @Column
-    private Double totalCarbs;
-
-    @Column
-    private Double totalProtein;
-
-    @Column
-    private Double totalFat;
-
-    @OneToMany
-    @JoinColumn(name = "DIETFOOD_ID")
-    private List<DietFood> dietFoodList;
+    @OneToMany(mappedBy = "diet", cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Food> foodList = new ArrayList<>();
 
     @Builder
-    public Diet(LocalDate localDate, MealTimeType mealTime, User user) {
-        this.localDate = localDate;
-        this.mealTime = mealTime;
+    public Diet(MealDateTime mealDateTime, Nutrient nutrient, User user) {
+        this.mealDateTime = mealDateTime;
+        this.nutrient = nutrient;
         this.user = user;
+    }
+
+    public void addFood(String name, Nutrient nutrient) {
+        this.foodList.add(Food.builder()
+                .name(name)
+                .nutrient(nutrient)
+                .diet(this)
+                .build());
     }
 }
