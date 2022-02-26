@@ -36,6 +36,42 @@ public class PostServiceTest {
 
     Post post;
 
+    @DisplayName("게시글 등록")
+    @Test
+    void 게시글_등록() {
+        //given
+
+        User user = User.builder()
+                .username("name")
+                .email("email")
+                .build();
+
+        Post post = Post.builder()
+                .id(1L)
+                .title("title")
+                .content("content")
+                .writer(user)
+                .build();
+
+        PostRequestDto requestDto = PostRequestDto.builder()
+                .title("title")
+                .content("content")
+                .username("username")
+                .build();
+
+        when(postRepository.save(any(Post.class))).thenReturn(post);
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+
+        //when
+        Long postId = postService.write(requestDto);
+
+        //then
+        assertThat(postId).isNotNull();
+
+        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
+        verify(postRepository, times(1)).save(any(Post.class));
+    }
+
 
 
 }
