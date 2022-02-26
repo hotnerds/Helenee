@@ -1,9 +1,6 @@
 package com.hotnerds.followers.domain;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -13,6 +10,7 @@ import java.io.Serializable;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
+@Builder
 public class FollowerId implements Serializable {
 
     // Logic : FOLLOWER_ID is following FOLLOWING_ID
@@ -22,4 +20,6 @@ public class FollowerId implements Serializable {
 
     @Column(name = "FOLLOWING_ID", nullable = false)
     private Long followingID;
+
+
 }
