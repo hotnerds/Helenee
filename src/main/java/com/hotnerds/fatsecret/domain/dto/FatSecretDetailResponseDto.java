@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FatSecretResponseDto {
+public class FatSecretDetailResponseDto {
 
     private Long foodApiId;
     private String name;
@@ -16,7 +16,7 @@ public class FatSecretResponseDto {
     private Double carbs;
 
     @Builder
-    public FatSecretResponseDto(Long foodApiId, String name, Double calories, Double protein,
+    public FatSecretDetailResponseDto(Long foodApiId, String name, Double calories, Double protein,
         Double carbs) {
         this.foodApiId = foodApiId;
         this.name = name;
@@ -25,8 +25,8 @@ public class FatSecretResponseDto {
         this.carbs = carbs;
     }
 
-    public static FatSecretResponseDto of(FatSecretFood fatSecretFood) {
-        return FatSecretResponseDto.builder()
+    public static FatSecretDetailResponseDto of(FatSecretFood fatSecretFood) {
+        return FatSecretDetailResponseDto.builder()
             .foodApiId(fatSecretFood.getFoodId())
             .name(fatSecretFood.getFoodName())
             .calories(fatSecretFood.getServingWrapper()

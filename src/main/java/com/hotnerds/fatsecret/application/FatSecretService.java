@@ -1,8 +1,8 @@
 package com.hotnerds.fatsecret.application;
 
 import com.hotnerds.common.FatSecretConfig;
+import com.hotnerds.fatsecret.domain.dto.FatSecretDetailResponseDto;
 import com.hotnerds.fatsecret.domain.dto.FatSecretFood;
-import com.hotnerds.fatsecret.domain.dto.FatSecretResponseDto;
 import com.hotnerds.fatsecret.domain.dto.FoodWrapper;
 import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class FatSecretService {
         this.fatSecretConfig = fatSecretConfig;
     }
 
-    public FatSecretResponseDto getFoodById(Long foodId) {
+    public FatSecretDetailResponseDto getFoodById(Long foodId) {
         final String METHOD = "food.get.v2";
         final String FOOD_ID = foodId.toString();
         final String FORMAT = "json";
@@ -62,7 +62,7 @@ public class FatSecretService {
 
         FatSecretFood fatSecretFood = responseEntity.getBody().getFatSecretFood();
 
-        return FatSecretResponseDto.of(fatSecretFood);
+        return FatSecretDetailResponseDto.of(fatSecretFood);
     }
 
 }
