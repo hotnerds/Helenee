@@ -41,4 +41,11 @@ public class FollowerServiceRequestDto {
                 .followingId(this.followerId)
                 .build();
     }
+
+    public static FollowerServiceRequestDto Of(Long followerId, Long followingId) {
+        return FollowerServiceRequestDto.builder()
+                .followerId(followerId)
+                .followingId(followingId)
+                .build();
+    }
 }

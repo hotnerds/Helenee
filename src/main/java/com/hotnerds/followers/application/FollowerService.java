@@ -25,16 +25,16 @@ public class FollowerService {
         followerRepository.save(newFollower);
     }
 
-    public List<Optional<Follower>> getAllFollowerRelationshipByFollowerId(Long followerId) {
-        List<Optional<Follower>> followerRelationships = followerRepository.FindByFollowerId(followerId);
+    public List<Follower> getAllFollowerRelationshipByFollowerId(Long followerId) {
+        List<Follower> followerRelationships = followerRepository.FindByFollowerId(followerId);
         if (followerRelationships.isEmpty()) {
             throw new FollowerRelationshipNotFound("해당 ID가 팔로잉하는 계정이 없습니다");
         }
         return followerRelationships;
     }
 
-    public List<Optional<Follower>> getAllFollowerRelationshipByFollowingId(Long followingId) {
-        List<Optional<Follower>> followerRelationships = followerRepository.FindByFollowingId(followingId);
+    public List<Follower> getAllFollowerRelationshipByFollowingId(Long followingId) {
+        List<Follower> followerRelationships = followerRepository.FindByFollowingId(followingId);
         if (followerRelationships.isEmpty()) {
             throw new FollowerRelationshipNotFound("해당 ID를 팔로잉하는 계정이 없습니다");
         }
@@ -65,6 +65,5 @@ public class FollowerService {
     public boolean isMutualFollow(FollowerServiceRequestDto followerServiceRequestDto) {
         return isFollower(followerServiceRequestDto) &&
                 isFollower(followerServiceRequestDto.reverse());
-
     }
 }
