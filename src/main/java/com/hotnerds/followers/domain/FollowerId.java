@@ -12,10 +12,14 @@ import java.io.Serializable;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Embeddable
 public class FollowerId implements Serializable {
-    @Column(name = "FOLLOWER_ID")
+
+    // Logic : FOLLOWER_ID is following FOLLOWING_ID
+
+    @Column(name = "FOLLOWER_ID", nullable = false)
     private Long followerID;
 
-    @Column(name = "FOLLOWING_ID")
+    @Column(name = "FOLLOWING_ID", nullable = false)
     private Long followingID;
 }
