@@ -34,7 +34,7 @@ public class FollowerService {
     }
 
     public List<Optional<Follower>> getAllFollowerRelationshipByFollowingId(Long followingId) {
-        List<Optional<Follower>> followerRelationships = followerRepository.FindByFollowerId(followingId);
+        List<Optional<Follower>> followerRelationships = followerRepository.FindByFollowingId(followingId);
         if (followerRelationships.isEmpty()) {
             throw new FollowerRelationshipNotFound("해당 ID를 팔로잉하는 계정이 없습니다");
         }
