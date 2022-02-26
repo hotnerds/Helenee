@@ -63,14 +63,14 @@ public class PostServiceTest {
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
 
         //when
-        Long postId = postService.write(requestDto);
+        postService.write(requestDto);
 
         //then
-        assertThat(postId).isNotNull();
-
         verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
         verify(postRepository, times(1)).save(any(Post.class));
     }
+
+
 
 
 
