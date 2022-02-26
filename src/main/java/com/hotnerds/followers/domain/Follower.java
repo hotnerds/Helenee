@@ -2,16 +2,26 @@ package com.hotnerds.followers.domain;
 
 import lombok.*;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
+@Entity
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Entity
 @Table(name = "follower")
+@IdClass(FollowerId.class)
 public class Follower {
-    @EmbeddedId
-    private FollowerFollowingId followerFollowingId;
+    @Id
+    @Column(name = "FOLLOWER_ID")
+    private Long followerID;
+
+    @Id
+    @Column(name = "FOLLOWING_ID")
+    private Long followingID;
+
+    @Builder
+    public Follower(Long followerID, Long followingID) {
+        this.followerID = followerID;
+        this.followingID = followingID;
+    }
+
 }
