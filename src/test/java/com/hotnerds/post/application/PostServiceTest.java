@@ -6,6 +6,8 @@ import com.hotnerds.post.domain.dto.PostResponseDto;
 import com.hotnerds.post.domain.repository.PostRepository;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
+import com.hotnerds.user.exception.UserNotFoundException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -73,7 +76,22 @@ public class PostServiceTest {
         verify(postRepository, times(1)).save(any(Post.class));
     }
 
+    @DisplayName("유효하지 않은 사용자는 게시물을 등록할 수 없다.")
+    @Test
+    void 유효하지않은사용자_게시글_생성_실패() {
+        //given
+        PostRequestDto requestDto = PostRequestDto.builder()
+                .title("title")
+                .content("content")
+                .username("username")
+                .build();
 
+        when(userRepository.findByUsername(anyString())).thenThrow(UserNotFoundException.class);
+
+        //when then
+        assertThrows(UserNotFoundException.class, () -> postService.write(requestDto));
+        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
+    }
 
     @DisplayName("게시글 제목으로 조회")
     @Test
