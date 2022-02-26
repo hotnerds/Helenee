@@ -20,5 +20,4 @@ public class FatSecretConfig {
     private String token;
     private String id;
     private String secret;
-    private String test;
 }
