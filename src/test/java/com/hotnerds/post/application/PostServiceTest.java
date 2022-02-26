@@ -12,11 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,23 +37,25 @@ public class PostServiceTest {
 
     Post post;
 
-    @DisplayName("게시글 등록")
-    @Test
-    void 게시글_등록() {
-        //given
-
-        User user = User.builder()
+    @BeforeEach
+    void init() {
+        user = User.builder()
                 .username("name")
                 .email("email")
                 .build();
 
-        Post post = Post.builder()
+        post = Post.builder()
                 .id(1L)
                 .title("title")
                 .content("content")
                 .writer(user)
                 .build();
+    }
 
+    @DisplayName("게시글 등록")
+    @Test
+    void 게시글_등록() {
+        //given
         PostRequestDto requestDto = PostRequestDto.builder()
                 .title("title")
                 .content("content")
@@ -74,22 +73,12 @@ public class PostServiceTest {
         verify(postRepository, times(1)).save(any(Post.class));
     }
 
+
+
     @DisplayName("게시글 제목으로 조회")
     @Test
     void 게시글_제목으로_조회() {
         //given
-        User user = User.builder()
-                .username("name")
-                .email("email")
-                .build();
-
-        Post post = Post.builder()
-                .id(1L)
-                .title("title")
-                .content("content")
-                .writer(user)
-                .build();
-
         when(postRepository.findAllByTitle(anyString())).thenReturn(List.of(post));
         //when
         List<PostResponseDto> findPosts = postService.searchByTitle(post.getTitle());
