@@ -26,7 +26,7 @@ public class FollowerService {
     }
 
     public List<Follower> getAllFollowerRelationshipByFollowerId(Long followerId) {
-        List<Follower> followerRelationships = followerRepository.FindByFollowerId(followerId);
+        List<Follower> followerRelationships = followerRepository.findByFollowerId(followerId);
         if (followerRelationships.isEmpty()) {
             throw new FollowerRelationshipNotFound("해당 ID가 팔로잉하는 계정이 없습니다");
         }
@@ -34,7 +34,7 @@ public class FollowerService {
     }
 
     public List<Follower> getAllFollowerRelationshipByFollowingId(Long followingId) {
-        List<Follower> followerRelationships = followerRepository.FindByFollowingId(followingId);
+        List<Follower> followerRelationships = followerRepository.findByFollowingId(followingId);
         if (followerRelationships.isEmpty()) {
             throw new FollowerRelationshipNotFound("해당 ID를 팔로잉하는 계정이 없습니다");
         }
@@ -42,7 +42,7 @@ public class FollowerService {
     }
 
     public Optional<Follower> getFollowerRelationshipByFollowerIdAndFollowingId(FollowerServiceRequestDto followerServiceRequestDto) {
-        Optional<Follower> followerRelationship = followerRepository.FindByFollowerIdAndFollowingId(followerServiceRequestDto.getFollowerId(), followerServiceRequestDto.getFollowingId());
+        Optional<Follower> followerRelationship = followerRepository.findByFollowerIdAndFollowingId(followerServiceRequestDto.getFollowerId(), followerServiceRequestDto.getFollowingId());
         if (followerRelationship.isEmpty()) {
             throw new FollowerRelationshipNotFound("주어진 정보의 팔로우 관계가 존재하지 않습니다");
         }
