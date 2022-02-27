@@ -136,7 +136,7 @@ public class PostServiceTest {
                 .username("garam")
                 .build();
 
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(User.builder().build()));
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when then
@@ -144,6 +144,27 @@ public class PostServiceTest {
 
         verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
         verify(postRepository, times(1)).findById(requestDto.getPostId());
+    }
+
+    @DisplayName("게시글 삭제 성공")
+    @Test
+    void 게시글_삭제_성공() {
+        //given
+        PostDeleteRequestDto requestDto = PostDeleteRequestDto.builder()
+                .postId(1L)
+                .username("garam")
+                .build();
+
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+
+        //when
+        postService.deletePost(requestDto);
+
+        //then
+        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
+        verify(postRepository, times(1)).findById(requestDto.getPostId());
+        verify(postRepository, times(1)).deleteById(requestDto.getPostId());
     }
 
 
