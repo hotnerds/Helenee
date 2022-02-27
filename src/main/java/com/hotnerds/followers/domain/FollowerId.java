@@ -10,7 +10,6 @@ import java.io.Serializable;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
-@Builder
 public class FollowerId implements Serializable {
 
     // Logic : FOLLOWER_ID is following FOLLOWING_ID
@@ -21,5 +20,19 @@ public class FollowerId implements Serializable {
     @Column(name = "FOLLOWING_ID", nullable = false)
     private Long followingID;
 
+    @Builder
+    public FollowerId(Long followerID, Long followingID) {
+        this.followerID = followerID;
+        this.followingID = followingID;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FollowerId followerIdObj = (FollowerId) o;
+        return this.followerID == followerIdObj.followerID
+                && this.followingID == followerIdObj.followingID;
+    }
 
 }
