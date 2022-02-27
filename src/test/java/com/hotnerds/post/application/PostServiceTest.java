@@ -1,6 +1,7 @@
 package com.hotnerds.post.application;
 
 import com.hotnerds.post.domain.Post;
+import com.hotnerds.post.domain.dto.PostDeleteRequestDto;
 import com.hotnerds.post.domain.dto.PostRequestDto;
 import com.hotnerds.post.domain.dto.PostResponseDto;
 import com.hotnerds.post.domain.repository.PostRepository;
@@ -106,6 +107,25 @@ public class PostServiceTest {
 
         verify(postRepository, times(1)).findAllByTitle(post.getTitle());
     }
+
+    @DisplayName("유효하지 않은 사용자는 게시글을 삭제할 수 없다.")
+    @Test
+    void 유효하지않은사용자_게시글_삭제_실패() {
+        //given
+        PostDeleteRequestDto requestDto = PostDeleteRequestDto.builder()
+                .postId(1L)
+                .username("garam")
+                .build();
+
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
+
+        //when then
+        assertThrows(UserNotFoundException.class, () -> postService.deletePost(requestDto));
+
+        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
+
+    }
+
 
 
 
