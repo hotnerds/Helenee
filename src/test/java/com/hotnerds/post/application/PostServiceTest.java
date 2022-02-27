@@ -5,6 +5,7 @@ import com.hotnerds.post.domain.dto.PostDeleteRequestDto;
 import com.hotnerds.post.domain.dto.PostRequestDto;
 import com.hotnerds.post.domain.dto.PostResponseDto;
 import com.hotnerds.post.domain.repository.PostRepository;
+import com.hotnerds.post.exception.PostNotFoundException;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import com.hotnerds.user.exception.UserNotFoundException;
@@ -126,7 +127,24 @@ public class PostServiceTest {
 
     }
 
+    @DisplayName("존재하지 않은 게시글 삭제 실패")
+    @Test
+    void 존재하지않은_게시글_삭제_실패() {
+        //given
+        PostDeleteRequestDto requestDto = PostDeleteRequestDto.builder()
+                .postId(1L)
+                .username("garam")
+                .build();
 
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(User.builder().build()));
+        when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        //when then
+        assertThrows(PostNotFoundException.class, () -> postService.deletePost(requestDto));
+
+        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
+        verify(postRepository, times(1)).findById(requestDto.getPostId());
+    }
 
 
 }
