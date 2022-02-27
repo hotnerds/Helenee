@@ -1,9 +1,11 @@
 package com.hotnerds.post.application;
 
 import com.hotnerds.post.domain.Post;
+import com.hotnerds.post.domain.dto.PostDeleteRequestDto;
 import com.hotnerds.post.domain.dto.PostRequestDto;
 import com.hotnerds.post.domain.dto.PostResponseDto;
 import com.hotnerds.post.domain.repository.PostRepository;
+import com.hotnerds.post.exception.PostNotFoundException;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import com.hotnerds.user.exception.UserNotFoundException;
@@ -48,5 +50,14 @@ public class PostService {
                 .writer(user)
                 .build();
 
+    }
+
+    public void deletePost(PostDeleteRequestDto requestDto) {
+
+        userRepository.findByUsername(requestDto.getUsername()).orElseThrow(UserNotFoundException::new);
+
+        postRepository.findById(requestDto.getPostId()).orElseThrow(PostNotFoundException::new);
+
+        postRepository.deleteById(requestDto.getPostId());
     }
 }
