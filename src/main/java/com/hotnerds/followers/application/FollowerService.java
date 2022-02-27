@@ -58,7 +58,7 @@ public class FollowerService {
     }
 
     public boolean isFollower(FollowerServiceRequestDto followerServiceRequestDto) {
-        Optional<Follower> followerRelationship = getFollowerRelationshipByFollowerIdAndFollowingId(followerServiceRequestDto);
+        Optional<Follower> followerRelationship = followerRepository.findByFollowerIdAndFollowingId(followerServiceRequestDto.getFollowerId(), followerServiceRequestDto.getFollowingId());
         return followerRelationship.isPresent();
     }
 
