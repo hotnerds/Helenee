@@ -1,6 +1,7 @@
 package com.hotnerds.post.application;
 
 import com.hotnerds.post.domain.Post;
+import com.hotnerds.post.domain.dto.PostByUserRequestDto;
 import com.hotnerds.post.domain.dto.PostDeleteRequestDto;
 import com.hotnerds.post.domain.dto.PostRequestDto;
 import com.hotnerds.post.domain.dto.PostResponseDto;
@@ -17,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,8 +38,17 @@ public class PostService {
 
         return findPosts.stream()
                 .map(PostResponseDto::of)
-                .collect(Collectors.toList());
+                .collect(toList());
 
+    }
+
+    public List<PostResponseDto> searchByWriter(PostByUserRequestDto requestDto) {
+        User user = userRepository.findByUsername(requestDto.getUsername()).orElseThrow(UserNotFoundException::new);
+
+        return postRepository.findAllByUser(user, requestDto.getPageable())
+                .stream()
+                .map(PostResponseDto::of)
+                .collect(toList());
     }
 
     private Post createPost(PostRequestDto postRequestDto) {
