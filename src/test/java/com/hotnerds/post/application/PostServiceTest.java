@@ -1,6 +1,7 @@
 package com.hotnerds.post.application;
 
 import com.hotnerds.post.domain.Post;
+import com.hotnerds.post.domain.dto.PostByUserRequestDto;
 import com.hotnerds.post.domain.dto.PostDeleteRequestDto;
 import com.hotnerds.post.domain.dto.PostRequestDto;
 import com.hotnerds.post.domain.dto.PostResponseDto;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -108,6 +110,23 @@ public class PostServiceTest {
 
         verify(postRepository, times(1)).findAllByTitle(post.getTitle());
     }
+
+    @DisplayName("유효하지 않은 사용자 게시물 조회 실패")
+    @Test
+    void 유효하지않은사용자_게시물_조회_실패() {
+        //given
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
+        PostByUserRequestDto requestDto = PostByUserRequestDto.builder()
+                .username(user.getUsername())
+                .pageable(PageRequest.of(0, 10))
+                .build();
+
+        //when then
+        assertThrows(UserNotFoundException.class, () -> postService.searchByWriter(requestDto));
+
+        verify(userRepository, times(1)).findByUsername(user.getUsername());
+    }
+
 
     @DisplayName("유효하지 않은 사용자는 게시글을 삭제할 수 없다.")
     @Test
