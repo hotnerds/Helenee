@@ -5,18 +5,18 @@ import lombok.*;
 
 @Getter
 @NoArgsConstructor
-public class NewUserDto {
+public class NewUserReqDto {
     private String username;
     private String email;
 
     @Builder
-    public NewUserDto(String username, String email) {
+    public NewUserReqDto(String username, String email) {
         this.username = username;
         this.email = email;
     }
 
-    public static NewUserDto of(User user) {
-        return NewUserDto.builder()
+    public static NewUserReqDto of(User user) {
+        return NewUserReqDto.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .build();
