@@ -127,6 +127,39 @@ public class PostServiceTest {
         verify(userRepository, times(1)).findByUsername(user.getUsername());
     }
 
+    @DisplayName("사용자가 작성한 게시물 조회")
+    @Test
+    void 사용자가_작성한_게시물_조회() {
+        //given
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        when(postRepository.findAllByUser(any(User.class), any(PageRequest.class))).thenReturn(List.of(post, post));
+
+        PostByUserRequestDto requestDto = PostByUserRequestDto.builder()
+                .username(user.getUsername())
+                .pageable(PageRequest.of(0, 10))
+                .build();
+
+        List<PostResponseDto> expectedResult = List.of(
+                PostResponseDto.of(post),
+                PostResponseDto.of(post)
+        );
+
+        //when
+        List<PostResponseDto> findResults = postService.searchByWriter(requestDto);
+
+        //then
+        assertThat(findResults.size()).isEqualTo(2);
+
+        assertThat(findResults)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedResult);
+
+        verify(userRepository, times(1)).findByUsername(user.getUsername());
+        verify(postRepository, times(1)).findAllByUser(user, requestDto.getPageable());
+
+
+    }
+
 
     @DisplayName("유효하지 않은 사용자는 게시글을 삭제할 수 없다.")
     @Test
