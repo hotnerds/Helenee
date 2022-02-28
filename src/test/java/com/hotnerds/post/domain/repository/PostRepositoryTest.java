@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,8 +31,8 @@ class PostRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Test
     @DisplayName("게시글 등록 성공")
+    @Test
     public void 게시글_등록_성공() {
         //given
         User user = User.builder()
@@ -58,8 +59,8 @@ class PostRepositoryTest {
 
     }
 
-    @Test
     @DisplayName("게시글 제목으로 조회")
+    @Test
     public void 게시글_제목으로_조회_성공() {
         //given
         User user = User.builder()
@@ -88,8 +89,8 @@ class PostRepositoryTest {
         assertThat(findPost.getWriter()).isNotNull();
     }
 
-    @Test
     @DisplayName("특정 시간 이후에 생성된 게시글 조회")
+    @Test
     public void 특정시간_이후에_생성된_게시글_조회() {
         //given
         User user = User.builder()
@@ -115,4 +116,47 @@ class PostRepositoryTest {
         assertThat(findPosts.get(0).getCreatedAt()).isAfter(LocalDateTime.MIN);
         assertThat(findPosts.size()).isEqualTo(1);
     }
+
+    @DisplayName("사용자가 작성한 게시글 조회")
+    @Test
+    void 사용자가_작성한_게시글_조회() {
+        //given
+        User user = User.builder()
+                .username("username")
+                .email("email")
+                .build();
+
+        User savedUser = userRepository.save(user);
+
+        Post post1 = Post.builder()
+                .title("temp")
+                .content("content")
+                .writer(savedUser)
+                .build();
+
+        Post post2 = Post.builder()
+                .title("temp2")
+                .content("content2")
+                .writer(savedUser)
+                .build();
+
+
+        postRepository.save(post1);
+        postRepository.save(post2);
+
+        //when
+        List<Post> findPosts = postRepository.findAllByUser(user, PageRequest.of(0, 10));
+
+        //then
+        assertThat(findPosts.size()).isEqualTo(2);
+
+        assertThat(findPosts)
+                .extracting("title", "content")
+                .contains(
+                        tuple("temp", "content"),
+                        tuple("temp2", "content2")
+                );
+
+    }
+
 }
