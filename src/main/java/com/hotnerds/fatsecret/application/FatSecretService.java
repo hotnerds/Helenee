@@ -2,6 +2,7 @@ package com.hotnerds.fatsecret.application;
 
 import com.hotnerds.common.FatSecretConfig;
 import com.hotnerds.fatsecret.domain.dto.FatSecretDetailResponseDto;
+import com.hotnerds.fatsecret.domain.dto.FatSecretError;
 import com.hotnerds.fatsecret.domain.dto.FatSecretFood;
 import com.hotnerds.fatsecret.domain.dto.FoodWrapper;
 import java.net.URI;
@@ -61,7 +62,8 @@ public class FatSecretService {
             HttpMethod.POST, httpEntity, FoodWrapper.class);
 
         FatSecretFood fatSecretFood = responseEntity.getBody().getFatSecretFood();
-
+        FatSecretError fatSecretError = responseEntity.getBody().getFatSecretError();
+        System.out.println(fatSecretError.getMessage());
         return FatSecretDetailResponseDto.of(fatSecretFood);
     }
 
