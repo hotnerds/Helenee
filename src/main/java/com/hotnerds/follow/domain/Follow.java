@@ -1,6 +1,5 @@
-package com.hotnerds.followers.domain;
+package com.hotnerds.follow.domain;
 
-import com.hotnerds.user.domain.User;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,9 +10,9 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Builder
 @Table(name = "follower")
-public class Follower {
+public class Follow {
 
     @EmbeddedId
-    private FollowerId followerId;
+    private FollowId followId;
 
 }

@@ -1,4 +1,4 @@
-package com.hotnerds.followers.domain;
+package com.hotnerds.follow.domain;
 
 import lombok.*;
 
@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
-public class FollowerId implements Serializable {
+public class FollowId implements Serializable {
 
     // Logic : FOLLOWER_ID is following FOLLOWING_ID
 
@@ -21,7 +21,7 @@ public class FollowerId implements Serializable {
     private Long followingID;
 
     @Builder
-    public FollowerId(Long followerID, Long followingID) {
+    public FollowId(Long followerID, Long followingID) {
         this.followerID = followerID;
         this.followingID = followingID;
     }
@@ -30,9 +30,9 @@ public class FollowerId implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FollowerId followerIdObj = (FollowerId) o;
-        return this.followerID == followerIdObj.followerID
-                && this.followingID == followerIdObj.followingID;
+        FollowId followIdObj = (FollowId) o;
+        return this.followerID == followIdObj.followerID
+                && this.followingID == followIdObj.followingID;
     }
 
 }

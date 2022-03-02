@@ -1,7 +1,7 @@
-package com.hotnerds.followers.domain.Dto;
+package com.hotnerds.follow.domain.Dto;
 
-import com.hotnerds.followers.domain.Follower;
-import com.hotnerds.followers.domain.FollowerId;
+import com.hotnerds.follow.domain.Follow;
+import com.hotnerds.follow.domain.FollowId;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,41 +9,41 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FollowerServiceRequestDto {
+public class FollowServiceRequestDto {
     private Long followerId;
     private Long followingId;
 
     @Builder
-    public FollowerServiceRequestDto(Long followerId, Long followingId) {
+    public FollowServiceRequestDto(Long followerId, Long followingId) {
         this.followerId = followerId;
         this.followingId = followingId;
     }
 
-    public Follower toEntity() {
-        return Follower.builder()
-                .followerId(FollowerId.builder()
+    public Follow toEntity() {
+        return Follow.builder()
+                .followId(FollowId.builder()
                         .followerID(this.followerId)
                         .followingID(this.followingId)
                         .build())
                 .build();
     }
 
-    public FollowerId toId() {
-        return FollowerId.builder()
+    public FollowId toId() {
+        return FollowId.builder()
                 .followerID(this.followerId)
                 .followingID(this.followingId)
                 .build();
     }
 
-    public FollowerServiceRequestDto reverse() {
-        return FollowerServiceRequestDto.builder()
+    public FollowServiceRequestDto reverse() {
+        return FollowServiceRequestDto.builder()
                 .followerId(this.followingId)
                 .followingId(this.followerId)
                 .build();
     }
 
-    public static FollowerServiceRequestDto Of(Long followerId, Long followingId) {
-        return FollowerServiceRequestDto.builder()
+    public static FollowServiceRequestDto Of(Long followerId, Long followingId) {
+        return FollowServiceRequestDto.builder()
                 .followerId(followerId)
                 .followingId(followingId)
                 .build();
