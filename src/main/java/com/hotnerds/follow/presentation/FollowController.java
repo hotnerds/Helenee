@@ -51,7 +51,10 @@ public class FollowController {
 
     @GetMapping("/{userId}/{followingId}")
     public ResponseEntity<Boolean> isFollowing(@PathVariable Long userId, @PathVariable Long followingId) {
-        FollowServiceRequestDto followServiceRequestDto = FollowServiceRequestDto.Of(userId, followingId);
+        FollowServiceRequestDto followServiceRequestDto = FollowServiceRequestDto.builder()
+                .followerId(userId)
+                .followingId(followingId)
+                .build();
         return ResponseEntity.ok(followService.isFollower(followServiceRequestDto));
     }
 

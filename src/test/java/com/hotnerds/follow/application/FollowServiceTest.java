@@ -42,7 +42,7 @@ class FollowServiceTest {
         Follow follow = testDto.toEntity();
 
         // when
-        when(followRepository.findByFollowIdAndFollowingId(anyLong(), anyLong())).thenReturn(Optional.of(follow));
+        when(followRepository.findByFollowerIdAndFollowingId(anyLong(), anyLong())).thenReturn(Optional.of(follow));
 
         // then
         assertThrows(FollowRelationshipExistsException.class, () -> followService.addFollowRelationship(testDto));
@@ -64,10 +64,10 @@ class FollowServiceTest {
         );
 
         // mocking
-        when(followRepository.findByFollowerId(anyLong())).thenReturn(testDtoList.stream()
+        when(followRepository.findAllByFollowerId(anyLong())).thenReturn(testDtoList.stream()
                 .map(reqDto -> reqDto.toEntity())
                 .collect(Collectors.toList()));
-        when(followRepository.findByFollowerId(4L)).thenReturn(Arrays.asList());
+        when(followRepository.findAllByFollowerId(4L)).thenReturn(Arrays.asList());
 
         // when
         List<Follow> resultList = followService.getAllFollowRelationshipByFollowerId(1L);
@@ -95,10 +95,10 @@ class FollowServiceTest {
         );
 
         // mocking
-        when(followRepository.findByFollowingId(anyLong())).thenReturn(testDtoList.stream()
+        when(followRepository.findAllByFollowingId(anyLong())).thenReturn(testDtoList.stream()
                 .map(reqDto -> reqDto.toEntity())
                 .collect(Collectors.toList()));
-        when(followRepository.findByFollowingId(4L)).thenReturn(Arrays.asList());
+        when(followRepository.findAllByFollowingId(4L)).thenReturn(Arrays.asList());
 
         // when
         List<Follow> resultList = followService.getAllFollowRelationshipByFollowingId(1L);
@@ -125,8 +125,8 @@ class FollowServiceTest {
         Follow follow = testDto.toEntity();
 
         // mocking
-        when(followRepository.findByFollowIdAndFollowingId(anyLong(), anyLong())).thenReturn(Optional.of(follow));
-        when(followRepository.findByFollowIdAndFollowingId(4L, 5L)).thenReturn(Optional.empty());
+        when(followRepository.findByFollowerIdAndFollowingId(anyLong(), anyLong())).thenReturn(Optional.of(follow));
+        when(followRepository.findByFollowerIdAndFollowingId(4L, 5L)).thenReturn(Optional.empty());
 
         // when
         Follow result = followService.getFollowRelationshipByFollowerIdAndFollowingId(testDto).get();
@@ -146,7 +146,7 @@ class FollowServiceTest {
                 .build();
 
         // mocking
-        when(followRepository.findByFollowIdAndFollowingId(anyLong(), anyLong())).thenReturn(Optional.empty());
+        when(followRepository.findByFollowerIdAndFollowingId(anyLong(), anyLong())).thenReturn(Optional.empty());
 
         // then
         assertThrows(FollowRelationshipNotFound.class, () -> followService.removeFollowRelationship(testDto));
@@ -167,8 +167,8 @@ class FollowServiceTest {
         Follow followPass = passTestDto.toEntity();
 
         // mocking
-        when(followRepository.findByFollowIdAndFollowingId(anyLong(), anyLong())).thenReturn(Optional.of(followPass));
-        when(followRepository.findByFollowIdAndFollowingId(2L, 3L)).thenReturn(Optional.empty());
+        when(followRepository.findByFollowerIdAndFollowingId(anyLong(), anyLong())).thenReturn(Optional.of(followPass));
+        when(followRepository.findByFollowerIdAndFollowingId(2L, 3L)).thenReturn(Optional.empty());
 
         // when
         boolean passResult = followService.isFollower(passTestDto);
@@ -194,10 +194,10 @@ class FollowServiceTest {
         Follow follow = passTestDto.toEntity();
 
         // mocking
-        when(followRepository.findByFollowIdAndFollowingId(1L, 2L)).thenReturn(Optional.of(follow));
-        when(followRepository.findByFollowIdAndFollowingId(2L, 1L)).thenReturn(Optional.of(follow));
-        when(followRepository.findByFollowIdAndFollowingId(100L, 101L)).thenReturn(Optional.of(follow));
-        when(followRepository.findByFollowIdAndFollowingId(101L, 100L)).thenReturn(Optional.empty());
+        when(followRepository.findByFollowerIdAndFollowingId(1L, 2L)).thenReturn(Optional.of(follow));
+        when(followRepository.findByFollowerIdAndFollowingId(2L, 1L)).thenReturn(Optional.of(follow));
+        when(followRepository.findByFollowerIdAndFollowingId(100L, 101L)).thenReturn(Optional.of(follow));
+        when(followRepository.findByFollowerIdAndFollowingId(101L, 100L)).thenReturn(Optional.empty());
 
         // when
         boolean passResult = followService.isMutualFollow(passTestDto);

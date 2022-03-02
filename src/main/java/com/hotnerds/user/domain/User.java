@@ -2,6 +2,7 @@ package com.hotnerds.user.domain;
 
 import com.hotnerds.common.BaseTimeEntity;
 import com.hotnerds.diet.domain.Diet;
+import com.hotnerds.follow.domain.Follow;
 import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -30,6 +31,14 @@ public class User extends BaseTimeEntity {
     @JoinColumn(name = "DIET_ID")
     private List<Diet> dietList;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "FOLLOWER_ID")
+    private List<Follow> followerList;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "FOLLOWING_ID")
+    private List<Follow> followingList;
+
     public void updateUser(UserUpdateReqDto userUpdateReqDto) {
         this.username = userUpdateReqDto.getUsername();
     }
@@ -42,7 +51,7 @@ public class User extends BaseTimeEntity {
 
     public boolean equals(User anotherUserEntity) {
         if (this == anotherUserEntity) return true;
-        return this.username.equals(anotherUserEntity.getUsername()) ||
+        return this.username.equals(anotherUserEntity.getUsername()) &&
                 this.email.equals(anotherUserEntity.getEmail());
     }
 }

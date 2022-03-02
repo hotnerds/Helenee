@@ -1,7 +1,7 @@
 package com.hotnerds.follow.domain.Dto;
 
 import com.hotnerds.follow.domain.Follow;
-import com.hotnerds.follow.domain.FollowId;
+import com.hotnerds.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,33 +19,17 @@ public class FollowServiceRequestDto {
         this.followingId = followingId;
     }
 
-    public Follow toEntity() {
-        return Follow.builder()
-                .followId(FollowId.builder()
-                        .followerID(this.followerId)
-                        .followingID(this.followingId)
-                        .build())
-                .build();
-    }
-
-    public FollowId toId() {
-        return FollowId.builder()
-                .followerID(this.followerId)
-                .followingID(this.followingId)
-                .build();
-    }
-
     public FollowServiceRequestDto reverse() {
         return FollowServiceRequestDto.builder()
-                .followerId(this.followingId)
-                .followingId(this.followerId)
+                .followerId(followingId)
+                .followingId(followerId)
                 .build();
     }
 
-    public static FollowServiceRequestDto Of(Long followerId, Long followingId) {
+    public static FollowServiceRequestDto Of(User followerUser, User followingUser) {
         return FollowServiceRequestDto.builder()
-                .followerId(followerId)
-                .followingId(followingId)
+                .followerId(followerUser.getId())
+                .followingId(followingUser.getId())
                 .build();
     }
 }
