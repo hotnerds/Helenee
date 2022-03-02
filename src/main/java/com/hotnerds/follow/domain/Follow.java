@@ -26,11 +26,4 @@ public class Follow {
     @JoinColumn(referencedColumnName = "USER_ID", name = "FOLLOWING_ID")
     private User following;
 
-    @Override
-    public boolean equals(Object anotherFollowRelationship) {
-        if (this == anotherFollowRelationship) return true;
-        return Objects.equals(follower, ((Follow) anotherFollowRelationship).follower) &&
-                Objects.equals(following, ((Follow) anotherFollowRelationship).following);
-    }
-
 }

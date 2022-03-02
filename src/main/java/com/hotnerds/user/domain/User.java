@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,11 +34,11 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "FOLLOWER_ID")
-    private List<Follow> followerList;
+    private List<Follow> followerList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "FOLLOWING_ID")
-    private List<Follow> followingList;
+    private List<Follow> followingList = new ArrayList<>();
 
     public void updateUser(UserUpdateReqDto userUpdateReqDto) {
         this.username = userUpdateReqDto.getUsername();

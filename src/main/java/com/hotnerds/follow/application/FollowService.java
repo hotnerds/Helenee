@@ -21,9 +21,9 @@ public class FollowService {
     private final FollowRepository followRepository;
 
     public void addFollowRelationship(FollowServiceRequestDto followServiceRequestDto) {
-        if (isFollower(followServiceRequestDto)) {
-            throw new FollowRelationshipExistsException("동일한 정보를 가진 팔로워 관계가 이미 존재합니다");
-        }
+        searchFollowerRelationship(followServiceRequestDto).ifPresent(exception -> {
+            throw new FollowRelationshipExistsException();
+        });
         Follow newFollowRelationship = Follow.builder()
                 .follower(userRepository.getById(followServiceRequestDto.getFollowerId()))
                 .following(userRepository.getById(followServiceRequestDto.getFollowingId()))
@@ -59,7 +59,7 @@ public class FollowService {
                 isFollower(followServiceRequestDto.reverse());
     }
 
-    private Optional<Follow> searchFollowerRelationship(FollowServiceRequestDto followServiceRequestDto) {
+    public Optional<Follow> searchFollowerRelationship(FollowServiceRequestDto followServiceRequestDto) {
         User user = userRepository.findById(followServiceRequestDto.getFollowerId()).orElseThrow(UserNotFoundException::new);
         Follow followRelationship = Follow.builder()
                 .follower(userRepository.getById(followServiceRequestDto.getFollowerId()))
