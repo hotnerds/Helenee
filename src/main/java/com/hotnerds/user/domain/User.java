@@ -26,6 +26,9 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, length = 20, unique = true)
     private String email;
 
+    @Enumerated(EnumType.STRING)
+    private ROLE role;
+
     @OneToMany
     @JoinColumn(name = "DIET_ID")
     private List<Diet> dietList;
@@ -44,5 +47,9 @@ public class User extends BaseTimeEntity {
         if (this == anotherUserEntity) return true;
         return this.username.equals(anotherUserEntity.getUsername()) ||
                 this.email.equals(anotherUserEntity.getEmail());
+    }
+
+    public String getRoleKey() {
+        return role.getKey();
     }
 }
