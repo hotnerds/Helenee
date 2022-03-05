@@ -11,3 +11,13 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+  social:
+    kakao:
+      client_id: 7047208c7b5a97ce9afd6f567c209fdf
+      redirect: /social/login/kakao
+      url:
+        login: https://kauth.kakao.com/oauth/authorize
+        token: https://kauth.kakao.com/oauth/token
+        profile: https:kapi.kakao.com/v2/user/me
+    url:
+      base: http://localhost:8080
