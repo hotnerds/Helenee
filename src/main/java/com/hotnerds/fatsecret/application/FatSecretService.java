@@ -2,12 +2,12 @@ package com.hotnerds.fatsecret.application;
 
 import com.hotnerds.common.FatSecretConfig;
 import com.hotnerds.fatsecret.domain.dto.FatSecretDetailResponseDto;
-import com.hotnerds.fatsecret.domain.dto.FatSecretError;
 import com.hotnerds.fatsecret.domain.dto.FatSecretFood;
 import com.hotnerds.fatsecret.domain.dto.FoodWrapper;
 import java.net.URI;
+
+import com.hotnerds.fatsecret.exception.FatSecretResponseErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,13 +29,12 @@ public class FatSecretService {
     private final FatSecretConfig fatSecretConfig;
 
     @Autowired
-    public FatSecretService(RestTemplateBuilder restTemplateBuilder,
-        FatSecretConfig fatSecretConfig) {
-        this.restTemplate = restTemplateBuilder.build();
+    public FatSecretService(RestTemplate restTemplate, FatSecretConfig fatSecretConfig) {
+        this.restTemplate = restTemplate;
         this.fatSecretConfig = fatSecretConfig;
     }
 
-    public FatSecretDetailResponseDto getFoodById(Long foodId) {
+    public FatSecretDetailResponseDto getFoodById(Long foodId) throws FatSecretResponseErrorException {
         final String METHOD = "food.get.v2";
         final String FOOD_ID = foodId.toString();
         final String FORMAT = "json";
@@ -62,8 +61,6 @@ public class FatSecretService {
             HttpMethod.POST, httpEntity, FoodWrapper.class);
 
         FatSecretFood fatSecretFood = responseEntity.getBody().getFatSecretFood();
-        FatSecretError fatSecretError = responseEntity.getBody().getFatSecretError();
-        System.out.println(fatSecretError.getMessage());
         return FatSecretDetailResponseDto.of(fatSecretFood);
     }
 
