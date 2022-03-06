@@ -11,7 +11,4 @@ public class FoodWrapper {
 
     @JsonProperty("food")
     private FatSecretFood fatSecretFood;
-
-    @JsonProperty("error")
-    private FatSecretError fatSecretError;
 }
