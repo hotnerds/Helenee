@@ -31,6 +31,8 @@ public class FatSecretProvider {
 
     private final String API_URI_PREFIX = "https://platform.fatsecret.com/rest/server.api";
 
+    private final String TOKEN_REQUEST_API_URI_PREFIX = "https://oauth.fatsecret.com/connect/token";
+
     private final RestTemplate restTemplate;
 
     private final FatSecretConfig fatSecretConfig;
@@ -59,9 +61,12 @@ public class FatSecretProvider {
                 .build()
                 .toUri();
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(fatSecretConfig.getToken());
+
         RequestEntity<Void> request = RequestEntity.post(url)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, fatSecretConfig.getToken())
+                .headers(headers)
                 .build();
 
         return restTemplate.exchange(request, PARAMETERIZED_RESPONSE_TYPE);
@@ -81,14 +86,33 @@ public class FatSecretProvider {
                 .build()
                 .toUri();
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(fatSecretConfig.getToken());
+
         RequestEntity<Void> request = RequestEntity.post(url)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, fatSecretConfig.getToken())
+                .headers(headers)
                 .build();
 
         return restTemplate.exchange(request, PARAMETERIZED_RESPONSE_TYPE);
     }
 
+    public ResponseEntity<Map<String, Object>> getAccessToken() throws FatSecretResponseErrorException {
+        URI url = UriComponentsBuilder
+                .fromHttpUrl(TOKEN_REQUEST_API_URI_PREFIX)
+                .build()
+                .toUri();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBasicAuth(fatSecretConfig.getId(), fatSecretConfig.getSecret());
+
+        RequestEntity<Void> request = RequestEntity.post(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(headers)
+                .build();
+
+        return restTemplate.exchange(request, PARAMETERIZED_RESPONSE_TYPE);
+    }
 
 
 }
