@@ -67,6 +67,28 @@ public class FatSecretProvider {
         return restTemplate.exchange(request, PARAMETERIZED_RESPONSE_TYPE);
     }
 
+    public ResponseEntity<Map<String, Object>> searchFoods(final String foodName, final int pageNumber, final int pageSize) throws FatSecretResponseErrorException {
+        final String METHOD = "food.get.v2";
+        final String FORMAT = "json";
+
+        URI url = UriComponentsBuilder
+                .fromHttpUrl(API_URI_PREFIX)
+                .queryParam("method", METHOD)
+                .queryParam("search_expression", foodName)
+                .queryParam("page_number", pageNumber)
+                .queryParam("max_results", pageSize)
+                .queryParam("format", FORMAT)
+                .build()
+                .toUri();
+
+        RequestEntity<Void> request = RequestEntity.post(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, fatSecretConfig.getToken())
+                .build();
+
+        return restTemplate.exchange(request, PARAMETERIZED_RESPONSE_TYPE);
+    }
+
 
 
 }
