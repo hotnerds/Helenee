@@ -47,7 +47,7 @@ public class FatSecretProvider {
         this.fatSecretConfig = fatSecretConfig;
     }
 
-    public ResponseEntity<Map<String, Object>> findFoodById(final Long foodId) throws FatSecretResponseErrorException {
+    public ResponseEntity<Map<String, Object>> searchFoodById(final Long foodId) throws FatSecretResponseErrorException {
         final String METHOD = "food.get.v2";
         final String FORMAT = "json";
 
