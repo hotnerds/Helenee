@@ -1,6 +1,7 @@
 package com.hotnerds.user.presentation;
 
 import com.hotnerds.user.application.UserService;
+import com.hotnerds.user.domain.Dto.FollowServiceReqDto;
 import com.hotnerds.user.domain.Dto.NewUserReqDto;
 import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
 import com.hotnerds.user.domain.User;
@@ -50,6 +51,13 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity updateUser(@PathVariable("id") Long id, @RequestBody UserUpdateReqDto userInfoReqDto) {
         userService.updateUser(id, userInfoReqDto);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/follow/{id}")
+    public ResponseEntity createFollow(@RequestBody FollowServiceReqDto followServiceReqDto) {
+        userService.createFollow(followServiceReqDto);
 
         return ResponseEntity.ok().build();
     }

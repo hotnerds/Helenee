@@ -2,15 +2,14 @@ package com.hotnerds.user.domain;
 
 import lombok.Getter;
 
-import javax.persistence.Embeddable;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Embeddable
 @Getter
 public class FollowedList {
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.PERSIST)
     private List<Follow> followed;
 
     public boolean isFollowing(User user) {
@@ -20,6 +19,10 @@ public class FollowedList {
 
     public int followCounts() {
         return followed.size();
+    }
+
+    public void add(Follow follow) {
+        followed.add(follow);
     }
 
 }

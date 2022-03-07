@@ -67,7 +67,7 @@ class FollowServiceTest {
     @DisplayName("새로운 팔로우 관계를 추가할때 주어진 정보로 이미 존재하는 관계가 있으면 예외 발생")
     void addFollowerException() {
         // given
-        FollowServiceRequestDto testDto = FollowServiceRequestDto.builder()
+        FollowServiceReqDto testDto = FollowServiceReqDto.builder()
                 .followerId(1L)
                 .followingId(2L)
                 .build();
@@ -82,12 +82,12 @@ class FollowServiceTest {
     @DisplayName("해당 ID가 팔로우 하는 모든 ID를 조회, 팔로잉하는 계정이 없으면 예외 발생")
     void getAllFollowerRelationshipByFollowerId() {
         // given
-        List<FollowServiceRequestDto> testDtoList = Arrays.asList(
-                FollowServiceRequestDto.builder()
+        List<FollowServiceReqDto> testDtoList = Arrays.asList(
+                FollowServiceReqDto.builder()
                         .followerId(1L)
                         .followingId(2L)
                         .build(),
-                FollowServiceRequestDto.builder()
+                FollowServiceReqDto.builder()
                         .followerId(1L)
                         .followingId(3L)
                         .build()
@@ -113,12 +113,12 @@ class FollowServiceTest {
     @DisplayName("해당 ID를 팔로우 하는 모든 ID를 조회, 결과가 빈 리스트일 경우 예외 발생")
     void getAllFollowerRelationshipByFollowingId() {
         // given
-        List<FollowServiceRequestDto> testDtoList = Arrays.asList(
-                FollowServiceRequestDto.builder()
+        List<FollowServiceReqDto> testDtoList = Arrays.asList(
+                FollowServiceReqDto.builder()
                         .followerId(2L)
                         .followingId(1L)
                         .build(),
-                FollowServiceRequestDto.builder()
+                FollowServiceReqDto.builder()
                         .followerId(3L)
                         .followingId(1L)
                         .build()
@@ -144,11 +144,11 @@ class FollowServiceTest {
     @DisplayName("특정 팔로워 ID, 팔로잉 ID의 팔로워 관계를 조회, 결과가 빈 리스트일 경우 예외 발생")
     void getFollowerRelationshipByFollowerIdAndFollowingId() {
         // given
-        FollowServiceRequestDto testDto = FollowServiceRequestDto.builder()
+        FollowServiceReqDto testDto = FollowServiceReqDto.builder()
                 .followerId(1L)
                 .followingId(2L)
                 .build();
-        FollowServiceRequestDto failDto = FollowServiceRequestDto.builder()
+        FollowServiceReqDto failDto = FollowServiceReqDto.builder()
                 .followerId(4L)
                 .followingId(5L)
                 .build();
@@ -170,7 +170,7 @@ class FollowServiceTest {
     @DisplayName("팔로워 관계를 삭제할 때 주어진 정보의 관계가 존재하지 않을 때 예외 발생")
     void removeFollowerRelationship() {
         // given
-        FollowServiceRequestDto testDto = FollowServiceRequestDto.builder()
+        FollowServiceReqDto testDto = FollowServiceReqDto.builder()
                 .followerId(1L)
                 .followingId(2L)
                 .build();
@@ -186,11 +186,11 @@ class FollowServiceTest {
     @DisplayName("특정 팔로워 ID와 팔로잉 ID가 팔로우 관계에 있는지 확인")
     void isFollower() {
         // given
-        FollowServiceRequestDto passTestDto = FollowServiceRequestDto.builder()
+        FollowServiceReqDto passTestDto = FollowServiceReqDto.builder()
                 .followerId(1L)
                 .followingId(2L)
                 .build();
-        FollowServiceRequestDto failTestDto = FollowServiceRequestDto.builder()
+        FollowServiceReqDto failTestDto = FollowServiceReqDto.builder()
                 .followerId(2L)
                 .followingId(3L)
                 .build();
@@ -213,11 +213,11 @@ class FollowServiceTest {
     @DisplayName("두 아이디가 서로 팔로우 관계에 있는지 확인")
     void isMutualFollow() {
         // given
-        FollowServiceRequestDto passTestDto = FollowServiceRequestDto.builder()
+        FollowServiceReqDto passTestDto = FollowServiceReqDto.builder()
                 .followerId(1L)
                 .followingId(2L)
                 .build();
-        FollowServiceRequestDto failTestDto = FollowServiceRequestDto.builder()
+        FollowServiceReqDto failTestDto = FollowServiceReqDto.builder()
                 .followerId(100L)
                 .followingId(101L)
                 .build();

@@ -1,13 +1,16 @@
 package com.hotnerds.user.application;
 
+import com.hotnerds.user.domain.Dto.FollowServiceReqDto;
 import com.hotnerds.user.domain.Dto.NewUserReqDto;
 import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
+import com.hotnerds.user.domain.Follow;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import com.hotnerds.user.exception.UserExistsException;
 import com.hotnerds.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +53,22 @@ public class UserService {
         user.updateUser(userUpdateReqDto);
 
         userRepository.save(user);
+    }
+
+    @Transactional
+    public Follow createFollow(FollowServiceReqDto followServiceReqDto) {
+        User followerUser = getUserById(followServiceReqDto.getFollowerId());
+        User followedUser = getUserById(followServiceReqDto.getFollowedId());
+
+        Follow newFollowRelationship = Follow.builder()
+                .follower(followerUser)
+                .followed(followedUser)
+                .build();
+
+        followerUser.getFollowerList().add(newFollowRelationship);
+        followedUser.getFollowedList().add(newFollowRelationship);
+
+        return newFollowRelationship;
     }
 
 }

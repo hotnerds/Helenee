@@ -8,7 +8,7 @@ import java.util.List;
 @Embeddable
 @Getter
 public class FollowerList {
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "followerList", orphanRemoval = true, cascade = CascadeType.PERSIST)
     private List<Follow> followers;
 
     public boolean isFollowedBy(User user) {
@@ -18,6 +18,10 @@ public class FollowerList {
 
     public int followerCounts() {
         return followers.size();
+    }
+
+    public void add(Follow follow) {
+        followers.add(follow);
     }
 
 }
