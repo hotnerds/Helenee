@@ -14,9 +14,13 @@ import org.springframework.http.*;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.annotation.Resource;
+import javax.print.attribute.standard.Media;
 
 @Component
 public class FatSecretApiClient {
@@ -37,11 +41,11 @@ public class FatSecretApiClient {
     };
 
     @Autowired
-    public FatSecretApiClient(RestTemplateBuilder restTemplateBuilder, ObjectMapper objectMapper, FatSecretToken fatSecretToken) {
+    public FatSecretApiClient(RestTemplateBuilder restTemplateBuilder, FatSecretResponseErrorHandler errorHandler, BufferingClientHttpRequestFactory requestFactory, FatSecretToken fatSecretToken) {
         this.fatSecretToken = fatSecretToken;
         this.restTemplate = restTemplateBuilder
-                .requestFactory(() -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()))
-                .errorHandler(new FatSecretResponseErrorHandler(objectMapper))
+                .requestFactory(() -> requestFactory)
+                .errorHandler(errorHandler)
                 .build();
     }
 
@@ -58,6 +62,7 @@ public class FatSecretApiClient {
                 .toUri();
 
         HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(fatSecretToken.getToken());
 
         RequestEntity<Void> request = RequestEntity.post(url)

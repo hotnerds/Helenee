@@ -33,4 +33,14 @@ public class AppConfig {
         return new ObjectMapper();
     }
 
+    @Bean
+    public SimpleClientHttpRequestFactory simpleClientHttpRequestFactory() {
+        return new SimpleClientHttpRequestFactory();
+    }
+
+    @Bean
+    public BufferingClientHttpRequestFactory bufferingClientHttpRequestFactory(SimpleClientHttpRequestFactory simpleClientHttpRequestFactory) {
+        return new BufferingClientHttpRequestFactory(simpleClientHttpRequestFactory);
+    }
+
 }
