@@ -1,5 +1,6 @@
 package com.hotnerds.fatsecret.application;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hotnerds.common.FatSecretConfig;
 import com.hotnerds.fatsecret.domain.dto.FatSecretDetailResponseDto;
 import com.hotnerds.fatsecret.domain.dto.FatSecretFood;
@@ -35,10 +36,10 @@ public class FatSecretService {
     private final FatSecretConfig fatSecretConfig;
 
     @Autowired
-    public FatSecretService(RestTemplateBuilder restTemplateBuilder, FatSecretConfig fatSecretConfig) {
+    public FatSecretService(RestTemplateBuilder restTemplateBuilder, FatSecretConfig fatSecretConfig, ObjectMapper objectMapper) {
         this.restTemplate = restTemplateBuilder
                 .requestFactory(() -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()))
-                .errorHandler(new FatSecretResponseErrorHandler())
+                .errorHandler(new FatSecretResponseErrorHandler(objectMapper))
                 .build();
         this.fatSecretConfig = fatSecretConfig;
     }

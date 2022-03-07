@@ -3,6 +3,7 @@ package com.hotnerds.fatsecret.exception;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,11 @@ import static java.util.Optional.ofNullable;
 
 public class FatSecretResponseErrorHandler extends DefaultResponseErrorHandler {
 
-    public FatSecretResponseErrorHandler() {
+    private final ObjectMapper objectMapper;
+
+    @Autowired
+    public FatSecretResponseErrorHandler(final ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -40,16 +45,13 @@ public class FatSecretResponseErrorHandler extends DefaultResponseErrorHandler {
     }
 
     protected boolean hasError(byte[] responseBody) throws IOException {
-        final ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> responseEntity = objectMapper.readValue(responseBody, Map.class);
         return responseEntity.containsKey("error");
     }
 
     protected void handleError(byte[] responseBody) throws IOException {
-        final ObjectMapper objectMapper = new ObjectMapper()
-                .enable(DeserializationFeature.UNWRAP_ROOT_VALUE); // @JsonRootName annotation 사용을 위한 설정
-
-        FatSecretResponseError error = objectMapper.readValue(responseBody, FatSecretResponseError.class);
+        FatSecretResponseError error = objectMapper.readValue(responseBody, ErrorWrapper.class)
+                .getError();
 
         throw new FatSecretResponseErrorException(error.getMessage());
     }

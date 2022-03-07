@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@JsonRootName(value = "error")
 public class FatSecretResponseError {
     private Integer code;
     private String message;
