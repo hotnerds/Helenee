@@ -23,6 +23,12 @@ public class FatSecretApiClient {
 
     private final String API_URI_PREFIX = "https://platform.fatsecret.com/rest/server.api";
 
+    private final String METHOD = "method";
+
+    private final String FORMAT = "format";
+
+    private final String JSON_FORMAT = "json";
+
     private final RestTemplate restTemplate;
 
     private final FatSecretToken fatSecretToken;
@@ -40,14 +46,14 @@ public class FatSecretApiClient {
     }
 
     public ResponseEntity<Map<String, Object>> searchFoodById(final Long foodId) throws RestClientResponseException {
-        final String METHOD = "food.get.v2";
-        final String FORMAT = "json";
+        final String FOOD_GET_METHOD = "food.get.v2";
+        final String FOOD_ID = "food_id";
 
         URI url = UriComponentsBuilder
                 .fromHttpUrl(API_URI_PREFIX)
-                .queryParam("method", METHOD)
-                .queryParam("food_id", foodId.toString())
-                .queryParam("format", FORMAT)
+                .queryParam(METHOD, FOOD_GET_METHOD)
+                .queryParam(FOOD_ID, foodId.toString())
+                .queryParam(FORMAT, JSON_FORMAT)
                 .build()
                 .toUri();
 
@@ -63,16 +69,18 @@ public class FatSecretApiClient {
     }
 
     public ResponseEntity<Map<String, Object>> searchFoods(final String foodName, final int pageNumber, final int pageSize) throws RestClientResponseException {
-        final String METHOD = "food.get.v2";
-        final String FORMAT = "json";
+        final String FOODS_SEARCH_METHOD = "foods.search";
+        final String SEARCH_EXPRESSION = "search_expression";
+        final String PAGE_NUMBER = "page_number";
+        final String MAX_RESULTS = "max_results";
 
         URI url = UriComponentsBuilder
                 .fromHttpUrl(API_URI_PREFIX)
-                .queryParam("method", METHOD)
-                .queryParam("search_expression", foodName)
-                .queryParam("page_number", pageNumber)
-                .queryParam("max_results", pageSize)
-                .queryParam("format", FORMAT)
+                .queryParam(METHOD, FOODS_SEARCH_METHOD)
+                .queryParam(SEARCH_EXPRESSION, foodName)
+                .queryParam(PAGE_NUMBER, pageNumber)
+                .queryParam(MAX_RESULTS, pageSize)
+                .queryParam(FORMAT, JSON_FORMAT)
                 .build()
                 .toUri();
 
