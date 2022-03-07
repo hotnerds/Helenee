@@ -1,5 +1,6 @@
 package com.hotnerds.common;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -25,6 +26,11 @@ public class AppConfig {
     @Bean
     public RestTemplateBuilder restTemplateBuilder() {
         return new RestTemplateBuilder();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 
 }
