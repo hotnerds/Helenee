@@ -6,6 +6,7 @@ import com.hotnerds.fatsecret.domain.dto.FatSecretDetailResponseDto;
 import com.hotnerds.fatsecret.domain.dto.FatSecretFood;
 import com.hotnerds.fatsecret.domain.dto.FoodWrapper;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Map;
 
 import com.hotnerds.fatsecret.exception.FatSecretResponseError;
@@ -14,11 +15,7 @@ import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -37,6 +34,9 @@ public class FatSecretService {
 
     private final FatSecretConfig fatSecretConfig;
 
+    private static final ParameterizedTypeReference<Map<String, Object>> PARAMETERIZED_RESPONSE_TYPE = new ParameterizedTypeReference<>() {
+    };
+
     @Autowired
     public FatSecretService(RestTemplateBuilder restTemplateBuilder, FatSecretConfig fatSecretConfig, ObjectMapper objectMapper) {
         this.restTemplate = restTemplateBuilder
@@ -46,33 +46,26 @@ public class FatSecretService {
         this.fatSecretConfig = fatSecretConfig;
     }
 
-    private static final ParameterizedTypeReference<Map<String, Object>> PARAMETERIZED_RESPONSE_TYPE = new ParameterizedTypeReference<Map<String, Object>>() {
-    };
-
-    public ResponseEntity<Map<String, Object>> getFoodById(Long foodId) throws FatSecretResponseErrorException {
+    public ResponseEntity<Map<String, Object>> findFoodById(final Long foodId) throws FatSecretResponseErrorException {
         final String METHOD = "food.get.v2";
-        final String FOOD_ID = foodId.toString();
         final String FORMAT = "json";
 
-        final String token = fatSecretConfig.getToken();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(token);
-        HttpEntity httpEntity = new HttpEntity(headers);
+        URI url = UriComponentsBuilder
+                .fromHttpUrl(API_URI_PREFIX)
+                .queryParam("method", METHOD)
+                .queryParam("food_id", foodId.toString())
+                .queryParam("format", FORMAT)
+                .build()
+                .toUri();
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        RequestEntity<Void> request = RequestEntity.post(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, fatSecretConfig.getToken())
+                .build();
 
-        params.add("method", METHOD);
-        params.add("food_id", FOOD_ID);
-        params.add("format", FORMAT);
-
-        URI uri = UriComponentsBuilder
-            .fromHttpUrl(API_URI_PREFIX)
-            .queryParams(params)
-            .build()
-            .toUri();
-
-        return restTemplate.exchange(uri, HttpMethod.POST, httpEntity, PARAMETERIZED_RESPONSE_TYPE);
+        return restTemplate.exchange(request, PARAMETERIZED_RESPONSE_TYPE);
     }
+
+
 
 }
