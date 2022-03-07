@@ -32,5 +32,9 @@ public class AppConfig {
         return new BufferingClientHttpRequestFactory(simpleClientHttpRequestFactory);
     }
 
+    @Bean
+    public RestTemplateBuilder restTemplateBuilder() {
+        return new RestTemplateBuilder();
+    }
 
 }
