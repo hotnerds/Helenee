@@ -1,15 +1,12 @@
 package com.hotnerds.fatsecret.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hotnerds.common.FatSecretConfig;
-import com.hotnerds.common.FatSecretToken;
+import com.hotnerds.fatsecret.FatSecretToken;
 
 import java.net.URI;
 import java.util.Map;
 
-import com.hotnerds.fatsecret.exception.FatSecretResponseErrorException;
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;

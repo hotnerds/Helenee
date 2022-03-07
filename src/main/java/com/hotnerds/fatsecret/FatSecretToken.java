@@ -1,6 +1,7 @@
-package com.hotnerds.common;
+package com.hotnerds.fatsecret;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hotnerds.common.FatSecretConfig;
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
