@@ -14,6 +14,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue
@@ -33,15 +34,24 @@ public class User extends BaseTimeEntity {
     @JoinColumn(name = "DIET_ID")
     private List<Diet> dietList;
 
-    public void updateUser(UserUpdateReqDto userUpdateReqDto) {
+    public User updateUser(UserUpdateReqDto userUpdateReqDto) {
         this.username = userUpdateReqDto.getUsername();
+        return this;
     }
 
-    @Builder
+
     public User(String username, String email) {
         this.username = username;
         this.email = email;
     }
+
+    public User(String username, String email, ROLE role) {
+        this.username = username;
+        this.email = email;
+        this.role = role;
+    }
+
+
 
     public boolean equals(User anotherUserEntity) {
         if (this == anotherUserEntity) return true;
