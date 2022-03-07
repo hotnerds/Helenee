@@ -22,14 +22,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
-@RequiredArgsConstructor
 public class FatSecretProvider {
 
     private final String API_URI_PREFIX = "https://platform.fatsecret.com/rest/server.api";
 
     private final RestTemplate restTemplate;
-
-    private final FatSecretConfig fatSecretConfig;
 
     private final FatSecretToken fatSecretToken;
 
@@ -37,13 +34,12 @@ public class FatSecretProvider {
     };
 
     @Autowired
-    public FatSecretProvider(RestTemplateBuilder restTemplateBuilder, FatSecretConfig fatSecretConfig, ObjectMapper objectMapper, FatSecretToken fatSecretToken) {
+    public FatSecretProvider(RestTemplateBuilder restTemplateBuilder, ObjectMapper objectMapper, FatSecretToken fatSecretToken) {
         this.fatSecretToken = fatSecretToken;
         this.restTemplate = restTemplateBuilder
                 .requestFactory(() -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()))
                 .errorHandler(new FatSecretResponseErrorHandler(objectMapper))
                 .build();
-        this.fatSecretConfig = fatSecretConfig;
     }
 
     public ResponseEntity<Map<String, Object>> searchFoodById(final Long foodId) throws RestClientResponseException {
