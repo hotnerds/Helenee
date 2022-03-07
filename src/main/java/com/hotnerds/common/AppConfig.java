@@ -32,12 +32,5 @@ public class AppConfig {
         return new BufferingClientHttpRequestFactory(simpleClientHttpRequestFactory);
     }
 
-    @Bean
-    public RestTemplate restTemplate(BufferingClientHttpRequestFactory requestFactory, FatSecretResponseErrorHandler errorHandler) {
-        return new RestTemplateBuilder()
-                .requestFactory(() -> requestFactory)
-                .errorHandler(errorHandler)
-                .build();
-    }
 
 }
