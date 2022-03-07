@@ -6,12 +6,14 @@ import com.hotnerds.fatsecret.domain.dto.FatSecretDetailResponseDto;
 import com.hotnerds.fatsecret.domain.dto.FatSecretFood;
 import com.hotnerds.fatsecret.domain.dto.FoodWrapper;
 import java.net.URI;
+import java.util.Map;
 
 import com.hotnerds.fatsecret.exception.FatSecretResponseError;
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorException;
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -44,7 +46,10 @@ public class FatSecretService {
         this.fatSecretConfig = fatSecretConfig;
     }
 
-    public FatSecretDetailResponseDto getFoodById(Long foodId) throws FatSecretResponseErrorException {
+    private static final ParameterizedTypeReference<Map<String, Object>> PARAMETERIZED_RESPONSE_TYPE = new ParameterizedTypeReference<Map<String, Object>>() {
+    };
+
+    public ResponseEntity<Map<String, Object>> getFoodById(Long foodId) throws FatSecretResponseErrorException {
         final String METHOD = "food.get.v2";
         final String FOOD_ID = foodId.toString();
         final String FORMAT = "json";
@@ -67,11 +72,7 @@ public class FatSecretService {
             .build()
             .toUri();
 
-        ResponseEntity<FoodWrapper> responseEntity = restTemplate.exchange(uri,
-            HttpMethod.POST, httpEntity, FoodWrapper.class);
-
-        FatSecretFood fatSecretFood = responseEntity.getBody().getFatSecretFood();
-        return FatSecretDetailResponseDto.of(fatSecretFood);
+        return restTemplate.exchange(uri, HttpMethod.POST, httpEntity, PARAMETERIZED_RESPONSE_TYPE);
     }
 
 }
