@@ -2,6 +2,7 @@ package com.hotnerds.fatsecret.exception;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,14 +19,10 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
+@RequiredArgsConstructor
 public class FatSecretResponseErrorHandler extends DefaultResponseErrorHandler {
 
     private final ObjectMapper objectMapper;
-
-    @Autowired
-    public FatSecretResponseErrorHandler(final ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
