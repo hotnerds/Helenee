@@ -6,16 +6,22 @@ import com.hotnerds.fatsecret.domain.dto.FatSecretFood;
 import com.hotnerds.fatsecret.domain.dto.FoodWrapper;
 import java.net.URI;
 
+import com.hotnerds.fatsecret.exception.FatSecretResponseError;
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorException;
+import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -29,8 +35,11 @@ public class FatSecretService {
     private final FatSecretConfig fatSecretConfig;
 
     @Autowired
-    public FatSecretService(RestTemplate restTemplate, FatSecretConfig fatSecretConfig) {
-        this.restTemplate = restTemplate;
+    public FatSecretService(RestTemplateBuilder restTemplateBuilder, FatSecretConfig fatSecretConfig) {
+        this.restTemplate = restTemplateBuilder
+                .requestFactory(() -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()))
+                .errorHandler(new FatSecretResponseErrorHandler())
+                .build();
         this.fatSecretConfig = fatSecretConfig;
     }
 

@@ -23,16 +23,6 @@ public class AppConfig {
     }
 
     @Bean
-    public SimpleClientHttpRequestFactory simpleClientHttpRequestFactory() {
-        return new SimpleClientHttpRequestFactory();
-    }
-
-    @Bean
-    public BufferingClientHttpRequestFactory bufferingClientHttpRequestFactory(SimpleClientHttpRequestFactory simpleClientHttpRequestFactory) {
-        return new BufferingClientHttpRequestFactory(simpleClientHttpRequestFactory);
-    }
-
-    @Bean
     public RestTemplateBuilder restTemplateBuilder() {
         return new RestTemplateBuilder();
     }

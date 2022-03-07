@@ -17,7 +17,6 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
-@Component
 public class FatSecretResponseErrorHandler extends DefaultResponseErrorHandler {
 
     public FatSecretResponseErrorHandler() {
