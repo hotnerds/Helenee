@@ -2,16 +2,14 @@ package com.hotnerds.fatsecret.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hotnerds.common.FatSecretConfig;
-import com.hotnerds.fatsecret.domain.dto.FatSecretDetailResponseDto;
-import com.hotnerds.fatsecret.domain.dto.FatSecretFood;
-import com.hotnerds.fatsecret.domain.dto.FoodWrapper;
+import com.hotnerds.common.FatSecretToken;
+
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Map;
 
-import com.hotnerds.fatsecret.exception.FatSecretResponseError;
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorException;
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
@@ -19,14 +17,11 @@ import org.springframework.http.*;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
+@RequiredArgsConstructor
 public class FatSecretProvider {
 
     private final String API_URI_PREFIX = "https://platform.fatsecret.com/rest/server.api";
@@ -37,11 +32,14 @@ public class FatSecretProvider {
 
     private final FatSecretConfig fatSecretConfig;
 
+    private final FatSecretToken fatSecretToken;
+
     private static final ParameterizedTypeReference<Map<String, Object>> PARAMETERIZED_RESPONSE_TYPE = new ParameterizedTypeReference<>() {
     };
 
     @Autowired
-    public FatSecretProvider(RestTemplateBuilder restTemplateBuilder, FatSecretConfig fatSecretConfig, ObjectMapper objectMapper) {
+    public FatSecretProvider(RestTemplateBuilder restTemplateBuilder, FatSecretConfig fatSecretConfig, ObjectMapper objectMapper, FatSecretToken fatSecretToken) {
+        this.fatSecretToken = fatSecretToken;
         this.restTemplate = restTemplateBuilder
                 .requestFactory(() -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()))
                 .errorHandler(new FatSecretResponseErrorHandler(objectMapper))
@@ -62,7 +60,7 @@ public class FatSecretProvider {
                 .toUri();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(fatSecretConfig.getToken());
+        headers.setBearerAuth(fatSecretToken.getToken());
 
         RequestEntity<Void> request = RequestEntity.post(url)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -87,7 +85,7 @@ public class FatSecretProvider {
                 .toUri();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(fatSecretConfig.getToken());
+        headers.setBearerAuth(fatSecretToken.getToken());
 
         RequestEntity<Void> request = RequestEntity.post(url)
                 .contentType(MediaType.APPLICATION_JSON)

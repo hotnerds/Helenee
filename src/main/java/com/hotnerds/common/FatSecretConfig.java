@@ -1,23 +1,20 @@
 package com.hotnerds.common;
 
-import static com.hotnerds.common.FatSecretConfig.FATSECRET_CONFIG_PREFIX;
+import static com.hotnerds.common.FatSecretConfig.FAT_SECRET_CONFIG_PREFIX;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 
 
 @Configuration
-@ConfigurationProperties(prefix = FATSECRET_CONFIG_PREFIX)
+@ConfigurationProperties(prefix = FAT_SECRET_CONFIG_PREFIX)
 @Getter
-@Setter
 public class FatSecretConfig {
 
-    public static final String FATSECRET_CONFIG_PREFIX = "fat-secret";
+    public static final String FAT_SECRET_CONFIG_PREFIX = "fat-secret";
 
-    private String token;
     private String id;
     private String secret;
 }
