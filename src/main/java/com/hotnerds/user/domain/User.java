@@ -32,13 +32,11 @@ public class User extends BaseTimeEntity {
     @JoinColumn(name = "DIET_ID")
     private List<Diet> dietList;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "FOLLOWER_ID")
-    private List<Follow> followerList = new ArrayList<>();
+    @Embedded
+    private FollowerList followerList;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "FOLLOWING_ID")
-    private List<Follow> followingList = new ArrayList<>();
+    @Embedded
+    private FollowedList followedList;
 
     public void updateUser(UserUpdateReqDto userUpdateReqDto) {
         this.username = userUpdateReqDto.getUsername();
