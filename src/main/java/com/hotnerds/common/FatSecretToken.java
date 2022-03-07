@@ -1,10 +1,7 @@
 package com.hotnerds.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hotnerds.fatsecret.application.FatSecretProvider;
-import com.hotnerds.fatsecret.exception.FatSecretResponseErrorException;
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -15,8 +12,6 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -24,7 +19,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.util.Map;
-import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor

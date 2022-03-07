@@ -22,7 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
-public class FatSecretProvider {
+public class FatSecretApiClient {
 
     private final String API_URI_PREFIX = "https://platform.fatsecret.com/rest/server.api";
 
@@ -34,7 +34,7 @@ public class FatSecretProvider {
     };
 
     @Autowired
-    public FatSecretProvider(RestTemplateBuilder restTemplateBuilder, ObjectMapper objectMapper, FatSecretToken fatSecretToken) {
+    public FatSecretApiClient(RestTemplateBuilder restTemplateBuilder, ObjectMapper objectMapper, FatSecretToken fatSecretToken) {
         this.fatSecretToken = fatSecretToken;
         this.restTemplate = restTemplateBuilder
                 .requestFactory(() -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()))
