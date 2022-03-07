@@ -17,6 +17,7 @@ import org.springframework.http.*;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -45,7 +46,7 @@ public class FatSecretProvider {
         this.fatSecretConfig = fatSecretConfig;
     }
 
-    public ResponseEntity<Map<String, Object>> searchFoodById(final Long foodId) throws FatSecretResponseErrorException {
+    public ResponseEntity<Map<String, Object>> searchFoodById(final Long foodId) throws RestClientResponseException {
         final String METHOD = "food.get.v2";
         final String FORMAT = "json";
 
@@ -68,7 +69,7 @@ public class FatSecretProvider {
         return restTemplate.exchange(request, PARAMETERIZED_RESPONSE_TYPE);
     }
 
-    public ResponseEntity<Map<String, Object>> searchFoods(final String foodName, final int pageNumber, final int pageSize) throws FatSecretResponseErrorException {
+    public ResponseEntity<Map<String, Object>> searchFoods(final String foodName, final int pageNumber, final int pageSize) throws RestClientResponseException {
         final String METHOD = "food.get.v2";
         final String FORMAT = "json";
 

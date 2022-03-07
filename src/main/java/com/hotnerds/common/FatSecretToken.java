@@ -17,6 +17,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -69,14 +70,12 @@ public class FatSecretToken {
             accessToken = requestAccessToken().getBody()
                     .get(ACCESS_TOKEN)
                     .toString();
-        } catch(HttpStatusCodeException e) {
-            e.printStackTrace();
-        } catch (FatSecretResponseErrorException e) {
+        } catch(RestClientResponseException e) {
             e.printStackTrace();
         }
     }
 
-    public ResponseEntity<Map<String, Object>> requestAccessToken() throws HttpStatusCodeException, FatSecretResponseErrorException {
+    public ResponseEntity<Map<String, Object>> requestAccessToken() throws RestClientResponseException {
         URI url = UriComponentsBuilder
                 .fromHttpUrl(API_URI_PREFIX)
                 .build()

@@ -26,7 +26,7 @@ public class FatSecretResponseErrorHandler extends DefaultResponseErrorHandler {
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
-        return super.hasError(response) || hasError(getResponseBody(response));
+        return super.hasError(response) || this.hasError(getResponseBody(response));
     }
 
     @Override
