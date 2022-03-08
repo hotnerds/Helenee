@@ -53,4 +53,14 @@ class FatSecretResponseErrorHandlerTest {
         assertThat(fatSecretResponseErrorHandler.hasError(responseBody)).isEqualTo(false);
 
     }
+
+    @Test
+    @DisplayName("response body에 error 필드가 있으면 예외를 발생시킨다.")
+    void BODY에_ERROR가_있으면_EXCEPTION_발생() throws IOException {
+        //given
+        byte[] responseBody = "{ \"error\": { }}\n".getBytes(StandardCharsets.UTF_8);
+
+        //when then
+        assertThrows(FatSecretResponseErrorException.class, () -> fatSecretResponseErrorHandler.handleError(responseBody));
+    }
 }
