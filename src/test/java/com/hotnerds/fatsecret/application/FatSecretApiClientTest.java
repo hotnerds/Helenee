@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withNoContent;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import com.hotnerds.common.FatSecretConfig;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
@@ -130,6 +132,42 @@ class FatSecretApiClientTest {
 
     }
 
+
+    @Test
+    @DisplayName("searchFoodById에서 올바른 access token과 함께 request 요청을 보낸다.")
+    void searchFoodById가_올바른_토큰을_전송한다 () {
+        //given
+        when(fatSecretToken.getToken()).thenReturn("valid token");
+        String requestURL = "https://platform.fatsecret.com/rest/server.api?method=food.get.v2&food_id=38821&format=json";
+        mockServer.expect(requestTo(requestURL))
+                .andExpect(header("Authorization", "Bearer valid token"))
+                .andRespond(withNoContent());
+
+        //when
+        fatSecretApiClient.searchFoodById(38821L);
+
+        //then
+        verify(fatSecretToken, times(1)).getToken();
+
+    }
+
+    @Test
+    @DisplayName("searchFoods에서 올바른 access token과 함께 request 요청을 보낸다.")
+    void searchFoods가_올바른_토큰을_전송한다 () {
+        //given
+        when(fatSecretToken.getToken()).thenReturn("valid token");
+        String requestURL = "https://platform.fatsecret.com/rest/server.api?method=foods.search&search_expression=Chicken&page_number=0&max_results=5&format=json";
+        mockServer.expect(requestTo(requestURL))
+                .andExpect(header("Authorization", "Bearer valid token"))
+                .andRespond(withNoContent());
+
+        //when
+        fatSecretApiClient.searchFoods("Chicken", 0, 5);
+
+        //then
+        verify(fatSecretToken, times(1)).getToken();
+
+    }
 
 
 
