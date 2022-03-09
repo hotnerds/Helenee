@@ -33,12 +33,12 @@ public class FollowService {
 
     public List<Follow> getAllFollowRelationshipByFollowerId(Long followerId) {
         User user = userRepository.findById(followerId).orElseThrow(UserNotFoundException::new);
-        return user.getFollowerList();
+        return List.of();
     }
 
     public List<Follow> getAllFollowRelationshipByFollowingId(Long followingId) {
         User user = userRepository.findById(followingId).orElseThrow(UserNotFoundException::new);
-        return user.getFollowingList();
+        return List.of();
     }
 
     public Follow getFollowRelationshipByFollowerIdAndFollowingId(FollowServiceRequestDto followServiceRequestDto) {
@@ -65,8 +65,6 @@ public class FollowService {
                 .follower(userRepository.getById(followServiceRequestDto.getFollowerId()))
                 .following(userRepository.getById(followServiceRequestDto.getFollowingId()))
                 .build();
-        return user.getFollowerList().stream()
-                .filter(i -> i.equals(followRelationship))
-                .findAny();
+        return Optional.of(Follow.builder().follower(user).following(user).build());
     }
 }

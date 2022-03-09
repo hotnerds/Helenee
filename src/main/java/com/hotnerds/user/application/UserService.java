@@ -6,6 +6,7 @@ import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
 import com.hotnerds.user.domain.Follow;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
+import com.hotnerds.user.exception.FollowRelationshipExistsException;
 import com.hotnerds.user.exception.UserExistsException;
 import com.hotnerds.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class UserService {
 
     public void createNewUser(NewUserReqDto newUserReqDto) {
         Optional<User> optionalUser = userRepository.findByUsernameOrEmail(newUserReqDto.getUsername(), newUserReqDto.getEmail());
-        if (!optionalUser.isEmpty()) {
+        if (optionalUser.isPresent()) {
             throw new UserExistsException("동일한 정보를 가진 유저가 이미 존재합니다");
         }
 
@@ -35,10 +36,8 @@ public class UserService {
     }
 
     public User getUserById(Long userId) {
-        User user = userRepository.findById(userId)
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User ID " + userId + "가 존재하지 않습니다"));
-
-        return user;
     }
 
     public void deleteUserById(Long userId) {
@@ -55,10 +54,22 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public boolean isFollowExist(User user1, User user2) {
+        return user1.isFollowerOf(user2) || user1.isFollowedBy(user2);
+    }
+
+    public boolean isMutualFollowExist(User user1, User user2) {
+        return user1.isFollowedBy(user2) && user1.isFollowerOf(user2);
+    }
+
     @Transactional
     public Follow createFollow(FollowServiceReqDto followServiceReqDto) {
         User followerUser = getUserById(followServiceReqDto.getFollowerId());
         User followedUser = getUserById(followServiceReqDto.getFollowedId());
+
+        if (isFollowExist(followerUser, followedUser)) {
+            throw new FollowRelationshipExistsException("생성하려는 팔로우 관계가 이미 존재합니다.");
+        }
 
         Follow newFollowRelationship = Follow.builder()
                 .follower(followerUser)

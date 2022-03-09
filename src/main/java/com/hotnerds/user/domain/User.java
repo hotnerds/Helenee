@@ -46,11 +46,21 @@ public class User extends BaseTimeEntity {
     public User(String username, String email) {
         this.username = username;
         this.email = email;
+        this.followerList = new FollowerList();
+        this.followedList = new FollowedList();
     }
 
     public boolean equals(User anotherUserEntity) {
         if (this == anotherUserEntity) return true;
         return this.username.equals(anotherUserEntity.getUsername()) &&
                 this.email.equals(anotherUserEntity.getEmail());
+    }
+
+    public boolean isFollowerOf(User followed) {
+        return this.getFollowedList().isFollowing(followed);
+    }
+
+    public boolean isFollowedBy(User follower) {
+        return this.getFollowerList().isFollowedBy(follower);
     }
 }

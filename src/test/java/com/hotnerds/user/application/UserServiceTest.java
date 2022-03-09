@@ -1,10 +1,12 @@
 package com.hotnerds.user.application;
 
+import com.hotnerds.user.domain.Dto.FollowServiceReqDto;
 import com.hotnerds.user.domain.Dto.NewUserReqDto;
 import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
+import com.hotnerds.user.domain.Follow;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
-import org.junit.jupiter.api.Assertions;
+import com.hotnerds.user.exception.FollowRelationshipExistsException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,8 +19,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -66,10 +69,10 @@ class UserServiceTest {
         List<User> gotUserList = userService.getAllUsers();
 
         // then
-        Assertions.assertEquals(2, gotUserList.size());
-        Assertions.assertTrue(actualNewUserReqDtoList.get(0).toEntity()
+        assertEquals(2, gotUserList.size());
+        assertTrue(actualNewUserReqDtoList.get(0).toEntity()
                 .equals(gotUserList.get(0)));
-        Assertions.assertTrue(actualNewUserReqDtoList.get(1).toEntity()
+        assertTrue(actualNewUserReqDtoList.get(1).toEntity()
                 .equals(gotUserList.get(1)));
     }
 
@@ -83,7 +86,7 @@ class UserServiceTest {
         User userFound = userService.getUserById(user.getId());
 
         // then
-        Assertions.assertEquals(user, userFound);
+        assertEquals(user, userFound);
     }
 
     @Test
@@ -101,8 +104,78 @@ class UserServiceTest {
         userService.updateUser(user.getId(), userUpdateReqDto);
 
         // then
-        // 반환이 void인 createNewUser, deleteUserById, updateUser 같은 경우
-        // DB에 적용이 되는지 확인하는 절차가 필요하기 때문에 테스트가 애매함
-        // 피드백 필요
+    }
+
+    @Test
+    @DisplayName("새로운 팔로우 관계를 생성할때 같은 관계가 존재하면 예외 발생")
+    void 팔로우_중복_확인() {
+        // given
+        final User user1 = User.builder()
+                .username("user1")
+                .email("user1@gmail.com")
+                .build();
+
+        final User user2 = User.builder()
+                .username("user2")
+                .email("user2@gmail.com")
+                .build();
+
+        final FollowServiceReqDto reqDto = FollowServiceReqDto.builder()
+                .followerId(1L) // given id for user1
+                .followedId(2L) // given id for user2
+                .build();
+
+        final Follow follow = Follow.builder()
+                .follower(user1)
+                .followed(user2)
+                .build();
+
+        user1.getFollowedList().add(follow);
+        user2.getFollowerList().add(follow);
+
+        when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
+        when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
+
+        // when then
+        assertThrows(FollowRelationshipExistsException.class, () -> userService.createFollow(reqDto));
+        verify(userRepository, times(1)).findById(reqDto.getFollowerId());
+        verify(userRepository, times(1)).findById(reqDto.getFollowedId());
+    }
+
+    @Test
+    @DisplayName("새로운 팔로우 관계를 생성할 수 있다")
+    void 새로운_팔로우_관계_생성() {
+        // given
+        final FollowServiceReqDto reqDto = FollowServiceReqDto.builder()
+                .followerId(1L) // given id for user1
+                .followedId(2L) // given id for user2
+                .build();
+
+        final User user1 = User.builder()
+                .username("user1")
+                .email("user1@gmail.com")
+                .build();
+
+        final User user2 = User.builder()
+                .username("user2")
+                .email("user2@gmail.com")
+                .build();
+
+        final Follow follow = Follow.builder()
+                .follower(user1)
+                .followed(user2)
+                .build();
+
+        when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
+        when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
+
+        // when
+        Follow response = userService.createFollow(reqDto);
+
+        // then
+        assertTrue(follow.getFollower() == response.getFollower() &&
+                follow.getFollowed() == response.getFollowed());
+        verify(userRepository, times(1)).findById(reqDto.getFollowerId());
+        verify(userRepository, times(1)).findById(reqDto.getFollowedId());
     }
 }
