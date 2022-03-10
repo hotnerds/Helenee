@@ -9,7 +9,7 @@ import java.util.List;
 @Embeddable
 @Getter
 public class FollowerList {
-    @OneToMany(mappedBy = "followerList", orphanRemoval = true, cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "follower", orphanRemoval = true, cascade = CascadeType.PERSIST)
     private List<Follow> followers = new ArrayList<>();
 
     public boolean isFollowedBy(User user) {
