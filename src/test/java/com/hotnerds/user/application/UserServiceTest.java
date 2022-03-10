@@ -7,6 +7,7 @@ import com.hotnerds.user.domain.Follow;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import com.hotnerds.user.exception.FollowRelationshipExistsException;
+import com.hotnerds.user.exception.FollowRelationshipNotFound;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,7 +63,7 @@ class UserServiceTest {
     void getAllUsers() {
         // mocking
         when(userRepository.findAll()).thenReturn(actualNewUserReqDtoList.stream()
-                .map(newUserDto -> newUserDto.toEntity())
+                .map(NewUserReqDto::toEntity)
                 .collect(Collectors.toList()));
 
         // when
@@ -175,6 +176,74 @@ class UserServiceTest {
         // then
         assertTrue(follow.getFollower() == response.getFollower() &&
                 follow.getFollowed() == response.getFollowed());
+        verify(userRepository, times(1)).findById(reqDto.getFollowerId());
+        verify(userRepository, times(1)).findById(reqDto.getFollowedId());
+    }
+
+    @Test
+    @DisplayName("없는 정보의 팔로우 검색 시도 시 예외발생")
+    public void 없는_팔로우_관계_검색() {
+        // given
+        final FollowServiceReqDto reqDto = FollowServiceReqDto.builder()
+                .followerId(1L) // given id for user1
+                .followedId(2L) // given id for user2
+                .build();
+
+        final User user1 = User.builder()
+                .username("user1")
+                .email("user1@gmail.com")
+                .build();
+
+        final User user2 = User.builder()
+                .username("user2")
+                .email("user2@gmail.com")
+                .build();
+
+        when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
+        when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
+
+        // when then
+        assertThrows(FollowRelationshipNotFound.class, () -> userService.getOneFollow(reqDto));
+        verify(userRepository, times(1)).findById(reqDto.getFollowerId());
+        verify(userRepository, times(1)).findById(reqDto.getFollowedId());
+    }
+
+    @Test
+    @DisplayName("팔로우 관계를 팔로워 ID와 피팔로워 ID로 검색 가능")
+    public void 팔로우_관계_검색() {
+        // given
+        final FollowServiceReqDto reqDto = FollowServiceReqDto.builder()
+                .followerId(1L) // given id for user1
+                .followedId(2L) // given id for user2
+                .build();
+
+        final User user1 = User.builder()
+                .username("user1")
+                .email("user1@gmail.com")
+                .build();
+
+        final User user2 = User.builder()
+                .username("user2")
+                .email("user2@gmail.com")
+                .build();
+
+        final Follow follow = Follow.builder()
+                .follower(user1)
+                .followed(user2)
+                .build();
+
+        user1.getFollowedList().add(follow);
+        user2.getFollowerList().add(follow);
+
+        when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
+        when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
+
+        // when
+        Follow searchResult = userService.getOneFollow(reqDto);
+
+        // then
+        assertEquals(follow.getFollower(), searchResult.getFollower());
+        assertEquals(follow.getFollowed(), searchResult.getFollowed());
         verify(userRepository, times(1)).findById(reqDto.getFollowerId());
         verify(userRepository, times(1)).findById(reqDto.getFollowedId());
     }
