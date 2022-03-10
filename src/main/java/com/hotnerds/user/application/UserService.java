@@ -105,4 +105,10 @@ public class UserService {
                 .map(f -> f.getFollower().getId())
                 .collect(Collectors.toList());
     }
+
+    public List<Long> getUserFollowings(final Long userId) {
+        return getUserById(userId).getFollowedList().getFollowed().stream()
+                .map(f -> f.getFollowed().getId())
+                .collect(Collectors.toList());
+    }
 }

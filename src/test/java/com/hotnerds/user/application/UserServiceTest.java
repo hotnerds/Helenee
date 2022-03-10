@@ -4,6 +4,7 @@ import com.hotnerds.user.domain.Dto.FollowServiceReqDto;
 import com.hotnerds.user.domain.Dto.NewUserReqDto;
 import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
 import com.hotnerds.user.domain.Follow;
+import com.hotnerds.user.domain.FollowedList;
 import com.hotnerds.user.domain.FollowerList;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
@@ -205,24 +206,20 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 유저의 ID로 팔로잉하는 유저들의 id를 검색하면 예외발생")
-    public void 유저_팔로잉_리스트_오류() {
+    @DisplayName("존재하지 않는 id를 가진 유저를 팔로잉하는 모든 유저들의 id를 검색하면 예외발생")
+    public void 유저_팔로워_리스트_오류() {
         // when then
         assertThrows(UserNotFoundException.class, () -> userService.getUserFollowers(999L));
     }
 
     @Test
-    @DisplayName("특정 id의 유저를 팔로잉하는 유저들의 id를 검색 가능")
-    public void 유저_팔로잉_리스트_검색() {
+    @DisplayName("특정 id의 유저를 팔로잉하는 모든 유저들의 id를 검색 가능")
+    public void 유저_팔로워_리스트_검색() {
         // given
         User mockedUser1 = mock(User.class);
         User mockedUser2 = mock(User.class);
         User mockedUser3 = mock(User.class);
         FollowerList mockedList = mock(FollowerList.class);
-        User user3 = User.builder()
-                .username("user3")
-                .email("user3@gmail.com")
-                .build();
 
         follow = Follow.builder()
                 .follower(mockedUser1)
@@ -234,9 +231,6 @@ class UserServiceTest {
                 .followed(mockedUser2)
                 .build();
 
-        user1.getFollowedList().add(follow);
-        user3.getFollowedList().add(anotherFollow);
-
         when(userRepository.findById(2L)).thenReturn(Optional.of(mockedUser2));
         when(mockedUser1.getId()).thenReturn(1L);
         when(mockedUser3.getId()).thenReturn(3L);
@@ -247,6 +241,50 @@ class UserServiceTest {
 
         // when
         List<Long> userIdList = userService.getUserFollowers(2L); // 2 is user id for user2
+
+        // then
+        assertEquals(expectedList.get(0), userIdList.get(0));
+        assertEquals(expectedList.get(1), userIdList.get(1));
+        verify(userRepository).findById(2L);
+    }
+
+
+    @Test
+    @DisplayName("존재하지 않는 id를 가진 유저가 팔로잉하는 모든 유저들의 id를 검색하면 예외발생")
+    public void 유저_팔로잉_리스트_오류() {
+        // when then
+        assertThrows(UserNotFoundException.class, () -> userService.getUserFollowings(999L));
+    }
+
+    @Test
+    @DisplayName("특정 id의 유저가 팔로잉하는 유저들의 모든 id를 검색 가능")
+    public void 유저_팔로잉_리스트_검색() {
+        // given
+        User mockedUser1 = mock(User.class);
+        User mockedUser2 = mock(User.class);
+        User mockedUser3 = mock(User.class);
+        FollowedList mockedList = mock(FollowedList.class);
+
+        follow = Follow.builder()
+                .follower(mockedUser2)
+                .followed(mockedUser1)
+                .build();
+
+        Follow anotherFollow = Follow.builder()
+                .follower(mockedUser2)
+                .followed(mockedUser3)
+                .build();
+
+        when(userRepository.findById(2L)).thenReturn(Optional.of(mockedUser2));
+        when(mockedUser1.getId()).thenReturn(1L);
+        when(mockedUser3.getId()).thenReturn(3L);
+        when(mockedUser2.getFollowedList()).thenReturn(mockedList);
+        when(mockedList.getFollowed()).thenReturn(Arrays.asList(follow, anotherFollow));
+
+        List<Long> expectedList = Arrays.asList(1L, 3L);
+
+        // when
+        List<Long> userIdList = userService.getUserFollowings(2L); // 2 is user id for user2
 
         // then
         assertEquals(expectedList.get(0), userIdList.get(0));
