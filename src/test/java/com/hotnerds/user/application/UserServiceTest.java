@@ -8,6 +8,8 @@ import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import com.hotnerds.user.exception.FollowRelationshipExistsException;
 import com.hotnerds.user.exception.FollowRelationshipNotFound;
+import com.hotnerds.user.exception.UserNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +45,34 @@ class UserServiceTest {
                     .email("lkslyj8@naver.com")
                     .build()
     );
+
+    private User user1;
+    private User user2;
+    private Follow follow;
+    private FollowServiceReqDto reqDto;
+
+    @BeforeEach
+    void setUp() {
+        user1 = User.builder()
+                .username("user1")
+                .email("user1@gmail.com")
+                .build();
+
+        user2 = User.builder()
+                .username("user2")
+                .email("user2@gmail.com")
+                .build();
+
+        reqDto = FollowServiceReqDto.builder()
+                .followerId(1L) // given id for user1
+                .followedId(2L) // given id for user2
+                .build();
+
+        follow = Follow.builder()
+                .follower(user1)
+                .followed(user2)
+                .build();
+    }
 
     @Test
     void createNewUser() {
@@ -111,26 +141,6 @@ class UserServiceTest {
     @DisplayName("새로운 팔로우 관계를 생성할때 같은 관계가 존재하면 예외 발생")
     void 팔로우_중복_확인() {
         // given
-        final User user1 = User.builder()
-                .username("user1")
-                .email("user1@gmail.com")
-                .build();
-
-        final User user2 = User.builder()
-                .username("user2")
-                .email("user2@gmail.com")
-                .build();
-
-        final FollowServiceReqDto reqDto = FollowServiceReqDto.builder()
-                .followerId(1L) // given id for user1
-                .followedId(2L) // given id for user2
-                .build();
-
-        final Follow follow = Follow.builder()
-                .follower(user1)
-                .followed(user2)
-                .build();
-
         user1.getFollowedList().add(follow);
         user2.getFollowerList().add(follow);
 
@@ -147,26 +157,6 @@ class UserServiceTest {
     @DisplayName("새로운 팔로우 관계를 생성할 수 있다")
     void 새로운_팔로우_관계_생성() {
         // given
-        final FollowServiceReqDto reqDto = FollowServiceReqDto.builder()
-                .followerId(1L) // given id for user1
-                .followedId(2L) // given id for user2
-                .build();
-
-        final User user1 = User.builder()
-                .username("user1")
-                .email("user1@gmail.com")
-                .build();
-
-        final User user2 = User.builder()
-                .username("user2")
-                .email("user2@gmail.com")
-                .build();
-
-        final Follow follow = Follow.builder()
-                .follower(user1)
-                .followed(user2)
-                .build();
-
         when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
         when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
 
@@ -184,21 +174,6 @@ class UserServiceTest {
     @DisplayName("없는 정보의 팔로우 검색 시도 시 예외발생")
     public void 없는_팔로우_관계_검색() {
         // given
-        final FollowServiceReqDto reqDto = FollowServiceReqDto.builder()
-                .followerId(1L) // given id for user1
-                .followedId(2L) // given id for user2
-                .build();
-
-        final User user1 = User.builder()
-                .username("user1")
-                .email("user1@gmail.com")
-                .build();
-
-        final User user2 = User.builder()
-                .username("user2")
-                .email("user2@gmail.com")
-                .build();
-
         when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
         when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
 
@@ -212,26 +187,6 @@ class UserServiceTest {
     @DisplayName("팔로우 관계를 팔로워 ID와 피팔로워 ID로 검색 가능")
     public void 팔로우_관계_검색() {
         // given
-        final FollowServiceReqDto reqDto = FollowServiceReqDto.builder()
-                .followerId(1L) // given id for user1
-                .followedId(2L) // given id for user2
-                .build();
-
-        final User user1 = User.builder()
-                .username("user1")
-                .email("user1@gmail.com")
-                .build();
-
-        final User user2 = User.builder()
-                .username("user2")
-                .email("user2@gmail.com")
-                .build();
-
-        final Follow follow = Follow.builder()
-                .follower(user1)
-                .followed(user2)
-                .build();
-
         user1.getFollowedList().add(follow);
         user2.getFollowerList().add(follow);
 
