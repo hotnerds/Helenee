@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public void createNewUser(NewUserReqDto newUserReqDto) {
+    public void createNewUser(final NewUserReqDto newUserReqDto) {
         Optional<User> optionalUser = userRepository.findByUsernameOrEmail(newUserReqDto.getUsername(), newUserReqDto.getEmail());
         if (optionalUser.isPresent()) {
             throw new UserExistsException("동일한 정보를 가진 유저가 이미 존재합니다");
@@ -36,16 +37,16 @@ public class UserService {
         userRepository.save(newUserReqDto.toEntity());
     }
 
-    public User getUserById(Long userId) {
+    public User getUserById(final Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User ID " + userId + "이(가) 존재하지 않습니다"));
     }
 
-    public void deleteUserById(Long userId) {
+    public void deleteUserById(final Long userId) {
         userRepository.deleteById(userId);
     }
 
-    public void updateUser(Long userId, UserUpdateReqDto userUpdateReqDto) {
+    public void updateUser(final Long userId, final UserUpdateReqDto userUpdateReqDto) {
         Optional<User> optionalUser = userRepository.findById(userId);
         User user = optionalUser
                 .orElseThrow(() -> new UserNotFoundException("User ID " + userId + "이(가) 존재하지 않습니다"));
@@ -55,18 +56,18 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public boolean isFollowExist(User user1, User user2) {
+    public boolean isFollowExist(final User user1, final User user2) {
         return (user1.isFollowerOf(user2) && user2.isFollowedBy(user1))
                 || (user1.isFollowedBy(user2) && user2.isFollowerOf(user1));
     }
 
-    public boolean isMutualFollowExist(User user1, User user2) {
+    public boolean isMutualFollowExist(final User user1, final User user2) {
         return (user1.isFollowerOf(user2) && user2.isFollowedBy(user1))
                 && (user1.isFollowedBy(user2) && user2.isFollowerOf(user1));
     }
 
     @Transactional
-    public Follow createFollow(FollowServiceReqDto followServiceReqDto) {
+    public Follow createFollow(final FollowServiceReqDto followServiceReqDto) {
         User followerUser = getUserById(followServiceReqDto.getFollowerId());
         User followedUser = getUserById(followServiceReqDto.getFollowedId());
 
@@ -85,7 +86,7 @@ public class UserService {
         return newFollowRelationship;
     }
 
-    public Follow getOneFollow(FollowServiceReqDto followServiceReqDto) {
+    public Follow getOneFollow(final FollowServiceReqDto followServiceReqDto) {
         User followerUser = getUserById(followServiceReqDto.getFollowerId());
         User followedUser = getUserById(followServiceReqDto.getFollowedId());
 
@@ -97,5 +98,11 @@ public class UserService {
                 .filter(f -> f.getFollowed().equals(followedUser))
                 .findAny()
                 .get();
+    }
+
+    public List<Long> getUserFollowers(final Long userId) {
+        return getUserById(userId).getFollowerList().getFollowers().stream()
+                .map(f -> f.getFollower().getId())
+                .collect(Collectors.toList());
     }
 }
