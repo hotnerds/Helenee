@@ -4,6 +4,7 @@ import com.hotnerds.user.application.UserService;
 import com.hotnerds.user.domain.Dto.FollowServiceReqDto;
 import com.hotnerds.user.domain.Dto.NewUserReqDto;
 import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
+import com.hotnerds.user.domain.Follow;
 import com.hotnerds.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -55,11 +56,47 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/follow/{id}")
-    public ResponseEntity createFollow(@RequestBody FollowServiceReqDto followServiceReqDto) {
+    @PostMapping("/follow")
+    public ResponseEntity<Void> createFollow(@RequestBody FollowServiceReqDto followServiceReqDto) {
         userService.createFollow(followServiceReqDto);
-
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/follow")
+    public ResponseEntity<Follow> getFollow(@RequestBody FollowServiceReqDto followServiceReqDto) {
+        return ResponseEntity.ok(userService.getOneFollow(followServiceReqDto));
+    }
+
+    @GetMapping("/follow/check")
+    public ResponseEntity<Boolean> checkFollow(@RequestBody FollowServiceReqDto followServiceReqDto) {
+        // 이 부분 리팩토링 필요. 지금 건드리지 않는 이유는 isFollowExist 부분 다 바꿔야해서 일단 안 건드리는 중.
+        return ResponseEntity.ok(userService.isFollowExist(userService.getUserById(followServiceReqDto.getFollowerId()), userService.getUserById(followServiceReqDto.getFollowerId())));
+    }
+    
+    @GetMapping("/follow/check/mutual")
+    public ResponseEntity<Boolean> checkMutualFollow(@RequestBody FollowServiceReqDto followServiceReqDto) {
+        // 동일
+        return ResponseEntity.ok(userService.isMutualFollowExist(userService.getUserById(followServiceReqDto.getFollowerId()), userService.getUserById(followServiceReqDto.getFollowerId())));
+    }
+
+    @GetMapping("/follow/{id}/follower")
+    public ResponseEntity<List<Long>> getFollower(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(userService.getUserFollowers(id));
+    }
+
+    @GetMapping("/follow/{id}/followed")
+    public ResponseEntity<List<Long>> getFollowed(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(userService.getUserFollowings(id));
+    }
+
+    @GetMapping("/follow/{id}/follower/counts")
+    public ResponseEntity<Integer> getFollowerCounts(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(userService.getFollowerCounts(id));
+    }
+
+    @GetMapping("/follow/{id}/followed/counts")
+    public ResponseEntity<Integer> getFollowedCounts(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(userService.getFollowCounts(id));
     }
 
 }

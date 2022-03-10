@@ -292,7 +292,7 @@ class UserServiceTest {
     }
     
     @Test
-    @DisplayName("특정 id를 가진 유저의 현재 팔로워 수를 응답하는 기능")
+    @DisplayName("특정 id를 가진 유저의 현재 팔로워 수 응답 가능")
     public void 유저_팔로워_수() {
         // given
         User user3 = User.builder()
@@ -321,7 +321,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("특정 id를 가진 유저의 현재 팔로워 수를 응답하는 기능")
+    @DisplayName("특정 id를 가진 유저의 현재 팔로워 수 응답 가능")
     public void 유저_팔로잉_수() {
         User user3 = User.builder()
                 .username("user3")
@@ -344,8 +344,56 @@ class UserServiceTest {
         Integer count = userService.getFollowCounts(2L);
 
         // then
-        assertEquals(1, count);
+        assertEquals(0, count);
         verify(userRepository).findById(anyLong());
+    }
+    
+    @Test
+    @DisplayName("어떤 유저가 다른 유저를 팔로우하고 있는지 확인 가능")
+    public void 유저_팔로우_확인() {
+        // given
+        user1.getFollowedList().getFollowed().add(follow);
+        user2.getFollowerList().getFollowers().add(follow);
+
+        // when
+        boolean expectTrue = userService.isFollowExist(user1, user2);
+
+        // then
+        assertTrue(expectTrue);
+    }
+
+    @Test
+    @DisplayName("서로 팔로우 되어있는지 확인하는 기능")
+    public void 유저_뮤추얼_팔로우_확인() {
+        User user3 = User.builder()
+                .username("user3")
+                .email("user3@gmail.com")
+                .build();
+
+        Follow mutualFollow = Follow.builder()
+                .follower(user2)
+                .followed(user1)
+                .build();
+
+        Follow anotherFollow = Follow.builder()
+                .follower(user3)
+                .followed(user2)
+                .build();
+
+        user1.getFollowedList().getFollowed().add(follow);
+        user2.getFollowerList().getFollowers().add(follow);
+        user2.getFollowedList().getFollowed().add(mutualFollow);
+        user1.getFollowerList().getFollowers().add(mutualFollow);
+        user3.getFollowedList().getFollowed().add(anotherFollow);
+        user2.getFollowerList().getFollowers().add(anotherFollow);
+
+        // when
+        boolean expectMutualTrue = userService.isMutualFollowExist(user1, user2);
+        boolean expectMutualFalse = userService.isMutualFollowExist(user2, user3); // user 3 follows user 2, but not vice versa
+
+        // then
+        assertTrue(expectMutualTrue);
+        assertFalse(expectMutualFalse);
     }
 
 }
