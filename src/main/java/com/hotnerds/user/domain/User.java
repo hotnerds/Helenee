@@ -2,7 +2,6 @@ package com.hotnerds.user.domain;
 
 import com.hotnerds.common.BaseTimeEntity;
 import com.hotnerds.diet.domain.Diet;
-import com.hotnerds.follow.domain.Follow;
 import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
