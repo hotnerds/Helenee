@@ -248,7 +248,6 @@ class UserServiceTest {
         verify(userRepository).findById(2L);
     }
 
-
     @Test
     @DisplayName("존재하지 않는 id를 가진 유저가 팔로잉하는 모든 유저들의 id를 검색하면 예외발생")
     public void 유저_팔로잉_리스트_오류() {
@@ -291,4 +290,62 @@ class UserServiceTest {
         assertEquals(expectedList.get(1), userIdList.get(1));
         verify(userRepository).findById(2L);
     }
+    
+    @Test
+    @DisplayName("특정 id를 가진 유저의 현재 팔로워 수를 응답하는 기능")
+    public void 유저_팔로워_수() {
+        // given
+        User user3 = User.builder()
+                .username("user3")
+                .email("user3@gmail.com")
+                .build();
+
+        Follow anotherFollow = Follow.builder()
+                .follower(user3)
+                .followed(user2)
+                .build();
+
+        user1.getFollowedList().getFollowed().add(follow);
+        user2.getFollowerList().getFollowers().add(follow);
+        user3.getFollowedList().getFollowed().add(anotherFollow);
+        user2.getFollowerList().getFollowers().add(anotherFollow);
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user2));
+
+        // when
+        Integer count = userService.getFollowerCounts(2L);
+
+        // then
+        assertEquals(2, count);
+        verify(userRepository).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("특정 id를 가진 유저의 현재 팔로워 수를 응답하는 기능")
+    public void 유저_팔로잉_수() {
+        User user3 = User.builder()
+                .username("user3")
+                .email("user3@gmail.com")
+                .build();
+
+        Follow anotherFollow = Follow.builder()
+                .follower(user3)
+                .followed(user2)
+                .build();
+
+        user1.getFollowedList().getFollowed().add(follow);
+        user2.getFollowerList().getFollowers().add(follow);
+        user3.getFollowedList().getFollowed().add(anotherFollow);
+        user2.getFollowerList().getFollowers().add(anotherFollow);
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user2));
+
+        // when
+        Integer count = userService.getFollowCounts(2L);
+
+        // then
+        assertEquals(1, count);
+        verify(userRepository).findById(anyLong());
+    }
+
 }

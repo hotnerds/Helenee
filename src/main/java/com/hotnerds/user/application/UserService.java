@@ -111,4 +111,12 @@ public class UserService {
                 .map(f -> f.getFollowed().getId())
                 .collect(Collectors.toList());
     }
+
+    public Integer getFollowerCounts(long userId) {
+        return getUserById(userId).getFollowerList().followerCounts();
+    }
+
+    public Integer getFollowCounts(long userId) {
+        return getUserById(userId).getFollowedList().followCounts();
+    }
 }
