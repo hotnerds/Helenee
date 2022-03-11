@@ -30,19 +30,53 @@ public class User extends BaseTimeEntity {
     @JoinColumn(name = "DIET_ID")
     private List<Diet> dietList;
 
-    public void updateUser(UserUpdateReqDto userUpdateReqDto) {
-        this.username = userUpdateReqDto.getUsername();
-    }
+    @Embedded
+    private FollowerList followerList;
+
+    @Embedded
+    private FollowedList followedList;
 
     @Builder
     public User(String username, String email) {
         this.username = username;
         this.email = email;
+        this.followerList = new FollowerList();
+        this.followedList = new FollowedList();
     }
 
-    public boolean equals(User anotherUserEntity) {
-        if (this == anotherUserEntity) return true;
-        return this.username.equals(anotherUserEntity.getUsername()) ||
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (this.getClass() != o.getClass()) return false;
+        User anotherUserEntity = (User) o;
+        return this.username.equals(anotherUserEntity.getUsername()) &&
                 this.email.equals(anotherUserEntity.getEmail());
+    }
+
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int hashCode = 1;
+        hashCode = PRIME * hashCode + ((this.getUsername() == null) ? 0 : this.getUsername().hashCode());
+        hashCode = PRIME * hashCode + ((this.getEmail() == null) ? 0 : this.getEmail().hashCode());
+        return hashCode;
+    }
+
+    public void updateUser(UserUpdateReqDto userUpdateReqDto) {
+        this.username = userUpdateReqDto.getUsername();
+    }
+
+    public void follow(User followed) {
+        Follow newFollow = new Follow(this, followed);
+        this.getFollowedList().add(newFollow);
+        followed.getFollowerList().add(newFollow);
+    }
+
+    public boolean isFollowerOf(User followed) {
+        return this.getFollowedList().isFollowing(followed);
+    }
+
+    public boolean isFollowedBy(User follower) {
+        return this.getFollowerList().isFollowedBy(follower);
     }
 }
