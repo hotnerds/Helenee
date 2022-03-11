@@ -27,21 +27,61 @@ public class User extends BaseTimeEntity {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    private ROLE role;
+    ROLE role;
 
     @OneToMany
     @JoinColumn(name = "DIET_ID")
     private List<Diet> dietList;
+
+    @Embedded
+    private FollowerList followerList;
+
+    @Embedded
+    private FollowedList followedList;
+
+    @Builder
+    public User(String username, String email) {
+        this.username = username;
+        this.email = email;
+        this.followerList = new FollowerList();
+        this.followedList = new FollowedList();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (this.getClass() != o.getClass()) return false;
+        User anotherUserEntity = (User) o;
+        return this.username.equals(anotherUserEntity.getUsername()) &&
+                this.email.equals(anotherUserEntity.getEmail());
+    }
+
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int hashCode = 1;
+        hashCode = PRIME * hashCode + ((this.getUsername() == null) ? 0 : this.getUsername().hashCode());
+        hashCode = PRIME * hashCode + ((this.getEmail() == null) ? 0 : this.getEmail().hashCode());
+        return hashCode;
+    }
 
     public User updateUser(UserUpdateReqDto userUpdateReqDto) {
         this.username = userUpdateReqDto.getUsername();
         return this;
     }
 
-    @Builder
-    public User(String username, String email) {
-        this.username = username;
-        this.email = email;
+    public void follow(User followed) {
+        Follow newFollow = new Follow(this, followed);
+        this.getFollowedList().add(newFollow);
+        followed.getFollowerList().add(newFollow);
+    }
+
+    public boolean isFollowerOf(User followed) {
+        return this.getFollowedList().isFollowing(followed);
+    }
+
+    public boolean isFollowedBy(User follower) {
+        return this.getFollowerList().isFollowedBy(follower);
     }
 
     public User(String username, String email, ROLE role) {
@@ -50,15 +90,7 @@ public class User extends BaseTimeEntity {
         this.role = role;
     }
 
-
-
-    public boolean equals(User anotherUserEntity) {
-        if (this == anotherUserEntity) return true;
-        return this.username.equals(anotherUserEntity.getUsername()) ||
-                this.email.equals(anotherUserEntity.getEmail());
-    }
-
     public String getRoleKey() {
-        return role.getKey();
+        return this.role.getKey();
     }
 }
