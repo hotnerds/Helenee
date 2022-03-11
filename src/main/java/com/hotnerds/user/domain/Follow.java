@@ -12,7 +12,7 @@ import javax.persistence.*;
 public class Follow {
     @Id
     @GeneratedValue
-    private long id;
+    private Long id;
 
     @ManyToOne
     private User follower;
@@ -26,4 +26,19 @@ public class Follow {
         this.followed = followed;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (this.getClass() != o.getClass()) return false;
+        Follow follow = (Follow) o;
+        return this.getId().equals(follow.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int hashCode = 1;
+        hashCode = PRIME * hashCode + getId().intValue();
+        return hashCode;
+    }
 }

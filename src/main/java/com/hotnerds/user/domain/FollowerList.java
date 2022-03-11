@@ -1,5 +1,6 @@
 package com.hotnerds.user.domain;
 
+import com.hotnerds.user.exception.FollowRelationshipExistsException;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -22,6 +23,9 @@ public class FollowerList {
     }
 
     public void add(Follow follow) {
+        if (followers.contains(follow)) {
+            throw new FollowRelationshipExistsException("추가하려 하는 팔로우 관계가 이미 존재합니다");
+        }
         followers.add(follow);
     }
 
