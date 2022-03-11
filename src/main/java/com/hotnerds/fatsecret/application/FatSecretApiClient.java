@@ -7,6 +7,7 @@ import java.net.URI;
 import java.util.Map;
 
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
@@ -41,12 +42,9 @@ public class FatSecretApiClient {
     };
 
     @Autowired
-    public FatSecretApiClient(RestTemplateBuilder restTemplateBuilder, FatSecretResponseErrorHandler errorHandler, BufferingClientHttpRequestFactory requestFactory, FatSecretToken fatSecretToken) {
+    public FatSecretApiClient(RestTemplateBuilder restTemplateBuilder, FatSecretToken fatSecretToken) {
         this.fatSecretToken = fatSecretToken;
-        this.restTemplate = restTemplateBuilder
-                .requestFactory(() -> requestFactory)
-                .errorHandler(errorHandler)
-                .build();
+        this.restTemplate = restTemplateBuilder.build();
     }
 
     public ResponseEntity<Map<String, Object>> searchFoodById(final Long foodId) throws RestClientResponseException {

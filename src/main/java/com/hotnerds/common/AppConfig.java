@@ -1,12 +1,14 @@
 package com.hotnerds.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hotnerds.fatsecret.exception.FatSecretResponseError;
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
@@ -24,11 +26,6 @@ public class AppConfig {
     }
 
     @Bean
-    public RestTemplateBuilder restTemplateBuilder() {
-        return new RestTemplateBuilder();
-    }
-
-    @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }
@@ -39,8 +36,23 @@ public class AppConfig {
     }
 
     @Bean
-    public BufferingClientHttpRequestFactory bufferingClientHttpRequestFactory(SimpleClientHttpRequestFactory simpleClientHttpRequestFactory) {
-        return new BufferingClientHttpRequestFactory(simpleClientHttpRequestFactory);
+    @DependsOn("simpleClientHttpRequestFactory")
+    public BufferingClientHttpRequestFactory bufferingClientHttpRequestFactory() {
+        return new BufferingClientHttpRequestFactory(simpleClientHttpRequestFactory());
+    }
+
+    @Bean
+    @DependsOn("objectMapper")
+    public FatSecretResponseErrorHandler fatSecretResponseErrorHandler() {
+        return new FatSecretResponseErrorHandler(objectMapper());
+    }
+
+    @Bean
+    @DependsOn(value = {"bufferingClientHttpRequestFactory", "fatSecretResponseErrorHandler"})
+    public RestTemplateBuilder restTemplateBuilder() {
+        return new RestTemplateBuilder()
+                .requestFactory(this::bufferingClientHttpRequestFactory)
+                .errorHandler(fatSecretResponseErrorHandler());
     }
 
 }
