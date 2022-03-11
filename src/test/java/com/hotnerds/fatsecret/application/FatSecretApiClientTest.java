@@ -8,8 +8,10 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withNoContent;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import com.hotnerds.common.AppConfig;
 import com.hotnerds.common.FatSecretConfig;
 import com.hotnerds.fatsecret.FatSecretToken;
+import com.hotnerds.fatsecret.TestConfig;
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorException;
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
 import org.junit.BeforeClass;
@@ -17,18 +19,25 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.client.MockServerRestTemplateCustomizer;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.ResponseCreator;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.*;
@@ -36,8 +45,9 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Import(TestConfig.class)
 @RestClientTest(value = FatSecretApiClient.class)
-@MockBean({JpaMetamodelMappingContext.class, BufferingClientHttpRequestFactory.class})
+@MockBean(JpaMetamodelMappingContext.class)
 class FatSecretApiClientTest {
 
     @MockBean
@@ -50,8 +60,14 @@ class FatSecretApiClientTest {
     FatSecretApiClient fatSecretApiClient;
 
     @Autowired
+    MockServerRestTemplateCustomizer customizer;
+
     MockRestServiceServer mockServer;
 
+    @BeforeEach
+    void setUp() {
+        mockServer = customizer.getServer();
+    }
 
     @Test
     @DisplayName("유효하지 않은 음식 id는 정보를 찾을 수 없다.")
@@ -66,12 +82,11 @@ class FatSecretApiClientTest {
                 "}";
         String requestURL = "https://platform.fatsecret.com/rest/server.api?method=food.get.v2&food_id=" + foodId + "&format=json";
 
-        when(fatSecretResponseErrorHandler.hasError(any(ClientHttpResponse.class))).thenThrow(FatSecretResponseErrorException.class);
+        when(fatSecretResponseErrorHandler.hasError(any())).thenThrow(FatSecretResponseErrorException.class);
         mockServer.expect(requestTo(requestURL))
                 .andRespond(withSuccess(jsonResponse, MediaType.APPLICATION_JSON));
         //when then
         assertThrows(FatSecretResponseErrorException.class, () -> fatSecretApiClient.searchFoodById(foodId));
-        verify(fatSecretResponseErrorHandler, times(1)).hasError(any());
 
     }
 
@@ -137,7 +152,6 @@ class FatSecretApiClientTest {
     @DisplayName("searchFoodById에서 올바른 access token과 함께 request 요청을 보낸다.")
     void searchFoodById가_올바른_토큰을_전송한다 () {
         //given
-        when(fatSecretToken.getToken()).thenReturn("valid token");
         String requestURL = "https://platform.fatsecret.com/rest/server.api?method=food.get.v2&food_id=38821&format=json";
         mockServer.expect(requestTo(requestURL))
                 .andExpect(header("Authorization", "Bearer valid token"))
@@ -147,7 +161,6 @@ class FatSecretApiClientTest {
         fatSecretApiClient.searchFoodById(38821L);
 
         //then
-        verify(fatSecretToken, times(1)).getToken();
 
     }
 
@@ -155,7 +168,6 @@ class FatSecretApiClientTest {
     @DisplayName("searchFoods에서 올바른 access token과 함께 request 요청을 보낸다.")
     void searchFoods가_올바른_토큰을_전송한다 () {
         //given
-        when(fatSecretToken.getToken()).thenReturn("valid token");
         String requestURL = "https://platform.fatsecret.com/rest/server.api?method=foods.search&search_expression=Chicken&page_number=0&max_results=5&format=json";
         mockServer.expect(requestTo(requestURL))
                 .andExpect(header("Authorization", "Bearer valid token"))
@@ -165,7 +177,6 @@ class FatSecretApiClientTest {
         fatSecretApiClient.searchFoods("Chicken", 0, 5);
 
         //then
-        verify(fatSecretToken, times(1)).getToken();
 
     }
 
