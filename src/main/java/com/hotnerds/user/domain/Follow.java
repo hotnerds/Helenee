@@ -15,10 +15,11 @@ public class Follow {
     private Long id;
 
     @ManyToOne
-    @JoinColumn()
+    @JoinColumn(name = "FOLLOWER_USER_ID")
     private User follower;
 
     @ManyToOne
+    @JoinColumn(name = "FOLLOWED_USER_ID")
     private User followed;
 
     @Builder
