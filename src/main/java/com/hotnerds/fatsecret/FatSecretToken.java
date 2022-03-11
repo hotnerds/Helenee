@@ -1,10 +1,10 @@
 package com.hotnerds.fatsecret;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hotnerds.common.FatSecretConfig;
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -25,7 +25,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FatSecretToken {
 
-    private final String API_URI_PREFIX = "https://oauth.fatsecret.com/connect/token";
+    @Value("${fat-secret.token-request-url}")
+    private String API_URI_PREFIX;
+
+    @Value("${fat-secret.id}")
+    private String ID;
+
+    @Value("${fat-secret.secret}")
+    private String SECRET;
 
     private final String GRANT_TYPE = "grant_type";
 
@@ -40,15 +47,12 @@ public class FatSecretToken {
     private static final ParameterizedTypeReference<Map<String, Object>> PARAMETERIZED_RESPONSE_TYPE = new ParameterizedTypeReference<>() {
     };
 
-    private final FatSecretConfig fatSecretConfig;
-
     private final RestTemplate restTemplate;
 
     private String accessToken;
 
     @Autowired
-    public FatSecretToken(RestTemplateBuilder restTemplateBuilder, FatSecretConfig fatSecretConfig, ObjectMapper objectMapper) {
-        this.fatSecretConfig = fatSecretConfig;
+    public FatSecretToken(RestTemplateBuilder restTemplateBuilder, ObjectMapper objectMapper) {
         this.restTemplate = restTemplateBuilder
                 .requestFactory(() -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()))
                 .errorHandler(new FatSecretResponseErrorHandler(objectMapper))
@@ -77,7 +81,7 @@ public class FatSecretToken {
                 .toUri();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(fatSecretConfig.getId(), fatSecretConfig.getSecret());
+        headers.setBasicAuth(ID, SECRET);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add(GRANT_TYPE, CLIENT_CREDENTIALS);

@@ -9,6 +9,7 @@ import java.util.Map;
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -26,7 +27,8 @@ import javax.print.attribute.standard.Media;
 @Component
 public class FatSecretApiClient {
 
-    private final String API_URI_PREFIX = "https://platform.fatsecret.com/rest/server.api";
+    @Value("${fat-secret.api-url}")
+    private String API_URI_PREFIX;
 
     private final String METHOD = "method";
 
