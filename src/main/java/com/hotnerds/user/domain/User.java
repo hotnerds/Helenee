@@ -14,7 +14,6 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
 public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue
@@ -39,7 +38,7 @@ public class User extends BaseTimeEntity {
         return this;
     }
 
-
+    @Builder
     public User(String username, String email) {
         this.username = username;
         this.email = email;
