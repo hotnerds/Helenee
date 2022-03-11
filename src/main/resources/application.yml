@@ -11,32 +11,28 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
-  social:
-    kakao:
-      client_id: 7047208c7b5a97ce9afd6f567c209fdf
-      redirect-uri: /social/login/kakao
-      scope: profile_nickname, account_email
-      url:
-        login: https://kauth.kakao.com/oauth/authorize
-        token: https://kauth.kakao.com/oauth/token
-        profile: https:kapi.kakao.com/v2/user/me
-    url:
-      base: http://localhost:8080
+
   security:
     oauth2:
       client:
         registration:
           kakao:
-            client-id: 7047208c7b5a97ce9afd6f567c209fdf
-            redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
-            client-authentication-method: CLIENT_SECRET_POST
-            authorization-grant-type: authorization_code
+            clientId: 7047208c7b5a97ce9afd6f567c209fdf
+            redirectUri: http://localhost:8080/login/oauth2/code/kakao
+            clientAuthenticationMethod: CLIENT_SECRET_POST
+            authorizationGrantType: authorization_code
             scope: profile_nickname, account_email
-            client-name: Kakao
-            client-secret: garam
+            clientName: Kakao
+            #client-secret: garam
         provider:
           Kakao:
             authorization_uri: https://kauth.kakao.com/oauth/authorize
             token_uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user_name_attribute: id
+    jwt:
+      token: #임시 최소 32자.
+        secret-key: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        expire-length: 3600000
+server:
+  port: 8080
