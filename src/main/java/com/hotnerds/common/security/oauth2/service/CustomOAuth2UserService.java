@@ -5,6 +5,7 @@ import com.hotnerds.user.domain.ROLE;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -22,21 +23,20 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-    private final DefaultOAuth2UserService defaultOAuth2UserService;
     private final UserRepository userRepository;
+    private final DefaultOAuth2UserService defaultOAuth2UserService;
 
     @Transactional
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+
         OAuth2User oAuth2User = defaultOAuth2UserService.loadUser(userRequest);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
 
-        String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails()
-                .getUserInfoEndpoint().getUserNameAttributeName();
-
-        Iterator<? extends GrantedAuthority> iterator = oAuth2User.getAuthorities().iterator();
+        String userNameAttributeName = oAuth2User.getName();
 
         OAuth2Attributes attributes = OAuth2Attributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
@@ -48,20 +48,13 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private User saveOrUpdateUser(OAuth2Attributes attributes) {
-        User findUser = userRepository.findByEmail(attributes.getEmail())
-                .map(user -> user.updateUser(
-                        UserUpdateReqDto.builder()
-                                .username(attributes.getName())
-                                .build()
-                ))
-                .orElse(userRepository.save(
-                        User.builder()
-                                .username(attributes.getName())
-                                .email(attributes.getEmail())
-                                .role(ROLE.USER)
-                                .build()));
 
-        return findUser;
+        Optional<User> optionalUser = userRepository.findByEmail(attributes.getEmail()).map(user -> user.updateUser(
+                UserUpdateReqDto.builder()
+                        .username(attributes.getName())
+                        .build()));
+
+        return optionalUser.orElseGet(() -> userRepository.save(new User(attributes.getName(), attributes.getEmail(), ROLE.USER)));
 
     }
 }
