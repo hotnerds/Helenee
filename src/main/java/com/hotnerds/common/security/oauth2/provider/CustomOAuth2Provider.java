@@ -11,9 +11,9 @@ public enum CustomOAuth2Provider {
     KAKAO {
         @Override
         public ClientRegistration.Builder getBuilder(String registrationId) {
-            ClientRegistration.Builder builder = getBuilder(registrationId, ClientAuthenticationMethod.CLIENT_SECRET_POST,
+            ClientRegistration.Builder builder = getBuilder(registrationId, org.springframework.security.oauth2.core.ClientAuthenticationMethod.CLIENT_SECRET_POST,
                     DEFAULT_LOGIN_REDIRECT_URL)
-                    .scope("profile", "email")
+                    .scope("profile_nickname", "account_email")
                     .authorizationUri(AUTHORIZATION_URI)
                     .tokenUri(TOKEN_URI)
                     .userInfoUri(USER_INFO_URI)
@@ -35,7 +35,7 @@ public enum CustomOAuth2Provider {
         return builder;
     }
 
-    private static final String DEFAULT_LOGIN_REDIRECT_URL = "{baseUrl}/{action}/oauth2/code/{registrationId}";
+    private static final String DEFAULT_LOGIN_REDIRECT_URL = "http://localhost:8080/login/oauth2/code/kakao";
     private static final String AUTHORIZATION_URI = "https://kauth.kakao.com/oauth/authorize";
     private static final String TOKEN_URI = "https://kauth.kakao.com/oauth/token";
     private static final String USER_INFO_URI = "https://kapi.kakao.com/v2/user/me";
