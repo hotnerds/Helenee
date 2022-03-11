@@ -2,10 +2,12 @@ package com.hotnerds.common.security.oauth2.service;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
 @Getter
+@Slf4j
 public class OAuth2Attributes {
     private final Map<String, Object> attributes;
     private final String nameAttributeName;
@@ -25,9 +27,12 @@ public class OAuth2Attributes {
     }
 
     private static OAuth2Attributes ofKakao(String usernameAttributeName, Map<String, Object> attributes) {
+        Map<String, Object> properties = (Map<String, Object>)attributes.get("properties");
+        Map<String, Object> kakaoAccount = (Map<String, Object>)attributes.get("kakao_account");
+
         return OAuth2Attributes.builder()
-                .name((String) attributes.get("name"))
-                .email((String) attributes.get("email"))
+                .name((String) properties.get("nickname"))
+                .email((String)kakaoAccount.get("email"))
                 .attributes(attributes)
                 .nameAttributeName((String) usernameAttributeName)
                 .build();
