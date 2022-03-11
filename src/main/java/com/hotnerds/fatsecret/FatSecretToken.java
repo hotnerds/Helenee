@@ -22,7 +22,6 @@ import java.net.URI;
 import java.util.Map;
 
 @Component
-@RequiredArgsConstructor
 public class FatSecretToken {
 
     @Value("${fat-secret.token-request-url}")
@@ -52,11 +51,8 @@ public class FatSecretToken {
     private String accessToken;
 
     @Autowired
-    public FatSecretToken(RestTemplateBuilder restTemplateBuilder, ObjectMapper objectMapper) {
-        this.restTemplate = restTemplateBuilder
-                .requestFactory(() -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()))
-                .errorHandler(new FatSecretResponseErrorHandler(objectMapper))
-                .build();
+    public FatSecretToken(RestTemplateBuilder restTemplateBuilder) {
+        this.restTemplate = restTemplateBuilder.build();
     }
 
     @PostConstruct
