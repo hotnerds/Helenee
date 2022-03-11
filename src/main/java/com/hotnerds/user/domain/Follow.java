@@ -15,6 +15,7 @@ public class Follow {
     private Long id;
 
     @ManyToOne
+    @JoinColumn()
     private User follower;
 
     @ManyToOne

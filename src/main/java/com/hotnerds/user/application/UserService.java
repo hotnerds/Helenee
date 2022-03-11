@@ -82,8 +82,7 @@ public class UserService {
                 .followed(followedUser)
                 .build();
 
-        followerUser.getFollowerList().add(newFollowRelationship);
-        followedUser.getFollowedList().add(newFollowRelationship);
+        followerUser.follow(followedUser);
 
         return newFollowRelationship;
     }
