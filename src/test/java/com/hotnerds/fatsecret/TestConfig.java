@@ -1,40 +1,27 @@
-package com.hotnerds.common;
-
+package com.hotnerds.fatsecret;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hotnerds.fatsecret.exception.FatSecretResponseError;
 import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
+import org.mockito.Mock;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.web.client.MockServerRestTemplateCustomizer;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.ResponseErrorHandler;
 
-@Configuration
-public class AppConfig {
-
-    @Bean
-    public ModelMapper modelMapper() {
-        ModelMapper modelMapper = new ModelMapper();
-
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
-
-        return modelMapper;
-    }
-
+import static org.mockito.Mockito.mock;
+@TestConfiguration
+public class TestConfig {
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }
-
     @Bean
     public SimpleClientHttpRequestFactory simpleClientHttpRequestFactory() {
         return new SimpleClientHttpRequestFactory();
     }
-
     @Bean
     @DependsOn("simpleClientHttpRequestFactory")
     public BufferingClientHttpRequestFactory bufferingClientHttpRequestFactory() {
@@ -42,17 +29,14 @@ public class AppConfig {
     }
 
     @Bean
-    @DependsOn("objectMapper")
-    public FatSecretResponseErrorHandler fatSecretResponseErrorHandler() {
-        return new FatSecretResponseErrorHandler(objectMapper());
+    public MockServerRestTemplateCustomizer customizer() {
+        return new MockServerRestTemplateCustomizer();
     }
 
     @Bean
-    @DependsOn(value = {"bufferingClientHttpRequestFactory", "fatSecretResponseErrorHandler"})
-    public RestTemplateBuilder restTemplateBuilder() {
-        return new RestTemplateBuilder()
+    public RestTemplateBuilder restTemplateBuilder(FatSecretResponseErrorHandler errorHandler) {
+        return new RestTemplateBuilder(customizer())
                 .requestFactory(this::bufferingClientHttpRequestFactory)
-                .errorHandler(fatSecretResponseErrorHandler());
+                .errorHandler(errorHandler);
     }
-
 }
