@@ -19,11 +19,13 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
-@Component
-@RequiredArgsConstructor
 public class FatSecretResponseErrorHandler extends DefaultResponseErrorHandler {
 
     private final ObjectMapper objectMapper;
+
+    public FatSecretResponseErrorHandler(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
