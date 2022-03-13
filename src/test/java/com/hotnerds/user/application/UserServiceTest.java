@@ -290,7 +290,7 @@ class UserServiceTest {
         assertEquals(expectedList.get(1), userIdList.get(1));
         verify(userRepository).findById(2L);
     }
-    
+
     @Test
     @DisplayName("특정 id를 가진 유저의 현재 팔로워 수 응답 가능")
     public void 유저_팔로워_수() {
@@ -347,7 +347,7 @@ class UserServiceTest {
         assertEquals(0, count);
         verify(userRepository).findById(anyLong());
     }
-    
+
     @Test
     @DisplayName("어떤 유저가 다른 유저를 팔로우하고 있는지 확인 가능")
     public void 유저_팔로우_확인() {

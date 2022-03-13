@@ -26,6 +26,9 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, length = 20, unique = true)
     private String email;
 
+    @Enumerated(EnumType.STRING)
+    ROLE role;
+
     @OneToMany
     @JoinColumn(name = "DIET_ID")
     private List<Diet> dietList;
@@ -62,8 +65,9 @@ public class User extends BaseTimeEntity {
         return hashCode;
     }
 
-    public void updateUser(UserUpdateReqDto userUpdateReqDto) {
+    public User updateUser(UserUpdateReqDto userUpdateReqDto) {
         this.username = userUpdateReqDto.getUsername();
+        return this;
     }
 
     public void follow(User followed) {
@@ -78,5 +82,15 @@ public class User extends BaseTimeEntity {
 
     public boolean isFollowedBy(User follower) {
         return this.getFollowerList().isFollowedBy(follower);
+    }
+
+    public User(String username, String email, ROLE role) {
+        this.username = username;
+        this.email = email;
+        this.role = role;
+    }
+
+    public String getRoleKey() {
+        return this.role.getKey();
     }
 }

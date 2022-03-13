@@ -19,6 +19,7 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
+
 .idea
 *.iws
 *.iml
@@ -29,6 +30,7 @@ out/
 
 #yml
 **/src/main/resources/application.yml
+**/src/main/resources/application-local.yml
 *.yml
 
 ### NetBeans ###
