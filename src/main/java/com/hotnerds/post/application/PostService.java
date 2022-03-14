@@ -84,4 +84,19 @@ public class PostService {
                 .postId(post.getId())
                 .build();
     }
+
+    public LikeResponseDto unlike(String username, Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(PostNotFoundException::new);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
+
+        post.unlike(user);
+
+        return LikeResponseDto.builder()
+                .likeCount(post.getLikeCount())
+                .username(user.getUsername())
+                .postId(post.getId())
+                .build();
+    }
 }
