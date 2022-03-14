@@ -6,6 +6,7 @@ import com.hotnerds.post.domain.like.Like;
 import com.hotnerds.post.domain.like.Likes;
 import com.hotnerds.post.domain.repository.PostRepository;
 import com.hotnerds.post.exception.DuplicatedLikeException;
+import com.hotnerds.post.exception.LikeNotFoundException;
 import com.hotnerds.post.exception.PostNotFoundException;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
@@ -292,6 +293,42 @@ public class PostServiceTest {
         verify(postRepository, times(1)).findById(post.getId());
     }
 
+    @DisplayName("좋아요를 누르지 않은 게시물에 대해 좋아요를 취소할 수 없다.")
+    @Test
+    void 좋아요_취소_실패() {
+        //given
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
+        //when then
+        assertThatThrownBy(
+                () -> postService.unlike(user.getUsername(), post.getId()))
+                .isInstanceOf(LikeNotFoundException.class)
+                .hasMessage(LikeNotFoundException.MESSAGE);
+    }
+
+    @DisplayName("좋아요 취소 성공")
+    @Test
+    void 존재하지않은_게시글_좋아요_취소() {
+        //given
+        post.like(user);
+
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+
+
+        //when
+        LikeResponseDto responseDto = postService.unlike(user.getUsername(), post.getId());
+
+        //then
+        assertAll(
+                () -> assertThat(responseDto.getLikeCount()).isEqualTo(0),
+                () -> assertThat(responseDto.getUsername()).isEqualTo(user.getUsername()),
+                () -> assertThat(responseDto.getPostId()).isEqualTo(post.getId())
+        );
+
+        verify(postRepository, times(1)).findById(post.getId());
+        verify(userRepository, times(1)).findByUsername(user.getUsername());
+    }
 
 }
