@@ -1,10 +1,7 @@
 package com.hotnerds.post.application;
 
 import com.hotnerds.post.domain.Post;
-import com.hotnerds.post.domain.dto.PostByUserRequestDto;
-import com.hotnerds.post.domain.dto.PostDeleteRequestDto;
-import com.hotnerds.post.domain.dto.PostRequestDto;
-import com.hotnerds.post.domain.dto.PostResponseDto;
+import com.hotnerds.post.domain.dto.*;
 import com.hotnerds.post.domain.repository.PostRepository;
 import com.hotnerds.post.exception.PostNotFoundException;
 import com.hotnerds.user.domain.User;
@@ -71,5 +68,20 @@ public class PostService {
         postRepository.findById(requestDto.getPostId()).orElseThrow(PostNotFoundException::new);
 
         postRepository.deleteById(requestDto.getPostId());
+    }
+
+    public LikeResponseDto like(String username, Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(PostNotFoundException::new);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
+
+        post.like(user);
+
+        return LikeResponseDto.builder()
+                .likeCount(post.getLikeCount())
+                .username(user.getUsername())
+                .postId(post.getId())
+                .build();
     }
 }
