@@ -1,6 +1,7 @@
 package com.hotnerds.post.domain.like;
 
 import com.hotnerds.post.exception.DuplicatedLikeException;
+import com.hotnerds.post.exception.LikeNotFoundException;
 import com.hotnerds.user.domain.User;
 import lombok.RequiredArgsConstructor;
 
@@ -40,7 +41,7 @@ public class Likes {
 
     public void remove(Like like) {
         if(!likes.contains(like)) {
-
+            throw new LikeNotFoundException();
         }
         likes.remove(like);
     }
