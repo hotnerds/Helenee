@@ -1,6 +1,8 @@
 package com.hotnerds.post.domain;
 
 import com.hotnerds.common.BaseTimeEntity;
+import com.hotnerds.post.domain.like.Like;
+import com.hotnerds.post.domain.like.Likes;
 import com.hotnerds.user.domain.User;
 import lombok.*;
 import org.hibernate.mapping.Join;
@@ -27,5 +29,30 @@ public class Post extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User writer;
+
+    @Embedded
+    Likes likes;
+
+    public void like(User user) {
+        Like like = Like.builder()
+                .id(null)
+                .post(this)
+                .user(user)
+                .build();
+        likes.add(like);
+    }
+
+    public void unlike(User user) {
+        Like like = Like.builder()
+                .id(null)
+                .post(this)
+                .user(user)
+                .build();
+        likes.remove(like);
+    }
+
+    public int getLikeCount() {
+        return likes.getCount();
+    }
 
 }
