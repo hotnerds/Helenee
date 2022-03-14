@@ -1,11 +1,11 @@
 package com.hotnerds.post.application;
 
 import com.hotnerds.post.domain.Post;
-import com.hotnerds.post.domain.dto.PostByUserRequestDto;
-import com.hotnerds.post.domain.dto.PostDeleteRequestDto;
-import com.hotnerds.post.domain.dto.PostRequestDto;
-import com.hotnerds.post.domain.dto.PostResponseDto;
+import com.hotnerds.post.domain.dto.*;
+import com.hotnerds.post.domain.like.Like;
+import com.hotnerds.post.domain.like.Likes;
 import com.hotnerds.post.domain.repository.PostRepository;
+import com.hotnerds.post.exception.DuplicatedLikeException;
 import com.hotnerds.post.exception.PostNotFoundException;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
@@ -20,10 +20,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -44,8 +46,12 @@ public class PostServiceTest {
 
     Post post;
 
+    Likes likes;
+
     @BeforeEach
     void init() {
+        likes = new Likes(new ArrayList<>());
+
         user = User.builder()
                 .username("name")
                 .email("email")
@@ -56,6 +62,7 @@ public class PostServiceTest {
                 .title("title")
                 .content("content")
                 .writer(user)
+                .likes(likes)
                 .build();
     }
 
@@ -218,6 +225,73 @@ public class PostServiceTest {
         verify(postRepository, times(1)).findById(requestDto.getPostId());
         verify(postRepository, times(1)).deleteById(requestDto.getPostId());
     }
+
+    @DisplayName("존재하지 않는 게시글에 좋아요를 누르면 실패 한다.")
+    @Test
+    void 존재하지않은_게시글_좋아요_실패() {
+        //given
+        when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        //when then
+        assertThatThrownBy(
+                () -> postService.like(user.getUsername(), post.getId()))
+                .isInstanceOf(PostNotFoundException.class)
+                .hasMessage(PostNotFoundException.MESSAGE);
+    }
+
+    @DisplayName("존재하지 않는 사용자가 게시글에 좋아요를 요청하면 실패한다.")
+    @Test
+    void 존재하지않는_사용자_좋아요_실패() {
+        //given
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+        //when then
+        assertThatThrownBy(
+                () -> postService.like(user.getUsername(), post.getId()))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessage(UserNotFoundException.MESSAGE);
+    }
+
+    @DisplayName("게시글 좋아요 요청이 중복되면 예외를 발생시킨다.")
+    @Test
+    void 게시글_좋아요_중복() {
+        //given
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+
+        post.getLikes().add(Like.builder()
+                .id(null)
+                .user(user)
+                .post(post)
+                .build());
+
+        //when then
+        assertThatThrownBy(
+                () -> postService.like(user.getUsername(), post.getId()))
+                .isInstanceOf(DuplicatedLikeException.class)
+                .hasMessage(DuplicatedLikeException.MESSAGE);
+    }
+
+    @DisplayName("사용자가 게시물에 좋아요를 누를 수 있다.")
+    @Test
+    void 게시글_좋아요_성공() {
+        //given
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+
+        //when
+        LikeResponseDto responseDto = postService.like(user.getUsername(), post.getId());
+
+        //then
+        assertAll(
+                () -> assertThat(responseDto.getLikeCount()).isEqualTo(1),
+                () -> assertThat(responseDto.getUsername()).isEqualTo(user.getUsername()),
+                () -> assertThat(responseDto.getPostId()).isEqualTo(post.getId())
+        );
+        verify(userRepository, times(1)).findByUsername(user.getUsername());
+        verify(postRepository, times(1)).findById(post.getId());
+    }
+
 
 
 }
