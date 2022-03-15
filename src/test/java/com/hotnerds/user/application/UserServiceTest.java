@@ -412,7 +412,7 @@ class UserServiceTest {
     public void 유저_팔로우_취소() {
         // given
         user1.getFollowedList().add(follow);
-        user2.getFollowedList().add(follow);
+        user2.getFollowerList().add(follow);
         when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
         when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
 

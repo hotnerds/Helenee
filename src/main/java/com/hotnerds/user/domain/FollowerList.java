@@ -1,6 +1,7 @@
 package com.hotnerds.user.domain;
 
 import com.hotnerds.user.exception.FollowRelationshipExistsException;
+import com.hotnerds.user.exception.FollowRelationshipNotFound;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -29,4 +30,10 @@ public class FollowerList {
         followers.add(follow);
     }
 
+    public void delete(Follow follow) {
+        if (!followers.contains(follow)) {
+            throw new FollowRelationshipNotFound();
+        }
+        followers.remove(follow);
+    }
 }

@@ -93,4 +93,10 @@ public class User extends BaseTimeEntity {
     public String getRoleKey() {
         return this.role.getKey();
     }
+
+    public void unfollow(User followed) {
+        Follow newFollow = new Follow(this, followed);
+        this.getFollowedList().delete(newFollow);
+        followed.getFollowerList().delete(newFollow);
+    }
 }
