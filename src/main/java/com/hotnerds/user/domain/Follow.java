@@ -33,14 +33,16 @@ public class Follow {
         if (this == o) return true;
         if (this.getClass() != o.getClass()) return false;
         Follow follow = (Follow) o;
-        return this.getId().equals(follow.getId());
+        return this.getFollower().equals(follow.getFollower())
+                && this.getFollowed().equals(follow.getFollowed());
     }
 
     @Override
     public int hashCode() {
         final int PRIME = 31;
         int hashCode = 1;
-        hashCode = PRIME * hashCode + getId().intValue();
+        hashCode = PRIME * hashCode + getFollower().hashCode();
+        hashCode = PRIME * hashCode + getFollowed().hashCode();
         return hashCode;
     }
 }
