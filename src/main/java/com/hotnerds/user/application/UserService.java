@@ -39,19 +39,19 @@ public class UserService {
 
     public User getUserById(final Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User ID " + userId + "이(가) 존재하지 않습니다"));
+                .orElseThrow(UserNotFoundException::new);
     }
 
     public void deleteUserById(final Long userId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User ID " + userId + "이(가) 존재하지 않습니다"));
+                .orElseThrow(UserNotFoundException::new);
 
         userRepository.deleteById(userId);
     }
 
     public void updateUser(final Long userId, final UserUpdateReqDto userUpdateReqDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User ID " + userId + "이(가) 존재하지 않습니다"));
+                .orElseThrow(UserNotFoundException::new);
 
         user.updateUser(userUpdateReqDto);
 

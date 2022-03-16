@@ -5,9 +5,9 @@ import org.springframework.http.HttpStatus;
 
 public class PostNotFoundException extends ApplicationException {
 
-    private static final String ERROR_CODE = "P0001";
-    private static final HttpStatus HTTP_STATUS = HttpStatus.INTERNAL_SERVER_ERROR;
-    private static final String MESSAGE = "해당하는 게시물을 찾을 수 없습니다.";
+    public static final String ERROR_CODE = "P0001";
+    public static final HttpStatus HTTP_STATUS = HttpStatus.INTERNAL_SERVER_ERROR;
+    public static final String MESSAGE = "해당하는 게시물을 찾을 수 없습니다.";
 
     public PostNotFoundException() {
         this(ERROR_CODE,HTTP_STATUS, MESSAGE);
