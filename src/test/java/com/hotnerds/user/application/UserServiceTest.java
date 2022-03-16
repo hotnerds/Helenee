@@ -395,5 +395,34 @@ class UserServiceTest {
         assertTrue(expectMutualTrue);
         assertFalse(expectMutualFalse);
     }
+    
+    @Test
+    @DisplayName("팔로우가 되어 있지 않은 유저에 대한 팔로우 관계 취소 요청이 오면 오류 발생")
+    public void 유저_팔로우_취소_오류() {
+        // given
+        when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
+        when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
 
+        // when then
+        assertThrows(FollowRelationshipNotFound.class, () -> userService.deleteFollow(reqDto));
+    }
+
+    @Test
+    @DisplayName("팔로우 관계 취소 기능이 되어야 한다")
+    public void 유저_팔로우_취소() {
+        // given
+        user1.getFollowedList().add(follow);
+        user2.getFollowerList().add(follow);
+        when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
+        when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
+
+        // when
+        userService.deleteFollow(reqDto);
+
+        // then
+        assertAll(
+                () -> assertEquals(0, user1.getFollowedList().followCounts()),
+                () -> assertEquals(0, user2.getFollowerList().followerCounts())
+        );
+    }
 }

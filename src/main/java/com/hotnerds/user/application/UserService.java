@@ -59,8 +59,7 @@ public class UserService {
     }
 
     public boolean isFollowExist(final User user1, final User user2) {
-        return (user1.isFollowerOf(user2) && user2.isFollowedBy(user1))
-                || (user1.isFollowedBy(user2) && user2.isFollowerOf(user1));
+        return user1.isFollowerOf(user2) && user2.isFollowedBy(user1);
     }
 
     public boolean isMutualFollowExist(final User user1, final User user2) {
@@ -119,5 +118,16 @@ public class UserService {
 
     public Integer getFollowCounts(long userId) {
         return getUserById(userId).getFollowedList().followCounts();
+    }
+
+    public void deleteFollow(final FollowServiceReqDto followServiceReqDto) {
+        User followerUser = getUserById(followServiceReqDto.getFollowerId());
+        User followedUser = getUserById(followServiceReqDto.getFollowedId());
+
+        if (!isFollowExist(followerUser, followedUser)) {
+            throw new FollowRelationshipNotFound();
+        }
+
+        followerUser.unfollow(followedUser);
     }
 }
