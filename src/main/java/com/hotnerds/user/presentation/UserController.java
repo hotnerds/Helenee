@@ -3,6 +3,7 @@ package com.hotnerds.user.presentation;
 import com.hotnerds.user.application.UserService;
 import com.hotnerds.user.domain.Dto.FollowServiceReqDto;
 import com.hotnerds.user.domain.Dto.NewUserReqDto;
+import com.hotnerds.user.domain.Dto.ResponseUserDto;
 import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
 import com.hotnerds.user.domain.Follow;
 import com.hotnerds.user.domain.User;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.hotnerds.user.presentation.UserController.*;
 
@@ -21,14 +23,18 @@ public class UserController {
     public static final String DEFAULT_URL = "/users";
     private final UserService userService;
 
-    @GetMapping("/")
-    public ResponseEntity<List<User>> getAllUser() {
+    @GetMapping
+    public ResponseEntity<List<ResponseUserDto>> getAllUser() {
         List<User> users = userService.getAllUsers();
 
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(
+                users.stream()
+                        .map(user -> ResponseUserDto.of(user))
+                        .collect(Collectors.toList())
+        );
     }
 
-    @PostMapping("/")
+    @PostMapping()
     public ResponseEntity<Void> createUser(@RequestBody NewUserReqDto requestData) { // 일단 username, email만 있는 DTO
         userService.createNewUser(requestData);
 
@@ -36,10 +42,10 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable("id") Long id) {
+    public ResponseEntity<ResponseUserDto> getUser(@PathVariable("id") Long id) {
         User user = userService.getUserById(id);
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(ResponseUserDto.of(user));
     }
 
     @DeleteMapping("/{id}")
