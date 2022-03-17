@@ -2,21 +2,21 @@ package com.hotnerds.user.domain.Dto;
 
 import com.hotnerds.user.domain.User;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
-public class ResponseUserDto {
+@Getter
+public class UserResponseDto {
     private String username;
     private String email;
 
     @Builder
-    public ResponseUserDto(String username, String email) {
+    public UserResponseDto(String username, String email) {
         this.username = username;
         this.email = email;
     }
 
-    public static ResponseUserDto of(User user) {
-        return ResponseUserDto.builder()
+    public static UserResponseDto of(User user) {
+        return UserResponseDto.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .build();

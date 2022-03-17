@@ -3,7 +3,7 @@ package com.hotnerds.user.presentation;
 import com.hotnerds.user.application.UserService;
 import com.hotnerds.user.domain.Dto.FollowServiceReqDto;
 import com.hotnerds.user.domain.Dto.NewUserReqDto;
-import com.hotnerds.user.domain.Dto.ResponseUserDto;
+import com.hotnerds.user.domain.Dto.UserResponseDto;
 import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
 import com.hotnerds.user.domain.Follow;
 import com.hotnerds.user.domain.User;
@@ -24,12 +24,12 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<ResponseUserDto>> getAllUser() {
+    public ResponseEntity<List<UserResponseDto>> getAllUser() {
         List<User> users = userService.getAllUsers();
 
         return ResponseEntity.ok(
                 users.stream()
-                        .map(user -> ResponseUserDto.of(user))
+                        .map(user -> UserResponseDto.of(user))
                         .collect(Collectors.toList())
         );
     }
@@ -42,10 +42,10 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseUserDto> getUser(@PathVariable("id") Long id) {
+    public ResponseEntity<UserResponseDto> getUser(@PathVariable("id") Long id) {
         User user = userService.getUserById(id);
 
-        return ResponseEntity.ok(ResponseUserDto.of(user));
+        return ResponseEntity.ok(UserResponseDto.of(user));
     }
 
     @DeleteMapping("/{id}")
