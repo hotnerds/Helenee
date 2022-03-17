@@ -40,9 +40,13 @@ public class PostServiceTest {
     @InjectMocks
     PostService postService;
 
+    String TEXT = "An apple a day keeps the doctor away";
+
     User user;
 
     Post post;
+
+    Comment comment;
 
     @BeforeEach
     void init() {
@@ -56,6 +60,13 @@ public class PostServiceTest {
                 .title("title")
                 .content("content")
                 .writer(user)
+                .build();
+
+        comment = Comment.builder()
+                .id(1L)
+                .writer(user)
+                .post(post)
+                .content(TEXT)
                 .build();
     }
 
@@ -219,5 +230,132 @@ public class PostServiceTest {
         verify(postRepository, times(1)).deleteById(requestDto.getPostId());
     }
 
+    @DisplayName("댓글 추가 요청할 때 본문 값이 공백이면 예외발생")
+    @Test
+    void 댓글_추가_실패_내용_공백() {
+        // given
+        CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
+                .reqUser(user)
+                .user(user)
+                .post(post)
+                .content("")
+                .build();
 
+        // when then
+        assertThrows(CommentInvalidException.class, postService.addComment(reqDto));
+
+    }
+
+    @DisplayName("댓글 추가 요청할 때 요청한 유저가 존재하지 않을 경우 예외 발생")
+    @Test
+    void 댓글_추가_실패_유저_없음() {
+        // given
+        CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
+                .reqUser(user)
+                .user(user)
+                .post(post)
+                .content(TEXT)
+                .build();
+
+        // when then
+        assertThrows(UserNotFoundException.class, postService.addComment(reqDto));
+
+    }
+
+    @DisplayName("댓글 추가 요청할 때 게시글이 존재하지 않을 경우 예외 발생")
+    @Test
+    void 댓글_추가_실패_게시글_없음() {
+        // given
+        CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
+                .reqUser(user)
+                .user(user)
+                .post(post)
+                .content(TEXT)
+                .build();
+
+        // when then
+        assertThrows(PostNotFoundException.class, postService.addComment(reqDto));
+
+    }
+
+    @DisplayName("댓글 추가 성공")
+    @Test
+    void 댓글_추가_성공() {
+        // given
+        CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
+                .reqUser(user)
+                .user(user)
+                .post(post)
+                .content(TEXT)
+                .build();
+
+        // when
+        postService.addComment(commentCreateReqDto);
+
+        // then
+        verify(userRepository, times(1)).findById(anyLong());
+        verify(postRepository, times(1)).findById(reqDto.getPost().getId());
+    }
+
+    @DisplayName("댓글 삭제 요청할 때 게시글 혹은 유저가 존재하지 않으면 예외 발생")
+    @Test
+    void 유효하지않은_게시글_유저_댓글_삭제() {
+        // given
+        Post wrongPost = Post.builder()
+                .id(2L)
+                .title("wrong")
+                .content("wrong")
+                .writer(user)
+                .build();
+
+        User wrongUser = User.builder()
+                .username("wrong")
+                .email("wrong")
+                .build();
+
+        CommentDeleteReqDto reqDtoWrongPost = CommentDeleteReqDto.builder()
+                .reqUser(user)
+                .user(user)
+                .post(wrongPost)
+                .content(TEXT)
+                .build();
+
+        CommentDeleteReqDto reqDtoWrongUser = CommentDeleteReqDto.builder()
+                .reqUser(wrongUser)
+                .user(wrongUser)
+                .post(post)
+                .content(TEXT)
+                .build();
+
+        when(postRepository.getById(1L)).thenReturn(post);
+        when(postRepository.getById(2L)).thenReturn(wrongPost);
+        when(userRepository.getById(anyLong())).thenReturn(user);
+
+        // when then
+        assertAll(
+                () -> assertThrows(PostNotFoundException.class, postService.deleteComment(reqDtoWrongPost)),
+                () -> assertThrows(UserNotFoundException.class, postService.deleteComment(reqDtoWrongUser))
+        );
+        verify(postRepository, times(2)).findById(anyLong());
+        verify(userRepository, times(1)).findById(anyLong());
+    }
+
+    @DisplayName("댓글의 주인이 아닌 사람이 댓글 삭제를 요청하면 오류 발생")
+    @Test
+    void 게시글_삭제_권한_오류() {
+    }
+
+    @DisplayName("댓글의 주인이 댓글 삭제를 요청하면 댓글이 삭제되어야 한다")
+    @Test
+    void 게시글_삭제_성공() {
+        // given
+        when(postRepository.getById(anyLong())).thenReturn(post);
+        when(userRepository.getById(anyLong())).thenReturn(user);
+    }
+
+    @DisplayName("댓글의 주인이 댓글 수정 요청을 보냈을 때 빈 내용을 보내면 오류가 발생한다")
+    @Test
+    void 댓글_수정_빈_내용() {
+        
+    }
 }
