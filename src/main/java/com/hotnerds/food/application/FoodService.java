@@ -21,7 +21,7 @@ public class FoodService {
 
     public Food findOrCreate(Long apiId) {
         Food food = foodRepository.findByApiId(apiId)
-                .orElse(mapApiResponseToFood(
+                .orElseGet(() -> mapApiResponseToFood(
                         apiClient.searchFoodById(apiId)));
 
         return foodRepository.save(food);
@@ -31,6 +31,7 @@ public class FoodService {
         return foodRepository.findById(foodId).orElseThrow(FoodNotFoundException::new);
     }
 
+    @SuppressWarnings("unchecked")
     protected Food mapApiResponseToFood(ResponseEntity<Map<String, Object>> response) {
         Map<String, Object> food = (Map<String, Object>) response.getBody().get("food");
         Map<String, Object> servings = (Map<String, Object>) food.get("servings");
