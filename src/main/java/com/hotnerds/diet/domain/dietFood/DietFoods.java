@@ -1,5 +1,6 @@
 package com.hotnerds.diet.domain.dietFood;
 
+import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.food.domain.Food;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -32,5 +33,12 @@ public class DietFoods {
         return dietFoods.stream()
                 .map(DietFood::getFood)
                 .collect(Collectors.toList());
+    }
+
+    public void associate(Diet diet, Food food) {
+        dietFoods.add(DietFood.builder()
+                        .diet(diet)
+                        .food(food)
+                .build());
     }
 }

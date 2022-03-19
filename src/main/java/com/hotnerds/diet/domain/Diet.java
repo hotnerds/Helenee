@@ -53,4 +53,8 @@ public class Diet extends BaseTimeEntity {
     public List<Food> getFoods() {
         return dietFoods.getFoods();
     }
+
+    public void addFood(Food food) {
+        dietFoods.associate(this, food);
+    }
 }
