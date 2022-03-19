@@ -16,7 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -113,6 +116,7 @@ class DietServiceTest {
         Diet expectedDiet = Diet.builder()
                 .mealDate(mealDate)
                 .mealTime(mealTime)
+                .user(user)
                 .build();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
@@ -129,5 +133,65 @@ class DietServiceTest {
         verify(dietRepository, times(1)).findByDateTimeUser(requestDto.getMealDate(),
                 requestDto.getMealTime(),
                 user);
+    }
+
+    @Test
+    @DisplayName("식단이 존재하지 않으면 식단을 생성한다.")
+    public void 식단이_존재하지_않으면_생성() {
+        //given
+        Diet expectedDiet = Diet.builder()
+                .mealDate(mealDate)
+                .mealTime(mealTime)
+                .user(user)
+                .build();
+
+        when(dietRepository.findByDateTimeUser(mealDate, mealTime, user))
+                .thenReturn(Optional.empty());
+
+        when(dietRepository.save(any(Diet.class))).thenAnswer(new Answer<Diet>() {
+            @Override
+            public Diet answer(InvocationOnMock invocation) throws Throwable {
+                return invocation.getArgument(0);
+            }
+        });
+
+
+
+        //when
+        Diet actualDiet = dietService.findOrCreate(mealDate, mealTime, user);
+
+        //then
+        assertThat(actualDiet).isEqualTo(expectedDiet);
+        verify(dietRepository, times(1)).save(any(Diet.class));
+        verify(dietRepository, times(1)).findByDateTimeUser(mealDate, mealTime, user);
+    }
+
+    @Test
+    @DisplayName("식단이 이미 존재하면 가져온다.")
+    public void 식단이_존재하면_가져옴() {
+        //given
+        Diet expectedDiet = Diet.builder()
+                .mealDate(mealDate)
+                .mealTime(mealTime)
+                .user(user)
+                .build();
+
+        when(dietRepository.findByDateTimeUser(mealDate, mealTime, user))
+                .thenReturn(Optional.of(expectedDiet));
+
+        when(dietRepository.save(any(Diet.class))).thenAnswer(new Answer<Diet>() {
+            @Override
+            public Diet answer(InvocationOnMock invocation) throws Throwable {
+                return invocation.getArgument(0);
+            }
+        });
+
+        //when
+        Diet actualDiet = dietService.findOrCreate(mealDate, mealTime, user);
+
+        //then
+        assertThat(actualDiet).isEqualTo(expectedDiet);
+        verify(dietRepository, times(1)).save(any(Diet.class));
+        verify(dietRepository, times(1)).findByDateTimeUser(mealDate, mealTime, user);
     }
 }

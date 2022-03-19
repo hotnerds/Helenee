@@ -27,7 +27,9 @@ import java.time.LocalDate;
 public class DietService {
 
     private final FoodService foodService;
+
     private final UserRepository userRepository;
+
     private final DietRepository dietRepository;
 
     public Diet findByDateTimeUser(DietReadRequestDto requestDto, Long userId) {
@@ -61,7 +63,7 @@ public class DietService {
         diet.removeFood(food);
     }
 
-    private Diet findOrCreate(LocalDate mealDate, MealTime mealTime, User user) {
+    protected Diet findOrCreate(LocalDate mealDate, MealTime mealTime, User user) {
         Diet diet = dietRepository.findByDateTimeUser(mealDate, mealTime, user)
                 .orElse(Diet.builder()
                         .mealDate(mealDate)

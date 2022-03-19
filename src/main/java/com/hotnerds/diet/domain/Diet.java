@@ -3,6 +3,7 @@ package com.hotnerds.diet.domain;
 import com.hotnerds.common.BaseTimeEntity;
 import com.hotnerds.diet.domain.dietFood.DietFoods;
 import com.hotnerds.food.domain.Food;
+import com.hotnerds.post.domain.like.Like;
 import com.hotnerds.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -60,5 +62,20 @@ public class Diet extends BaseTimeEntity {
 
     public void removeFood(Food food) {
         dietFoods.dissociate(this, food);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Diet diet = (Diet) obj;
+        return Objects.equals(mealDate, diet.mealDate)
+                && Objects.equals(mealTime, diet.mealTime)
+                && Objects.equals(user, diet.user);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mealDate, mealTime, user);
     }
 }
