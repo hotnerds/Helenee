@@ -1,5 +1,7 @@
-package com.hotnerds.diet.domain;
+package com.hotnerds.food.domain;
 
+import com.hotnerds.diet.domain.Diet;
+import com.hotnerds.diet.domain.Nutrient;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

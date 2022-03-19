@@ -1,6 +1,7 @@
 package com.hotnerds.diet.domain;
 
 import com.hotnerds.common.BaseTimeEntity;
+import com.hotnerds.food.domain.Food;
 import com.hotnerds.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
