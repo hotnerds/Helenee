@@ -40,6 +40,7 @@ public class DietService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.DIET_NOT_FOUND_EXCEPTION));
     }
 
+    @Transactional
     public void addFood(DietAddFoodRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
@@ -51,6 +52,7 @@ public class DietService {
         diet.addFood(food);
     }
 
+    @Transactional
     public void removeFood(DietRemoveFoodRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
@@ -63,6 +65,7 @@ public class DietService {
         diet.removeFood(food);
     }
 
+    @Transactional
     protected Diet findOrCreate(LocalDate mealDate, MealTime mealTime, User user) {
         Diet diet = dietRepository.findByDateTimeUser(mealDate, mealTime, user)
                 .orElseGet(() -> Diet.builder()

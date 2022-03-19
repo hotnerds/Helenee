@@ -9,17 +9,20 @@ import com.hotnerds.food.domain.repository.FoodRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class FoodService {
 
     FatSecretApiClient apiClient;
     FoodRepository foodRepository;
 
+    @Transactional
     public Food findOrCreate(Long apiId) {
         Food food = foodRepository.findByApiId(apiId)
                 .orElseGet(() -> mapApiResponseToFood(
