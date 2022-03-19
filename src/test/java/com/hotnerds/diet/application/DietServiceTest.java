@@ -1,10 +1,10 @@
 package com.hotnerds.diet.application;
 
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.*;
 import com.hotnerds.diet.domain.dto.DietRequestDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
-import com.hotnerds.diet.exception.DietAlreadyExistsException;
-import com.hotnerds.diet.exception.DietNotFoundException;
 import com.hotnerds.user.application.UserService;
 import com.hotnerds.user.domain.User;
 import org.junit.jupiter.api.Test;
@@ -70,7 +70,9 @@ class DietServiceTest {
         // then
         assertThat(dietService.getDietById(1L))
                 .isEqualTo(expectedDiet);
-        assertThrows(DietNotFoundException.class, () -> dietService.getDietById(2L));
+        assertThatThrownBy(() -> dietService.getDietById(2L))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.DIET_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test
@@ -139,7 +141,9 @@ class DietServiceTest {
         when(dietRepository.save(any(Diet.class))).thenReturn(expectedDiet);
 
         // then
-        assertThrows(DietAlreadyExistsException.class, () -> dietService.createDiet(dto1));
+        assertThatThrownBy(() -> dietService.createDiet(dto1))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.DIET_DUPLICATED_EXCEPTION.getMessage());
         assertThat(dietService.createDiet(dto2)).isEqualTo(expectedDiet);
     }
 }

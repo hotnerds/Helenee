@@ -1,16 +1,14 @@
 package com.hotnerds.post.application;
 
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.post.domain.dto.*;
 import com.hotnerds.post.domain.like.Like;
 import com.hotnerds.post.domain.like.Likes;
 import com.hotnerds.post.domain.repository.PostRepository;
-import com.hotnerds.post.exception.DuplicatedLikeException;
-import com.hotnerds.post.exception.LikeNotFoundException;
-import com.hotnerds.post.exception.PostNotFoundException;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
-import com.hotnerds.user.exception.UserNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -98,10 +96,12 @@ public class PostServiceTest {
                 .username("username")
                 .build();
 
-        when(userRepository.findByUsername(anyString())).thenThrow(UserNotFoundException.class);
+        when(userRepository.findByUsername(anyString())).thenThrow(new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         //when then
-        assertThrows(UserNotFoundException.class, () -> postService.write(requestDto));
+        assertThatThrownBy(() -> postService.write(requestDto))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
         verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
     }
 
@@ -130,8 +130,10 @@ public class PostServiceTest {
                 .build();
 
         //when then
-        assertThrows(UserNotFoundException.class, () -> postService.searchByWriter(requestDto));
 
+        assertThatThrownBy(() -> postService.searchByWriter(requestDto))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
         verify(userRepository, times(1)).findByUsername(user.getUsername());
     }
 
@@ -181,7 +183,9 @@ public class PostServiceTest {
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
 
         //when then
-        assertThrows(UserNotFoundException.class, () -> postService.deletePost(requestDto));
+        assertThatThrownBy(() -> postService.deletePost(requestDto))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
 
         verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
 
@@ -200,7 +204,9 @@ public class PostServiceTest {
         when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when then
-        assertThrows(PostNotFoundException.class, () -> postService.deletePost(requestDto));
+        assertThatThrownBy(() -> postService.deletePost(requestDto))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.POST_NOT_FOUND_EXCEPTION.getMessage());
 
         verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
         verify(postRepository, times(1)).findById(requestDto.getPostId());
@@ -236,8 +242,8 @@ public class PostServiceTest {
         //when then
         assertThatThrownBy(
                 () -> postService.like(user.getUsername(), post.getId()))
-                .isInstanceOf(PostNotFoundException.class)
-                .hasMessage(PostNotFoundException.MESSAGE);
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.POST_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @DisplayName("존재하지 않는 사용자가 게시글에 좋아요를 요청하면 실패한다.")
@@ -249,8 +255,8 @@ public class PostServiceTest {
         //when then
         assertThatThrownBy(
                 () -> postService.like(user.getUsername(), post.getId()))
-                .isInstanceOf(UserNotFoundException.class)
-                .hasMessage(UserNotFoundException.MESSAGE);
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @DisplayName("게시글 좋아요 요청이 중복되면 예외를 발생시킨다.")
@@ -269,8 +275,8 @@ public class PostServiceTest {
         //when then
         assertThatThrownBy(
                 () -> postService.like(user.getUsername(), post.getId()))
-                .isInstanceOf(DuplicatedLikeException.class)
-                .hasMessage(DuplicatedLikeException.MESSAGE);
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.DUPLICATED_LIKE_EXCEPTION.getMessage());
     }
 
     @DisplayName("사용자가 게시물에 좋아요를 누를 수 있다.")
@@ -303,8 +309,8 @@ public class PostServiceTest {
         //when then
         assertThatThrownBy(
                 () -> postService.unlike(user.getUsername(), post.getId()))
-                .isInstanceOf(LikeNotFoundException.class)
-                .hasMessage(LikeNotFoundException.MESSAGE);
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.LIKE_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @DisplayName("좋아요 취소 성공")

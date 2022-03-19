@@ -1,7 +1,7 @@
 package com.hotnerds.post.domain.like;
 
-import com.hotnerds.post.exception.DuplicatedLikeException;
-import com.hotnerds.post.exception.LikeNotFoundException;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.user.domain.User;
 import lombok.RequiredArgsConstructor;
 
@@ -34,14 +34,14 @@ public class Likes {
 
     public void add(Like like) {
         if(likes.contains(like)) {
-            throw new DuplicatedLikeException();
+            throw new BusinessException(ErrorCode.DUPLICATED_LIKE_EXCEPTION);
         }
         likes.add(like);
     }
 
     public void remove(Like like) {
         if(!likes.contains(like)) {
-            throw new LikeNotFoundException();
+            throw new BusinessException(ErrorCode.LIKE_NOT_FOUND_EXCEPTION);
         }
         likes.remove(like);
     }
