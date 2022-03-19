@@ -130,7 +130,7 @@ class DietServiceTest {
         when(dietRepository.findByDateTimeUser(requestDto.getMealDate(),
                 requestDto.getMealTime(),
                 user)).thenReturn(Optional.of(expectedDiet));
-
+      
         //when
         Diet actualDiet = dietService.findByDateTimeUser(requestDto, 1L);
 
@@ -281,7 +281,7 @@ class DietServiceTest {
 
         //when
         dietService.removeFood(requestDto, 1L);
-
+      
         //then
         verify(userRepository, times(1)).findById(1L);
         verify(dietRepository, times(1)).findByDateTimeUser(mealDate, mealTime, user);
