@@ -10,6 +10,7 @@ import java.util.Objects;
 
 @Entity
 @Getter
+@Table(name = "LIKES")
 public class Like {
     @GeneratedValue
     @Id

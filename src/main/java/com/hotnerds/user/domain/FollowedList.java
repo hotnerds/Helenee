@@ -1,7 +1,7 @@
 package com.hotnerds.user.domain;
 
-import com.hotnerds.user.exception.FollowRelationshipExistsException;
-import com.hotnerds.user.exception.FollowRelationshipNotFound;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -25,14 +25,14 @@ public class FollowedList {
 
     public void add(Follow follow) {
         if (followed.contains(follow)) {
-            throw new FollowRelationshipExistsException("추가하려 하는 팔로우 관계가 이미 존재합니다");
+            throw new BusinessException(ErrorCode.FOLLOW_DUPLICATED_EXCEPTION);
         }
         followed.add(follow);
     }
 
     public void delete(Follow follow) {
         if (!followed.contains(follow)) {
-            throw new FollowRelationshipNotFound();
+            throw new BusinessException(ErrorCode.FOLLOW_NOT_FOUND_EXCEPTION);
         }
         followed.remove(follow);
     }

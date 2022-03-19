@@ -2,11 +2,12 @@ package com.hotnerds.food.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.fatsecret.application.FatSecretApiClient;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.Nutrient;
 import com.hotnerds.food.domain.repository.FoodRepository;
-import com.hotnerds.food.exception.FoodNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,8 +48,8 @@ class FoodServiceTest {
 
         //when then
         assertThatThrownBy(() -> foodService.findById(1L))
-                .isInstanceOf(FoodNotFoundException.class)
-                .hasMessage(FoodNotFoundException.MESSAGE);
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.FOOD_NOT_FOUND_EXCEPTION.getMessage());
         verify(foodRepository, times(1)).findById(1L);
     }
 

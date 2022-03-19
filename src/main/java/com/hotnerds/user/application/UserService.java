@@ -1,15 +1,13 @@
 package com.hotnerds.user.application;
 
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.user.domain.Dto.FollowServiceReqDto;
 import com.hotnerds.user.domain.Dto.NewUserReqDto;
 import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
 import com.hotnerds.user.domain.Follow;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
-import com.hotnerds.user.exception.FollowRelationshipExistsException;
-import com.hotnerds.user.exception.FollowRelationshipNotFound;
-import com.hotnerds.user.exception.UserExistsException;
-import com.hotnerds.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +29,7 @@ public class UserService {
     public void createNewUser(final NewUserReqDto newUserReqDto) {
         Optional<User> optionalUser = userRepository.findByUsernameOrEmail(newUserReqDto.getUsername(), newUserReqDto.getEmail());
         if (optionalUser.isPresent()) {
-            throw new UserExistsException("동일한 정보를 가진 유저가 이미 존재합니다");
+            throw new BusinessException(ErrorCode.USER_DUPLICATED_EXCEPTION);
         }
 
         userRepository.save(newUserReqDto.toEntity());
@@ -39,19 +37,19 @@ public class UserService {
 
     public User getUserById(final Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
     }
 
     public void deleteUserById(final Long userId) {
         userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         userRepository.deleteById(userId);
     }
 
     public void updateUser(final Long userId, final UserUpdateReqDto userUpdateReqDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         user.updateUser(userUpdateReqDto);
 
@@ -73,7 +71,7 @@ public class UserService {
         User followedUser = getUserById(followServiceReqDto.getFollowedId());
 
         if (isFollowExist(followerUser, followedUser)) {
-            throw new FollowRelationshipExistsException("생성하려는 팔로우 관계가 이미 존재합니다.");
+            throw new BusinessException(ErrorCode.FOLLOW_DUPLICATED_EXCEPTION);
         }
 
         Follow newFollowRelationship = Follow.builder()
@@ -91,7 +89,7 @@ public class UserService {
         User followedUser = getUserById(followServiceReqDto.getFollowedId());
 
         if (!isFollowExist(followerUser, followedUser)) {
-            throw new FollowRelationshipNotFound("찾으려는 팔로우 관계 정보가 존재하지 않습니다.");
+            throw new BusinessException(ErrorCode.FOLLOW_NOT_FOUND_EXCEPTION);
         }
 
         return followerUser.getFollowedList().getFollowed().stream()
@@ -125,7 +123,7 @@ public class UserService {
         User followedUser = getUserById(followServiceReqDto.getFollowedId());
 
         if (!isFollowExist(followerUser, followedUser)) {
-            throw new FollowRelationshipNotFound();
+            throw new BusinessException(ErrorCode.FOLLOW_NOT_FOUND_EXCEPTION);
         }
 
         followerUser.unfollow(followedUser);

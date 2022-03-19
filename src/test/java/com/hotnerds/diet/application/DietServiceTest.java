@@ -1,17 +1,17 @@
 package com.hotnerds.diet.application;
 
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
 import com.hotnerds.diet.domain.dto.DietAddFoodRequestDto;
 import com.hotnerds.diet.domain.dto.DietReadRequestDto;
 import com.hotnerds.diet.domain.dto.DietRemoveFoodRequestDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
-import com.hotnerds.diet.exception.DietNotFoundException;
 import com.hotnerds.food.application.FoodService;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
-import com.hotnerds.user.exception.UserNotFoundException;
 import org.apache.tomcat.jni.Local;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -81,7 +81,8 @@ class DietServiceTest {
         //when then
         assertThatThrownBy(
                 () -> dietService.findByDateTimeUser(requestDto, 1L))
-                .isInstanceOf(DietNotFoundException.class);
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.DIET_NOT_FOUND_EXCEPTION.getMessage());
         verify(userRepository, times(1)).findById(1L);
         verify(dietRepository, times(1)).findByDateTimeUser(requestDto.getMealDate(),
                 requestDto.getMealTime(),
@@ -102,7 +103,8 @@ class DietServiceTest {
         //when then
         assertThatThrownBy(
                 () -> dietService.findByDateTimeUser(requestDto, 1L))
-                .isInstanceOf(UserNotFoundException.class);
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
         verify(userRepository, times(1)).findById(1L);
         verify(dietRepository, times(0)).findByDateTimeUser(requestDto.getMealDate(),
                 requestDto.getMealTime(),
@@ -214,8 +216,8 @@ class DietServiceTest {
 
         //when then
         assertThatThrownBy(() -> dietService.addFood(requestDto, 1L))
-                .isInstanceOf(UserNotFoundException.class)
-                .hasMessage(UserNotFoundException.MESSAGE);
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test
@@ -257,8 +259,8 @@ class DietServiceTest {
 
         //when then
         assertThatThrownBy(() -> dietService.removeFood(requestDto, 1L))
-                .isInstanceOf(UserNotFoundException.class)
-                .hasMessage(UserNotFoundException.MESSAGE);
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test

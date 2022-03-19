@@ -1,6 +1,8 @@
 package com.hotnerds.diet.application;
 
 
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
 import com.hotnerds.diet.domain.dto.DietAddFoodRequestDto;
@@ -8,12 +10,10 @@ import com.hotnerds.diet.domain.dto.DietReadRequestDto;
 import com.hotnerds.diet.domain.dto.DietRemoveFoodRequestDto;
 import com.hotnerds.diet.domain.dto.DietResponseDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
-import com.hotnerds.diet.exception.DietNotFoundException;
 import com.hotnerds.food.application.FoodService;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
-import com.hotnerds.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
@@ -34,15 +34,15 @@ public class DietService {
 
     public Diet findByDateTimeUser(DietReadRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         return dietRepository.findByDateTimeUser(requestDto.getMealDate(), requestDto.getMealTime(), user)
-                .orElseThrow(DietNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.DIET_NOT_FOUND_EXCEPTION));
     }
 
     public void addFood(DietAddFoodRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         Diet diet = findOrCreate(requestDto.getMealDate(), requestDto.getMealTime(), user);
 
@@ -53,10 +53,10 @@ public class DietService {
 
     public void removeFood(DietRemoveFoodRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         Diet diet = dietRepository.findByDateTimeUser(requestDto.getMealDate(), requestDto.getMealTime(), user)
-                .orElseThrow(DietNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.DIET_NOT_FOUND_EXCEPTION));
 
         Food food = foodService.findById(requestDto.getFoodId());
 

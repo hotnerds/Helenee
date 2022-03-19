@@ -1,10 +1,11 @@
 package com.hotnerds.food.application;
 
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.fatsecret.application.FatSecretApiClient;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.Nutrient;
 import com.hotnerds.food.domain.repository.FoodRepository;
-import com.hotnerds.food.exception.FoodNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class FoodService {
     }
 
     public Food findById(Long foodId) {
-        return foodRepository.findById(foodId).orElseThrow(FoodNotFoundException::new);
+        return foodRepository.findById(foodId).orElseThrow(() -> new BusinessException(ErrorCode.FOOD_NOT_FOUND_EXCEPTION));
     }
 
     @SuppressWarnings("unchecked")
