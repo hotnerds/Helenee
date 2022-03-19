@@ -23,11 +23,11 @@ public class MealDateTime {
 
     @Column(name = "meal_time", nullable = false)
     @Enumerated(EnumType.STRING)
-    private MealTimeType mealTimeType;
+    private MealTime mealTime;
 
     @Builder
-    public MealDateTime(LocalDate localDate, MealTimeType mealTimeType) {
+    public MealDateTime(LocalDate localDate, MealTime mealTime) {
         this.localDate = localDate;
-        this.mealTimeType = mealTimeType;
+        this.mealTime = mealTime;
     }
 }
