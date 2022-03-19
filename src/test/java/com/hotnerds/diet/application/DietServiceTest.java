@@ -4,6 +4,7 @@ import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
 import com.hotnerds.diet.domain.dto.DietAddFoodRequestDto;
 import com.hotnerds.diet.domain.dto.DietReadRequestDto;
+import com.hotnerds.diet.domain.dto.DietRemoveFoodRequestDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
 import com.hotnerds.diet.exception.DietNotFoundException;
 import com.hotnerds.food.application.FoodService;
@@ -54,13 +55,13 @@ class DietServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = User.builder().build();
-
-        food = Food.builder().build();
-
         mealDate = LocalDate.parse("2022-03-20", DateTimeFormatter.ISO_DATE);
 
         mealTime = MealTime.BREAKFAST;
+
+        user = User.builder().build();
+
+        food = Food.builder().build();
     }
 
     @Test
@@ -211,7 +212,7 @@ class DietServiceTest {
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        //then
+        //when then
         assertThatThrownBy(() -> dietService.addFood(requestDto, 1L))
                 .isInstanceOf(UserNotFoundException.class)
                 .hasMessage(UserNotFoundException.MESSAGE);
@@ -240,5 +241,48 @@ class DietServiceTest {
         verify(diet, times(1)).addFood(food);
         verify(userRepository, times(1)).findById(1L);
 
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 유저는 식단에서 음식을 삭제할 수 없다.")
+    void 존재하지_않는_유저가_식단에서_음식_삭제시_실패() {
+        //given
+        DietRemoveFoodRequestDto requestDto = DietRemoveFoodRequestDto.builder()
+                .mealDate(mealDate)
+                .mealTime(mealTime)
+                .foodId(1L)
+                .build();
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        //when then
+        assertThatThrownBy(() -> dietService.removeFood(requestDto, 1L))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessage(UserNotFoundException.MESSAGE);
+    }
+
+    @Test
+    @DisplayName("식단에서 음식을 삭제한다.")
+    void 식단에서_음식_삭제() {
+        //given
+        DietRemoveFoodRequestDto requestDto = DietRemoveFoodRequestDto.builder()
+                .mealDate(mealDate)
+                .mealTime(mealTime)
+                .foodId(1L)
+                .build();
+
+        Diet diet = Mockito.spy(Diet.class);
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(dietRepository.findByDateTimeUser(any(LocalDate.class), any(MealTime.class), any(User.class))).thenReturn(Optional.of(diet));
+        when(foodService.findById(1L)).thenReturn(food);
+
+        //when
+        dietService.removeFood(requestDto, 1L);
+
+        //then
+        verify(userRepository, times(1)).findById(1L);
+        verify(dietRepository, times(1)).findByDateTimeUser(mealDate, mealTime, user);
+        verify(diet, times(1)).removeFood(food);
     }
 }
