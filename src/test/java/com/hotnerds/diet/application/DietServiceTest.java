@@ -2,10 +2,12 @@ package com.hotnerds.diet.application;
 
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
+import com.hotnerds.diet.domain.dto.DietAddFoodRequestDto;
 import com.hotnerds.diet.domain.dto.DietReadRequestDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
 import com.hotnerds.diet.exception.DietNotFoundException;
 import com.hotnerds.food.application.FoodService;
+import com.hotnerds.food.domain.Food;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import com.hotnerds.user.exception.UserNotFoundException;
@@ -46,13 +48,15 @@ class DietServiceTest {
     DietService dietService;
 
     User user;
+    Food food;
     LocalDate mealDate;
     MealTime mealTime;
 
     @BeforeEach
     void setUp() {
-        user = User.builder()
-                .build();
+        user = User.builder().build();
+
+        food = Food.builder().build();
 
         mealDate = LocalDate.parse("2022-03-20", DateTimeFormatter.ISO_DATE);
 
@@ -193,5 +197,48 @@ class DietServiceTest {
         assertThat(actualDiet).isEqualTo(expectedDiet);
         verify(dietRepository, times(1)).save(any(Diet.class));
         verify(dietRepository, times(1)).findByDateTimeUser(mealDate, mealTime, user);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 유저는 식단에 음식을 추가할 수 없다.")
+    public void 존재하지_않는_유저가_식단에_음식_추가시_실패() {
+        //given
+        DietAddFoodRequestDto requestDto = DietAddFoodRequestDto.builder()
+                .mealDate(mealDate)
+                .mealTime(mealTime)
+                .apiId(1L)
+                .build();
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        //then
+        assertThatThrownBy(() -> dietService.addFood(requestDto, 1L))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessage(UserNotFoundException.MESSAGE);
+    }
+
+    @Test
+    @DisplayName("식단에 음식을 추가한다.")
+    public void 식단에_음식_추가() {
+        //given
+        DietAddFoodRequestDto requestDto = DietAddFoodRequestDto.builder()
+                .mealDate(mealDate)
+                .mealTime(mealTime)
+                .apiId(1L)
+                .build();
+
+        Diet diet = Mockito.spy(Diet.class);
+
+        when(dietService.findOrCreate(mealDate, mealTime, user)).thenReturn(diet);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(foodService.findOrCreate(anyLong())).thenReturn(food);
+
+        //when
+        dietService.addFood(requestDto, 1L);
+
+        //then
+        verify(diet, times(1)).addFood(food);
+        verify(userRepository, times(1)).findById(1L);
+
     }
 }
