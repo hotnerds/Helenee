@@ -17,6 +17,11 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(uniqueConstraints = {
+        @UniqueConstraint(
+                columnNames = {"meal_date", "meal_time", "user_id"}
+        )
+})
 public class Diet extends BaseTimeEntity {
     @Id
     @GeneratedValue

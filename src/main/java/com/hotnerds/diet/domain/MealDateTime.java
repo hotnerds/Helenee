@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MealDateTime {
 
-    @Column(name = "date", nullable = false)
+    @Column(name = "meal_date", nullable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate mealDate;
 
