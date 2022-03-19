@@ -1,6 +1,7 @@
 package com.hotnerds.diet.domain;
 
 import com.hotnerds.common.BaseTimeEntity;
+import com.hotnerds.diet.domain.dietFood.DietFoods;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.Nutrient;
 import com.hotnerds.user.domain.User;
@@ -29,20 +30,12 @@ public class Diet extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "diet", cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Food> foodList = new ArrayList<>();
+    @Embedded
+    private DietFoods dietFoods = DietFoods.empty();
 
     @Builder
     public Diet(MealDateTime mealDateTime, User user) {
         this.mealDateTime = mealDateTime;
         this.user = user;
-    }
-
-    public void addFood(String name, Nutrient nutrient) {
-        this.foodList.add(Food.builder()
-                .name(name)
-                .nutrient(nutrient)
-                .diet(this)
-                .build());
     }
 }

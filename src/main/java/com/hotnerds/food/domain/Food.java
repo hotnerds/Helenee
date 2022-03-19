@@ -18,19 +18,14 @@ public class Food {
     private Long foodId;
 
     @Column(name = "food_name", unique = true)
-    private String name;
+    private String foodName;
 
     @Embedded
     private Nutrient nutrient;
 
-    @ManyToOne
-    @JoinColumn(name = "diet_id")
-    private Diet diet;
-
     @Builder
-    public Food(String name, Nutrient nutrient, Diet diet) {
-        this.name = name;
+    public Food(String foodName, Nutrient nutrient) {
+        this.foodName = foodName;
         this.nutrient = nutrient;
-        this.diet = diet;
     }
 }
