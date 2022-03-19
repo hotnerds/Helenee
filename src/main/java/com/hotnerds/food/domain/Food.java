@@ -1,6 +1,5 @@
 package com.hotnerds.food.domain;
 
-import com.hotnerds.diet.domain.Diet;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,7 +26,8 @@ public class Food {
     private Nutrient nutrient;
 
     @Builder
-    public Food(String foodName, Nutrient nutrient) {
+    public Food(Long apiId, String foodName, Nutrient nutrient) {
+        this.apiId = apiId;
         this.foodName = foodName;
         this.nutrient = nutrient;
     }

@@ -43,4 +43,8 @@ public class Diet extends BaseTimeEntity {
         this.mealDateTime = mealDateTime;
         this.user = user;
     }
+
+    public List<Food> getFoods() {
+        return dietFoods.getFoods();
+    }
 }
