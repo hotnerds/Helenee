@@ -41,8 +41,8 @@ public class DietResponseDto {
 
         return DietResponseDto.builder()
                 .dietId(diet.getDietId())
-                .mealDate(diet.getMealDateTime().getMealDate())
-                .mealTime(diet.getMealDateTime().getMealTime())
+                .mealDate(diet.getMealDate())
+                .mealTime(diet.getMealTime())
                 .foodList(foodList)
                 .build();
     }
