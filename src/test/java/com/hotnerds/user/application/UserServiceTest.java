@@ -1,5 +1,7 @@
 package com.hotnerds.user.application;
 
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.user.domain.Dto.FollowServiceReqDto;
 import com.hotnerds.user.domain.Dto.NewUserReqDto;
 import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
@@ -8,9 +10,6 @@ import com.hotnerds.user.domain.FollowedList;
 import com.hotnerds.user.domain.FollowerList;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
-import com.hotnerds.user.exception.FollowRelationshipExistsException;
-import com.hotnerds.user.exception.FollowRelationshipNotFound;
-import com.hotnerds.user.exception.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +23,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -150,7 +151,9 @@ class UserServiceTest {
         when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
 
         // when then
-        assertThrows(FollowRelationshipExistsException.class, () -> userService.createFollow(reqDto));
+        assertThatThrownBy(() -> userService.createFollow(reqDto))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.FOLLOW_DUPLICATED_EXCEPTION.getMessage());
         verify(userRepository, times(1)).findById(reqDto.getFollowerId());
         verify(userRepository, times(1)).findById(reqDto.getFollowedId());
     }
@@ -180,7 +183,9 @@ class UserServiceTest {
         when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
 
         // when then
-        assertThrows(FollowRelationshipNotFound.class, () -> userService.getOneFollow(reqDto));
+        assertThatThrownBy(() -> userService.getOneFollow(reqDto))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.FOLLOW_NOT_FOUND_EXCEPTION.getMessage());
         verify(userRepository, times(1)).findById(reqDto.getFollowerId());
         verify(userRepository, times(1)).findById(reqDto.getFollowedId());
     }
@@ -209,7 +214,9 @@ class UserServiceTest {
     @DisplayName("존재하지 않는 id를 가진 유저를 팔로잉하는 모든 유저들의 id를 검색하면 예외발생")
     public void 유저_팔로워_리스트_오류() {
         // when then
-        assertThrows(UserNotFoundException.class, () -> userService.getUserFollowers(999L));
+        assertThatThrownBy(() -> userService.getUserFollowers(999L))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test
@@ -252,7 +259,9 @@ class UserServiceTest {
     @DisplayName("존재하지 않는 id를 가진 유저가 팔로잉하는 모든 유저들의 id를 검색하면 예외발생")
     public void 유저_팔로잉_리스트_오류() {
         // when then
-        assertThrows(UserNotFoundException.class, () -> userService.getUserFollowings(999L));
+        assertThatThrownBy(() -> userService.getUserFollowings(999L))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test
@@ -404,7 +413,9 @@ class UserServiceTest {
         when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
 
         // when then
-        assertThrows(FollowRelationshipNotFound.class, () -> userService.deleteFollow(reqDto));
+        assertThatThrownBy(() -> userService.deleteFollow(reqDto))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.FOLLOW_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test

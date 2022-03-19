@@ -1,12 +1,12 @@
 package com.hotnerds.post.application;
 
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.post.domain.dto.*;
 import com.hotnerds.post.domain.repository.PostRepository;
-import com.hotnerds.post.exception.PostNotFoundException;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
-import com.hotnerds.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -36,11 +36,10 @@ public class PostService {
         return findPosts.stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
-
     }
 
     public List<PostResponseDto> searchByWriter(PostByUserRequestDto requestDto) {
-        User user = userRepository.findByUsername(requestDto.getUsername()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByUsername(requestDto.getUsername()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         return postRepository.findAllByUser(user, requestDto.getPageable())
                 .stream()
@@ -51,7 +50,7 @@ public class PostService {
     private Post createPost(PostRequestDto postRequestDto) {
         Optional<User> optionalUser = userRepository.findByUsername(postRequestDto.getUsername());
 
-        User user = optionalUser.orElseThrow(UserNotFoundException::new);
+        User user = optionalUser.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         return Post.builder()
                 .title(postRequestDto.getTitle())
@@ -63,18 +62,18 @@ public class PostService {
 
     public void deletePost(PostDeleteRequestDto requestDto) {
 
-        userRepository.findByUsername(requestDto.getUsername()).orElseThrow(UserNotFoundException::new);
+        userRepository.findByUsername(requestDto.getUsername()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        postRepository.findById(requestDto.getPostId()).orElseThrow(PostNotFoundException::new);
+        postRepository.findById(requestDto.getPostId()).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
 
         postRepository.deleteById(requestDto.getPostId());
     }
 
     public LikeResponseDto like(String username, Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
         User user = userRepository.findByUsername(username)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         post.like(user);
 
@@ -87,9 +86,9 @@ public class PostService {
 
     public LikeResponseDto unlike(String username, Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
         User user = userRepository.findByUsername(username)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         post.unlike(user);
 
