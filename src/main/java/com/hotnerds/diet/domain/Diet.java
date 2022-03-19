@@ -2,6 +2,7 @@ package com.hotnerds.diet.domain;
 
 import com.hotnerds.common.BaseTimeEntity;
 import com.hotnerds.food.domain.Food;
+import com.hotnerds.food.domain.Nutrient;
 import com.hotnerds.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -24,9 +25,6 @@ public class Diet extends BaseTimeEntity {
     @Embedded
     private MealDateTime mealDateTime;
 
-    @Embedded
-    private Nutrient nutrient;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -35,9 +33,8 @@ public class Diet extends BaseTimeEntity {
     private List<Food> foodList = new ArrayList<>();
 
     @Builder
-    public Diet(MealDateTime mealDateTime, Nutrient nutrient, User user) {
+    public Diet(MealDateTime mealDateTime, User user) {
         this.mealDateTime = mealDateTime;
-        this.nutrient = nutrient;
         this.user = user;
     }
 
