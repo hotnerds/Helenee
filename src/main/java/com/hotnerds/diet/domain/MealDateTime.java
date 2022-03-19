@@ -17,11 +17,11 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MealDateTime {
 
-    @Column(name = "DATE", nullable = false)
+    @Column(name = "date", nullable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate localDate;
 
-    @Column(name = "MEAL_TIME", nullable = false)
+    @Column(name = "meal_time", nullable = false)
     @Enumerated(EnumType.STRING)
     private MealTimeType mealTimeType;
 

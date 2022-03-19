@@ -15,17 +15,17 @@ import javax.persistence.*;
 public class Food {
     @Id
     @GeneratedValue
-    @Column(name = "FOOD_ID")
+    @Column(name = "food_id")
     private Long foodId;
 
-    @Column(name = "FOOD_NAME", unique = true)
+    @Column(name = "food_name", unique = true)
     private String name;
 
     @Embedded
     private Nutrient nutrient;
 
     @ManyToOne
-    @JoinColumn(name = "DIET_ID")
+    @JoinColumn(name = "diet_id")
     private Diet diet;
 
     @Builder

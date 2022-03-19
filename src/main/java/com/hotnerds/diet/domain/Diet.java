@@ -18,7 +18,7 @@ import java.util.List;
 public class Diet extends BaseTimeEntity {
     @Id
     @GeneratedValue
-    @Column(name = "DIET_ID")
+    @Column(name = "diet_id")
     private Long dietId;
 
     @Embedded
@@ -28,7 +28,7 @@ public class Diet extends BaseTimeEntity {
     private Nutrient nutrient;
 
     @ManyToOne
-    @JoinColumn(name = "USER_ID")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "diet", cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.EAGER)
