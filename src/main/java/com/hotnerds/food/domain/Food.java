@@ -17,6 +17,9 @@ public class Food {
     @Column(name = "food_id")
     private Long foodId;
 
+    @Column(name = "api_id", unique = true)
+    private Long apiId;
+
     @Column(name = "food_name", unique = true)
     private String foodName;
 
