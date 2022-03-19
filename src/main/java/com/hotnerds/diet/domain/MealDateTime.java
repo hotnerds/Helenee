@@ -19,15 +19,15 @@ public class MealDateTime {
 
     @Column(name = "date", nullable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate localDate;
+    private LocalDate mealDate;
 
     @Column(name = "meal_time", nullable = false)
     @Enumerated(EnumType.STRING)
     private MealTime mealTime;
 
     @Builder
-    public MealDateTime(LocalDate localDate, MealTime mealTime) {
-        this.localDate = localDate;
+    public MealDateTime(LocalDate mealDate, MealTime mealTime) {
+        this.mealDate = mealDate;
         this.mealTime = mealTime;
     }
 }
