@@ -4,6 +4,7 @@ import com.hotnerds.fatsecret.application.FatSecretApiClient;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.Nutrient;
 import com.hotnerds.food.domain.repository.FoodRepository;
+import com.hotnerds.food.exception.FoodNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,11 @@ public class FoodService {
         return foodRepository.save(food);
     }
 
-    private Food mapApiResponseToFood(ResponseEntity<Map<String, Object>> response) {
+    public Food findById(Long foodId) {
+        return foodRepository.findById(foodId).orElseThrow(FoodNotFoundException::new);
+    }
+
+    protected Food mapApiResponseToFood(ResponseEntity<Map<String, Object>> response) {
         Map<String, Object> food = (Map<String, Object>) response.getBody().get("food");
         Map<String, Object> servings = (Map<String, Object>) food.get("servings");
         Map<String, String> serving = ((ArrayList<Map<String, String>>) servings.get("serving")).get(0);

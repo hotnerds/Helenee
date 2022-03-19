@@ -41,4 +41,11 @@ public class DietFoods {
                         .food(food)
                 .build());
     }
+
+    public void dissociate(Diet diet, Food food) {
+        dietFoods.remove(DietFood.builder()
+                .diet(diet)
+                .food(food)
+                .build());
+    }
 }

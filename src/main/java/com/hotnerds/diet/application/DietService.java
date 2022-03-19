@@ -5,6 +5,7 @@ import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
 import com.hotnerds.diet.domain.dto.DietAddFoodRequestDto;
 import com.hotnerds.diet.domain.dto.DietReadRequestDto;
+import com.hotnerds.diet.domain.dto.DietRemoveFoodRequestDto;
 import com.hotnerds.diet.domain.dto.DietResponseDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
 import com.hotnerds.diet.exception.DietNotFoundException;
@@ -46,6 +47,18 @@ public class DietService {
         Food food = foodService.findOrCreate(requestDto.getApiId());
 
         diet.addFood(food);
+    }
+
+    public void removeFood(DietRemoveFoodRequestDto requestDto, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        Diet diet = dietRepository.findByDateTimeUser(requestDto.getMealDate(), requestDto.getMealTime(), user)
+                .orElseThrow(DietNotFoundException::new);
+
+        Food food = foodService.findById(requestDto.getFoodId());
+
+        diet.removeFood(food);
     }
 
     private Diet findOrCreate(LocalDate mealDate, MealTime mealTime, User user) {
