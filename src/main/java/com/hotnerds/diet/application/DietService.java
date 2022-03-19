@@ -65,7 +65,7 @@ public class DietService {
 
     protected Diet findOrCreate(LocalDate mealDate, MealTime mealTime, User user) {
         Diet diet = dietRepository.findByDateTimeUser(mealDate, mealTime, user)
-                .orElse(Diet.builder()
+                .orElseGet(() -> Diet.builder()
                         .mealDate(mealDate)
                         .mealTime(mealTime)
                         .user(user)
