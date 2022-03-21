@@ -304,6 +304,24 @@ public class PostServiceTest {
         verify(postRepository, times(1)).findById(anyLong());
     }
 
+    @DisplayName("댓글 생성 요청의 content 길이가 1000 이상일 때 에러 발생")
+    @Test
+    void 댓글_내용_제한() {
+        // given
+        String LONG_STRING = "";
+        for (int i = 0; i < 29; i++) {
+            LONG_STRING += TEXT; // LONG_STRING의 길이는 1008
+        }
+        CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
+                .userId(1L) // id for user
+                .postId(post.getId())
+                .content(LONG_STRING)
+                .build();
+
+        // when then
+        assertThrows(CommentInvalidException.class, () -> postService.addComment(reqDto));
+    }
+
     @DisplayName("댓글 삭제 요청할 때 게시글 혹은 유저가 존재하지 않으면 예외 발생")
     @Test
     void 유효하지않은_게시글_유저_댓글_삭제() {

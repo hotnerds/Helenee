@@ -71,7 +71,7 @@ public class PostService {
     }
 
     public void addComment(CommentCreateReqDto reqDto) {
-        if (reqDto.getContent().equals("")) {
+        if (reqDto.getContent().equals("") || reqDto.getContent().length() > 1000) {
             throw new CommentInvalidException();
         }
         User user = userRepository.findById(reqDto.getUserId()).orElseThrow(UserNotFoundException::new);
