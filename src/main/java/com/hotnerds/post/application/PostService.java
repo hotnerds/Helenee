@@ -59,7 +59,6 @@ public class PostService {
                 .content(postRequestDto.getContent())
                 .writer(user)
                 .build();
-
     }
 
     public void deletePost(PostDeleteRequestDto requestDto) {
@@ -71,6 +70,7 @@ public class PostService {
         postRepository.deleteById(requestDto.getPostId());
     }
 
+    @Transactional
     public void addComment(CommentCreateReqDto reqDto) {
         if (reqDto.getContent().equals("") || reqDto.getContent().length() > 1000) {
             throw new CommentInvalidException();
@@ -89,8 +89,15 @@ public class PostService {
         post.addComment(comment);
     }
 
+    @Transactional
     public void deleteComment(CommentDeleteReqDto reqDto) {
         Post post = postRepository.findById(reqDto.getPostId()).orElseThrow(PostNotFoundException::new);
         post.removeComment(reqDto.getCommentId());
+    }
+
+    @Transactional
+    public void updateComment(CommentUpdateReqDto reqDto) {
+        Post post = postRepository.findById(reqDto.getPostId()).orElseThrow(PostNotFoundException::new);
+        post.updateComment(reqDto.getCommentId(), reqDto.getContent());
     }
 }

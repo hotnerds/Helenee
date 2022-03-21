@@ -42,4 +42,8 @@ public class Post extends BaseTimeEntity {
     public void removeComment(Long commentId) {
         comments.remove(commentId);
     }
+
+    public void updateComment(Long commentId, String content) {
+        comments.update(commentId, content);
+    }
 }
