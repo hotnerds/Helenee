@@ -5,6 +5,7 @@ import com.hotnerds.post.domain.comment.Comment;
 import com.hotnerds.post.domain.dto.*;
 import com.hotnerds.post.domain.repository.PostRepository;
 import com.hotnerds.post.exception.CommentInvalidException;
+import com.hotnerds.post.exception.CommentNotFoundException;
 import com.hotnerds.post.exception.PostNotFoundException;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
@@ -74,18 +75,22 @@ public class PostService {
         if (reqDto.getContent().equals("") || reqDto.getContent().length() > 1000) {
             throw new CommentInvalidException();
         }
-        User user = userRepository.findById(reqDto.getUserId()).orElseThrow(UserNotFoundException::new);
-        Post post = postRepository.findById(reqDto.getPostId()).orElseThrow(PostNotFoundException::new);
+        User user = userRepository.findById(reqDto.getUserId())
+                .orElseThrow(UserNotFoundException::new);
+        Post post = postRepository.findById(reqDto.getPostId())
+                .orElseThrow(PostNotFoundException::new);
 
-        Comment newComment = Comment.builder()
+        Comment comment = Comment.builder()
                 .writer(user)
                 .post(post)
                 .content(reqDto.getContent())
                 .build();
 
-        post.addComment(newComment);
+        post.addComment(comment);
     }
 
-    public void deleteComment(CommentDeleteReqDto reqDtoWrongPost) {
+    public void deleteComment(CommentDeleteReqDto reqDto) {
+        Post post = postRepository.findById(reqDto.getPostId()).orElseThrow(PostNotFoundException::new);
+        post.removeComment(reqDto.getCommentId());
     }
 }

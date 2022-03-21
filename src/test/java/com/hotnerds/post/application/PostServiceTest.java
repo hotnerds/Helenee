@@ -6,6 +6,7 @@ import com.hotnerds.post.domain.comment.Comments;
 import com.hotnerds.post.domain.dto.*;
 import com.hotnerds.post.domain.repository.PostRepository;
 import com.hotnerds.post.exception.CommentInvalidException;
+import com.hotnerds.post.exception.CommentNotFoundException;
 import com.hotnerds.post.exception.PostNotFoundException;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
@@ -240,7 +241,7 @@ public class PostServiceTest {
     void 댓글_추가_실패_내용_공백() {
         // given
         CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
-                .userId(user.getId())
+                .userId(1L)
                 .postId(post.getId())
                 .content("")
                 .build();
@@ -255,12 +256,10 @@ public class PostServiceTest {
     void 댓글_추가_실패_유저_없음() {
         // given
         CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
-                .userId(user.getId())
+                .userId(1L)
                 .postId(post.getId())
-                .content("")
+                .content(TEXT)
                 .build();
-        when(userRepository.findById(anyLong())).thenThrow(UserNotFoundException.class);
-        when(postRepository.findById(anyLong())).thenThrow(PostNotFoundException.class);
 
         // when then
         assertThrows(UserNotFoundException.class, () -> postService.addComment(reqDto));
@@ -272,41 +271,19 @@ public class PostServiceTest {
     void 댓글_추가_실패_게시글_없음() {
         // given
         CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
-                .userId(user.getId())
+                .userId(1L)
                 .postId(post.getId())
-                .content("")
+                .content(TEXT)
                 .build();
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
         // when then
         assertThrows(PostNotFoundException.class, () -> postService.addComment(reqDto));
     }
 
-    @DisplayName("댓글 추가 성공")
-    @Test
-    void 댓글_추가_성공() {
-        // given
-        CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
-                .userId(1L) // id for user
-                .postId(post.getId())
-                .content(TEXT)
-                .build();
-
-        comments.add(comment);
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
-
-        // when
-        postService.addComment(reqDto);
-
-        // then
-        assertTrue(post.getComments().contains(comment));
-        verify(userRepository, times(1)).findById(anyLong());
-        verify(postRepository, times(1)).findById(anyLong());
-    }
-
     @DisplayName("댓글 생성 요청의 content 길이가 1000 이상일 때 에러 발생")
     @Test
-    void 댓글_내용_제한() {
+    void 댓글_내용_길이_제한() {
         // given
         String LONG_STRING = "";
         for (int i = 0; i < 29; i++) {
@@ -322,44 +299,95 @@ public class PostServiceTest {
         assertThrows(CommentInvalidException.class, () -> postService.addComment(reqDto));
     }
 
-    @DisplayName("댓글 삭제 요청할 때 게시글 혹은 유저가 존재하지 않으면 예외 발생")
+    @DisplayName("댓글 추가 성공")
     @Test
-    void 유효하지않은_게시글_유저_댓글_삭제() {
+    void 댓글_추가_성공() {
         // given
-        Post wrongPost = Post.builder()
-                .id(2L)
-                .title("wrong")
-                .content("wrong")
-                .writer(user)
+        CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
+                .userId(1L) // id for user
+                .postId(1L)
+                .content(TEXT)
                 .build();
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
-        User wrongUser = User.builder()
-                .username("wrong")
-                .email("wrong")
+        // when
+        postService.addComment(reqDto);
+
+        // then
+        assertThat(post.getComments().getComments().size()).isEqualTo(1);
+        verify(userRepository, times(1)).findById(anyLong());
+        verify(postRepository, times(1)).findById(anyLong());
+    }
+
+    @DisplayName("존재하지 않는 댓글에 대한 삭제 요청 시 에러를 발생")
+    @Test
+    void 존재하지_않는_댓글에_대한_삭제() {
+        // given
+        CommentDeleteReqDto reqDto = CommentDeleteReqDto.builder()
+                .postId(1L) // id for post
+                .commentId(1L) // id comment
                 .build();
-
-        CommentDeleteReqDto reqDtoWrongPost = CommentDeleteReqDto.builder()
-                .userId(user.getId())
-                .postId(wrongPost.getId())
-                .commentId(1L)
-                .build();
-
-        CommentDeleteReqDto reqDtoWrongUser = CommentDeleteReqDto.builder()
-                .userId(wrongUser.getId())
-                .postId(post.getId())
-                .commentId(2L)
-                .build();
-
-        when(postRepository.getById(1L)).thenReturn(post);
-        when(postRepository.getById(2L)).thenReturn(wrongPost);
-        when(userRepository.getById(anyLong())).thenReturn(user);
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
         // when then
-        assertAll(
-                () -> assertThrows(PostNotFoundException.class, () -> postService.deleteComment(reqDtoWrongPost)),
-                () -> assertThrows(UserNotFoundException.class, () -> postService.deleteComment(reqDtoWrongUser))
-        );
-        verify(postRepository, times(2)).findById(anyLong());
-        verify(userRepository, times(1)).findById(anyLong());
+        assertThrows(CommentNotFoundException.class, () -> postService.deleteComment(reqDto));
+        verify(postRepository, times(1)).findById(anyLong());
+    }
+
+    @DisplayName("댓글 삭제 성공")
+    void 댓글_삭제_성공() {
+        // given
+        CommentDeleteReqDto reqDto = CommentDeleteReqDto.builder()
+                .postId(1L) // id for post
+                .commentId(1L) // id comment
+                .build();
+
+        comments.add(comment);
+
+        post = Post.builder()
+                .id(1L)
+                .title("title")
+                .content("content")
+                .writer(user)
+                .comments(comments)
+                .build();
+
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+
+        // when
+        postService.deleteComment(reqDto);
+
+        // then
+        assertThat(post.getComments().getComments().size()).isEqualTo(0);
+        verify(postRepository, times(1)).findById(anyLong());
+    }
+
+    @DisplayName("존재하지 않는 댓글에 대한 수정 요청 시 에러 발생")
+    void 댓글_수정_실패() {
+        // given
+        CommentDeleteReqDto reqDto = CommentDeleteReqDto.builder()
+                .postId(1L) // id for post
+                .commentId(1L) // id comment
+                .build();
+
+        comments.add(comment);
+
+        post = Post.builder()
+                .id(1L)
+                .title("title")
+                .content("content")
+                .writer(user)
+                .comments(comments)
+                .build();
+
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+
+        // when
+        postService.deleteComment(reqDto);
+
+        // then
+        assertThat(post.getComments().getComments().size()).isEqualTo(0);
+        verify(postRepository, times(1)).findById(anyLong());
     }
 }

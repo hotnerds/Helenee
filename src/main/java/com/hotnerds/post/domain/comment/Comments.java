@@ -1,5 +1,9 @@
 package com.hotnerds.post.domain.comment;
 
+import com.hotnerds.post.domain.Post;
+import com.hotnerds.post.exception.CommentExistsException;
+import com.hotnerds.post.exception.CommentNotFoundException;
+import com.hotnerds.user.domain.User;
 import lombok.Getter;
 
 import javax.persistence.CascadeType;
@@ -22,13 +26,24 @@ public class Comments {
         this.comments = comments;
     }
 
-    public boolean contains(Comment expectedComment) {
+    public boolean contains(Comment comment) {
         return this.getComments().stream()
-                .anyMatch(c -> c.equals(expectedComment));
+                .anyMatch(comment::equals);
     }
 
     public Comment add(Comment comment) {
+        if (comments.contains(comment)) {
+            throw new CommentExistsException();
+        }
         comments.add(comment);
         return comment;
+    }
+
+    public void remove(Long commentId) {
+        Comment comment = comments.stream()
+                .filter(c -> c.getId().equals(commentId))
+                .findAny()
+                .orElseThrow(CommentNotFoundException::new);
+        comments.remove(comment);
     }
 }
