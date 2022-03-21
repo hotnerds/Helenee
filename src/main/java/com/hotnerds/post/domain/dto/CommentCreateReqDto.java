@@ -5,16 +5,10 @@ import com.hotnerds.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 
+@Builder
 @Getter
 public class CommentCreateReqDto {
     private Long userId;
     private Long postId;
     private String content;
-
-    @Builder
-    public CommentCreateReqDto(Long userId, Long postId, String content) {
-        this.userId = userId;
-        this.postId = postId;
-        this.content = content;
-    }
 }
