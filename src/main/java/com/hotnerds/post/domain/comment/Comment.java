@@ -2,10 +2,12 @@ package com.hotnerds.post.domain.comment;
 
 import javax.persistence.Entity;
 
+import com.hotnerds.common.BaseTimeEntity;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -13,24 +15,25 @@ import java.util.Objects;
 @Entity
 @Getter
 @Embeddable
-public class Comment {
+public class Comment extends BaseTimeEntity {
     @GeneratedValue
     @Id
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    final private User writer;
+    private User writer;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
-    final private Post post;
+    private Post post;
 
     @Column(name = "content")
-    final private String content;
+    private String content;
 
     @Builder
-    public Comment(User writer, Post post, String content) {
+    public Comment(Long id, User writer, Post post, String content) {
+        this.id = id;
         this.writer = writer;
         this.post = post;
         this.content = content;
@@ -49,5 +52,9 @@ public class Comment {
     @Override
     public int hashCode() {
         return Objects.hash(writer, post, content);
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
     }
 }
