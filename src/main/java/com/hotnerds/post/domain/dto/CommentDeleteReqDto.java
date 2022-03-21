@@ -6,7 +6,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class CommentDeleteReqDto {
-    private Long userId;
     private Long postId;
     private Long commentId;
 }
