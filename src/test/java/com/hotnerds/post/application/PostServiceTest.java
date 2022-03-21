@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -57,6 +59,7 @@ public class PostServiceTest {
         comments = new Comments(new ArrayList<>());
 
         comment = Comment.builder()
+                .id(1L)
                 .writer(user)
                 .post(post)
                 .content(TEXT)
@@ -336,6 +339,7 @@ public class PostServiceTest {
     }
 
     @DisplayName("댓글 삭제 성공")
+    @Test
     void 댓글_삭제_성공() {
         // given
         CommentDeleteReqDto reqDto = CommentDeleteReqDto.builder()
@@ -364,15 +368,35 @@ public class PostServiceTest {
     }
 
     @DisplayName("존재하지 않는 댓글에 대한 수정 요청 시 에러 발생")
+    @Test
     void 댓글_수정_실패() {
         // given
-        CommentDeleteReqDto reqDto = CommentDeleteReqDto.builder()
+        String NEW_TEXT = TEXT + "asdf";
+        CommentUpdateReqDto reqDto = CommentUpdateReqDto.builder()
                 .postId(1L) // id for post
                 .commentId(1L) // id comment
+                .content(NEW_TEXT)
+                .build();
+
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+
+        // when then
+        assertThatThrownBy(() -> postService.updateComment(reqDto))
+                .isInstanceOf(CommentNotFoundException.class);
+        verify(postRepository, times(1)).findById(anyLong());
+    }
+
+    @DisplayName("댓글 수정 성공")
+    void 댓글_수정_성공() {
+        // given
+        String NEW_TEXT = TEXT + "asdf";
+        CommentUpdateReqDto reqDto = CommentUpdateReqDto.builder()
+                .postId(1L) // id for post
+                .commentId(1L) // id comment
+                .content(NEW_TEXT)
                 .build();
 
         comments.add(comment);
-
         post = Post.builder()
                 .id(1L)
                 .title("title")
@@ -384,10 +408,10 @@ public class PostServiceTest {
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
         // when
-        postService.deleteComment(reqDto);
+        postService.updateComment(reqDto);
 
         // then
-        assertThat(post.getComments().getComments().size()).isEqualTo(0);
+        assertThat(post.getComments().getComments().get(0).getContent()).isEqualTo(NEW_TEXT);
         verify(postRepository, times(1)).findById(anyLong());
     }
 }
