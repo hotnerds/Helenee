@@ -1,6 +1,8 @@
 package com.hotnerds.post.domain;
 
 import com.hotnerds.common.BaseTimeEntity;
+import com.hotnerds.post.domain.comment.Comment;
+import com.hotnerds.post.domain.comment.Comments;
 import com.hotnerds.user.domain.User;
 import lombok.*;
 import org.hibernate.mapping.Join;
@@ -27,5 +29,8 @@ public class Post extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User writer;
+
+    @Embedded
+    private Comments comments;
 
 }
