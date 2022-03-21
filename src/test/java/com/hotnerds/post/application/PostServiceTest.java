@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,8 +49,18 @@ public class PostServiceTest {
 
     Comment comment;
 
+    Comments comments;
+
     @BeforeEach
     void init() {
+        comments = new Comments(new ArrayList<>());
+
+        comment = Comment.builder()
+                .writer(user)
+                .post(post)
+                .content(TEXT)
+                .build();
+
         user = User.builder()
                 .username("name")
                 .email("email")
@@ -60,12 +71,7 @@ public class PostServiceTest {
                 .title("title")
                 .content("content")
                 .writer(user)
-                .build();
-
-        comment = Comment.builder()
-                .writer(user)
-                .post(post)
-                .content(TEXT)
+                .comments(comments)
                 .build();
     }
 
@@ -238,7 +244,6 @@ public class PostServiceTest {
                 .postId(post.getId())
                 .content("")
                 .build();
-        when(userRepository.findById(anyLong())).thenThrow(UserNotFoundException.class);
 
         // when then
         assertThrows(CommentInvalidException.class, () -> postService.addComment(reqDto));
@@ -254,10 +259,11 @@ public class PostServiceTest {
                 .postId(post.getId())
                 .content("")
                 .build();
+        when(userRepository.findById(anyLong())).thenThrow(UserNotFoundException.class);
         when(postRepository.findById(anyLong())).thenThrow(PostNotFoundException.class);
 
         // when then
-        assertThrows(UserNotFoundException.class, () ->postService.addComment(reqDto));
+        assertThrows(UserNotFoundException.class, () -> postService.addComment(reqDto));
 
     }
 
@@ -280,24 +286,22 @@ public class PostServiceTest {
     void 댓글_추가_성공() {
         // given
         CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
-                .userId(user.getId())
+                .userId(1L) // id for user
                 .postId(post.getId())
                 .content(TEXT)
                 .build();
 
-        Comment expectedComment = Comment.builder()
-                .writer(user)
-                .post(post)
-                .content(reqDto.getContent())
-                .build();
+        comments.add(comment);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
         // when
         postService.addComment(reqDto);
 
         // then
-        assertTrue(post.getComments().getComments().contains(expectedComment));
+        assertTrue(post.getComments().contains(comment));
         verify(userRepository, times(1)).findById(anyLong());
-        verify(postRepository, times(1)).findById(reqDto.getPostId());
+        verify(postRepository, times(1)).findById(anyLong());
     }
 
     @DisplayName("댓글 삭제 요청할 때 게시글 혹은 유저가 존재하지 않으면 예외 발생")
