@@ -23,4 +23,8 @@ public class Comments {
         return comment;
     }
 
+    public boolean contains(Comment expectedComment) {
+        return this.getComments().stream()
+                .anyMatch(c -> c.equals(expectedComment));
+    }
 }
