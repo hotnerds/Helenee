@@ -1,11 +1,11 @@
 package com.hotnerds.post.application;
 
 import com.hotnerds.post.domain.Post;
-import com.hotnerds.post.domain.dto.PostByUserRequestDto;
-import com.hotnerds.post.domain.dto.PostDeleteRequestDto;
-import com.hotnerds.post.domain.dto.PostRequestDto;
-import com.hotnerds.post.domain.dto.PostResponseDto;
+import com.hotnerds.post.domain.comment.Comment;
+import com.hotnerds.post.domain.comment.Comments;
+import com.hotnerds.post.domain.dto.*;
 import com.hotnerds.post.domain.repository.PostRepository;
+import com.hotnerds.post.exception.CommentInvalidException;
 import com.hotnerds.post.exception.PostNotFoundException;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
@@ -63,7 +63,6 @@ public class PostServiceTest {
                 .build();
 
         comment = Comment.builder()
-                .id(1L)
                 .writer(user)
                 .post(post)
                 .content(TEXT)
@@ -235,14 +234,14 @@ public class PostServiceTest {
     void 댓글_추가_실패_내용_공백() {
         // given
         CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
-                .reqUser(user)
-                .user(user)
-                .post(post)
+                .userId(user.getId())
+                .postId(post.getId())
                 .content("")
                 .build();
+        when(userRepository.findById(anyLong())).thenThrow(UserNotFoundException.class);
 
         // when then
-        assertThrows(CommentInvalidException.class, postService.addComment(reqDto));
+        assertThrows(CommentInvalidException.class, () -> postService.addComment(reqDto));
 
     }
 
@@ -251,14 +250,14 @@ public class PostServiceTest {
     void 댓글_추가_실패_유저_없음() {
         // given
         CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
-                .reqUser(user)
-                .user(user)
-                .post(post)
-                .content(TEXT)
+                .userId(user.getId())
+                .postId(post.getId())
+                .content("")
                 .build();
+        when(postRepository.findById(anyLong())).thenThrow(PostNotFoundException.class);
 
         // when then
-        assertThrows(UserNotFoundException.class, postService.addComment(reqDto));
+        assertThrows(UserNotFoundException.class, () ->postService.addComment(reqDto));
 
     }
 
@@ -267,15 +266,13 @@ public class PostServiceTest {
     void 댓글_추가_실패_게시글_없음() {
         // given
         CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
-                .reqUser(user)
-                .user(user)
-                .post(post)
-                .content(TEXT)
+                .userId(user.getId())
+                .postId(post.getId())
+                .content("")
                 .build();
 
         // when then
-        assertThrows(PostNotFoundException.class, postService.addComment(reqDto));
-
+        assertThrows(PostNotFoundException.class, () -> postService.addComment(reqDto));
     }
 
     @DisplayName("댓글 추가 성공")
@@ -283,18 +280,24 @@ public class PostServiceTest {
     void 댓글_추가_성공() {
         // given
         CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
-                .reqUser(user)
-                .user(user)
-                .post(post)
+                .userId(user.getId())
+                .postId(post.getId())
                 .content(TEXT)
                 .build();
 
+        Comment expectedComment = Comment.builder()
+                .writer(user)
+                .post(post)
+                .content(reqDto.getContent())
+                .build();
+
         // when
-        postService.addComment(commentCreateReqDto);
+        postService.addComment(reqDto);
 
         // then
+        assertTrue(post.getComments().getComments().contains(expectedComment));
         verify(userRepository, times(1)).findById(anyLong());
-        verify(postRepository, times(1)).findById(reqDto.getPost().getId());
+        verify(postRepository, times(1)).findById(reqDto.getPostId());
     }
 
     @DisplayName("댓글 삭제 요청할 때 게시글 혹은 유저가 존재하지 않으면 예외 발생")
@@ -314,17 +317,15 @@ public class PostServiceTest {
                 .build();
 
         CommentDeleteReqDto reqDtoWrongPost = CommentDeleteReqDto.builder()
-                .reqUser(user)
-                .user(user)
-                .post(wrongPost)
-                .content(TEXT)
+                .userId(user.getId())
+                .postId(wrongPost.getId())
+                .commentId(1L)
                 .build();
 
         CommentDeleteReqDto reqDtoWrongUser = CommentDeleteReqDto.builder()
-                .reqUser(wrongUser)
-                .user(wrongUser)
-                .post(post)
-                .content(TEXT)
+                .userId(wrongUser.getId())
+                .postId(post.getId())
+                .commentId(2L)
                 .build();
 
         when(postRepository.getById(1L)).thenReturn(post);
@@ -333,29 +334,10 @@ public class PostServiceTest {
 
         // when then
         assertAll(
-                () -> assertThrows(PostNotFoundException.class, postService.deleteComment(reqDtoWrongPost)),
-                () -> assertThrows(UserNotFoundException.class, postService.deleteComment(reqDtoWrongUser))
+                () -> assertThrows(PostNotFoundException.class, () -> postService.deleteComment(reqDtoWrongPost)),
+                () -> assertThrows(UserNotFoundException.class, () -> postService.deleteComment(reqDtoWrongUser))
         );
         verify(postRepository, times(2)).findById(anyLong());
         verify(userRepository, times(1)).findById(anyLong());
-    }
-
-    @DisplayName("댓글의 주인이 아닌 사람이 댓글 삭제를 요청하면 오류 발생")
-    @Test
-    void 게시글_삭제_권한_오류() {
-    }
-
-    @DisplayName("댓글의 주인이 댓글 삭제를 요청하면 댓글이 삭제되어야 한다")
-    @Test
-    void 게시글_삭제_성공() {
-        // given
-        when(postRepository.getById(anyLong())).thenReturn(post);
-        when(userRepository.getById(anyLong())).thenReturn(user);
-    }
-
-    @DisplayName("댓글의 주인이 댓글 수정 요청을 보냈을 때 빈 내용을 보내면 오류가 발생한다")
-    @Test
-    void 댓글_수정_빈_내용() {
-        
     }
 }
