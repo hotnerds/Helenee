@@ -18,13 +18,17 @@ public class Comments {
     )
     private List<Comment> comments = new ArrayList<>();
 
-    public Comment add(Comment comment) {
-        comments.add(comment);
-        return comment;
+    public Comments(List<Comment> comments) {
+        this.comments = comments;
     }
 
     public boolean contains(Comment expectedComment) {
         return this.getComments().stream()
                 .anyMatch(c -> c.equals(expectedComment));
+    }
+
+    public Comment add(Comment comment) {
+        comments.add(comment);
+        return comment;
     }
 }
