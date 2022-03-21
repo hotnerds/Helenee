@@ -18,7 +18,7 @@ public class Comments {
     )
     private List<Comment> comments = new ArrayList<>();
 
-    public Comment addComment(Comment comment) {
+    public Comment add(Comment comment) {
         comments.add(comment);
         return comment;
     }

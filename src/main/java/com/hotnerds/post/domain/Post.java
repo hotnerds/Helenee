@@ -33,4 +33,8 @@ public class Post extends BaseTimeEntity {
     @Embedded
     private Comments comments;
 
+    public void addComment(Comment comment) {
+        this.getComments().add(comment);
+    }
+
 }

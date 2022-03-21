@@ -83,7 +83,7 @@ public class PostService {
                 .content(reqDto.getContent())
                 .build();
 
-        post.getComments().addComment(newComment);
+        post.addComment(newComment);
     }
 
     public void deleteComment(CommentDeleteReqDto reqDtoWrongPost) {
