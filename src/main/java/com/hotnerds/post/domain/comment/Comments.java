@@ -26,11 +26,6 @@ public class Comments {
         this.comments = comments;
     }
 
-    public boolean contains(Comment comment) {
-        return this.getComments().stream()
-                .anyMatch(comment::equals);
-    }
-
     public Comment add(Comment comment) {
         if (comments.contains(comment)) {
             throw new CommentExistsException();
