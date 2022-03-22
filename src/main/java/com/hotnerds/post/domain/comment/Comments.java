@@ -35,16 +35,16 @@ public class Comments {
     }
 
     public void remove(Long commentId) {
-        Comment comment = getComment(commentId);
+        Comment comment = getOneComment(commentId);
         comments.remove(comment);
     }
 
     public void update(Long commentId, String content) {
-        Comment comment = getComment(commentId);
+        Comment comment = getOneComment(commentId);
         comment.updateContent(content);
     }
 
-    protected Comment getComment(Long commentId) {
+    protected Comment getOneComment(Long commentId) {
         return comments.stream()
                 .filter(c -> c.getId().equals(commentId))
                 .findAny()
