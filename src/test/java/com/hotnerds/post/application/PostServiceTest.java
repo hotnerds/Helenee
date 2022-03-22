@@ -239,7 +239,7 @@ public class PostServiceTest {
         verify(postRepository, times(1)).deleteById(requestDto.getPostId());
     }
 
-    @DisplayName("댓글 추가 요청할 때 본문 값이 공백이면 예외발생")
+    @DisplayName("댓글 생성 요청할 때 본문 값이 공백이면 예외발생")
     @Test
     void 댓글_추가_실패_내용_공백() {
         // given
@@ -254,7 +254,7 @@ public class PostServiceTest {
 
     }
 
-    @DisplayName("댓글 추가 요청할 때 요청한 유저가 존재하지 않을 경우 예외 발생")
+    @DisplayName("댓글 생성 요청할 때 요청한 유저가 존재하지 않을 경우 예외 발생")
     @Test
     void 댓글_추가_실패_유저_없음() {
         // given
@@ -269,7 +269,7 @@ public class PostServiceTest {
 
     }
 
-    @DisplayName("댓글 추가 요청할 때 게시글이 존재하지 않을 경우 예외 발생")
+    @DisplayName("댓글 생성 요청할 때 게시글이 존재하지 않을 경우 예외 발생")
     @Test
     void 댓글_추가_실패_게시글_없음() {
         // given
@@ -302,7 +302,7 @@ public class PostServiceTest {
         assertThrows(CommentInvalidException.class, () -> postService.addComment(reqDto));
     }
 
-    @DisplayName("댓글 추가 성공")
+    @DisplayName("댓글 생성 성공")
     @Test
     void 댓글_추가_성공() {
         // given
