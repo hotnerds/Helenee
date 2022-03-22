@@ -387,6 +387,7 @@ public class PostServiceTest {
     }
 
     @DisplayName("댓글 수정 성공")
+    @Test
     void 댓글_수정_성공() {
         // given
         String NEW_TEXT = TEXT + "asdf";
@@ -414,4 +415,50 @@ public class PostServiceTest {
         assertThat(post.getComments().getComments().get(0).getContent()).isEqualTo(NEW_TEXT);
         verify(postRepository, times(1)).findById(anyLong());
     }
+
+    @DisplayName("존재하지 않는 게시글에 대한 댓글 요청할 시 에러 발생")
+    @Test
+    void 게시글_댓글_조회_실패() {
+        // given
+        Long postId = 2L;
+
+        // when then
+        assertThatThrownBy(() -> postService.getComments(postId))
+                .isInstanceOf(PostNotFoundException.class);
+    }
+
+    @DisplayName("특정 게시글의 모든 댓글 데이터를 조회")
+    @Test
+    void 게시글_댓글_전체_조회() {
+        // given
+        Comment comment2 = Comment.builder()
+                .id(2L)
+                .writer(user)
+                .post(post)
+                .content(TEXT)
+                .build();
+
+        comments.add(comment);
+        comments.add(comment2);
+        post = Post.builder()
+                .id(1L)
+                .title("title")
+                .content(TEXT)
+                .writer(user)
+                .comments(comments)
+                .build();
+
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+
+        // when
+        List<Comment> commentList = postService.getComments(1L);
+
+        // then
+        assertAll(
+                () -> assertThat(post.getComments().getComments().size()).isEqualTo(2),
+                () -> assertEquals(comment, commentList.get(0)),
+                () -> assertEquals(comment2, commentList.get(1))
+        );
+    }
+
 }

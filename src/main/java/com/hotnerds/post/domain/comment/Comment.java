@@ -44,7 +44,8 @@ public class Comment extends BaseTimeEntity {
         if (this == o) return true;
         if (this.getClass() != o.getClass()) return false;
         Comment comment = (Comment) o;
-        return Objects.equals(this.getWriter(), comment.getWriter())
+        return Objects.equals(this.getId(), comment.getId())
+                && Objects.equals(this.getWriter(), comment.getWriter())
                 && Objects.equals(this.getPost(), comment.getPost())
                 && Objects.equals(this.getContent(), comment.getContent());
     }

@@ -100,4 +100,10 @@ public class PostService {
         Post post = postRepository.findById(reqDto.getPostId()).orElseThrow(PostNotFoundException::new);
         post.updateComment(reqDto.getCommentId(), reqDto.getContent());
     }
+
+    @Transactional(readOnly = true)
+    public List<Comment> getComments(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        return post.getAllComments();
+    }
 }

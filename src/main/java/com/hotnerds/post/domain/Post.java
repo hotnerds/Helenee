@@ -6,9 +6,9 @@ import com.hotnerds.post.domain.comment.Comments;
 import com.hotnerds.user.domain.User;
 import lombok.*;
 import org.hibernate.mapping.Join;
-import org.hibernate.mapping.List;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Builder
@@ -45,5 +45,9 @@ public class Post extends BaseTimeEntity {
 
     public void updateComment(Long commentId, String content) {
         comments.update(commentId, content);
+    }
+
+    public List<Comment> getAllComments() {
+        return comments.getComments();
     }
 }
