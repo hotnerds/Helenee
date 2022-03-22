@@ -1,6 +1,8 @@
 package com.hotnerds.user.presentation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hotnerds.ControllerTest;
+import com.hotnerds.WithCustomMockUser;
 import com.hotnerds.user.application.UserService;
 import com.hotnerds.user.domain.Dto.NewUserReqDto;
 import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
@@ -26,48 +28,51 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = UserController.class)
-class UserControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
+class UserControllerTest extends ControllerTest {
+//
+//    @Autowired
+//    private MockMvc mockMvc;
 
     @MockBean
     private UserService userService;
 
     @Test
+    @WithCustomMockUser
     void getAllUser() throws Exception {
         // given
-        List<User> userData = Arrays.asList(
-                User.builder()
-                        .username("RetepMil")
-                        .email("lkslyj2@naver.com")
-                        .build(),
+        List<User> userData = Arrays.asList(User.builder()
+                .username("RetepMil")
+                .email("lkslyj2@naver.com")
+                .build(),
                 User.builder()
                         .username("PeterLim")
                         .email("lkslyj8@naver.com")
                         .build()
         );
 
-        // mocking
-        when(userService.getAllUsers()).thenReturn(userData);
 
+        when(userService.getAllUsers()).thenReturn(userData);
+        when(userRepository.findAll()).thenReturn(userData);
+
+        // mocking
         // when
-        MvcResult result = mockMvc.perform(get("/users/"))
+        MvcResult result = mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
                 .andDo(print()).andReturn();
         DocumentContext documentContext = JsonPath.parse(result.getResponse().getContentAsString());
 
-        // then
+        //then
         Assertions.assertEquals(documentContext.read("$[*]['username']").toString(), "[\"RetepMil\",\"PeterLim\"]");
         Assertions.assertEquals(documentContext.read("$[*]['email']").toString(), "[\"lkslyj2@naver.com\",\"lkslyj8@naver.com\"]");
 
     }
 
     @Test
+    @WithCustomMockUser
     void createUser() throws Exception {
         NewUserReqDto newUserReqDto = new NewUserReqDto("PeterLim", "lkslyj2@naver.com");
 
-        mockMvc.perform(post("/users/")
+        mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(newUserReqDto)))
                 .andExpect(status().isOk())
@@ -75,6 +80,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     void getUser() throws Exception {
         // given
         User user = User.builder()
@@ -97,6 +103,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     void deleteUser() throws Exception {
         mockMvc.perform(delete("/users/1")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -104,6 +111,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     void updateUser() throws Exception {
         // given
         UserUpdateReqDto userUpdateReqDto = new UserUpdateReqDto("PeterLim");

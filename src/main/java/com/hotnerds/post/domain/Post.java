@@ -1,6 +1,8 @@
 package com.hotnerds.post.domain;
 
 import com.hotnerds.common.BaseTimeEntity;
+import com.hotnerds.post.domain.like.Like;
+import com.hotnerds.post.domain.like.Likes;
 import com.hotnerds.post.domain.comment.Comment;
 import com.hotnerds.post.domain.comment.Comments;
 import com.hotnerds.user.domain.User;
@@ -50,4 +52,29 @@ public class Post extends BaseTimeEntity {
     public List<Comment> getAllComments() {
         return comments.getComments();
     }
+    @Embedded
+    Likes likes;
+
+    public void like(User user) {
+        Like like = Like.builder()
+                .id(null)
+                .post(this)
+                .user(user)
+                .build();
+        likes.add(like);
+    }
+
+    public void unlike(User user) {
+        Like like = Like.builder()
+                .id(null)
+                .post(this)
+                .user(user)
+                .build();
+        likes.remove(like);
+    }
+
+    public int getLikeCount() {
+        return likes.getCount();
+    }
+
 }

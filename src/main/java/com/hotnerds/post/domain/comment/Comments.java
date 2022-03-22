@@ -1,9 +1,7 @@
 package com.hotnerds.post.domain.comment;
 
-import com.hotnerds.post.domain.Post;
-import com.hotnerds.post.exception.CommentExistsException;
-import com.hotnerds.post.exception.CommentNotFoundException;
-import com.hotnerds.user.domain.User;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import lombok.Getter;
 
 import javax.persistence.CascadeType;
@@ -28,7 +26,7 @@ public class Comments {
 
     public Comment add(Comment comment) {
         if (comments.contains(comment)) {
-            throw new CommentExistsException();
+            throw new BusinessException(ErrorCode.COMMENT_DUPLICATED_EXCEPTION);
         }
         comments.add(comment);
         return comment;
@@ -48,6 +46,6 @@ public class Comments {
         return comments.stream()
                 .filter(c -> c.getId().equals(commentId))
                 .findAny()
-                .orElseThrow(CommentNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION));
     }
 }

@@ -1,12 +1,12 @@
 package com.hotnerds.diet.application;
 
 
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealDateTime;
 import com.hotnerds.diet.domain.dto.DietRequestDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
-import com.hotnerds.diet.exception.DietAlreadyExistsException;
-import com.hotnerds.diet.exception.DietNotFoundException;
 import com.hotnerds.user.application.UserService;
 import com.hotnerds.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class DietService {
     public Diet createDiet(DietRequestDto dietRequestDto) {
         User user = userService.getUserById(dietRequestDto.getUserId());
         if (isExistedDiet(dietRequestDto.getMealDateTime(), user)) {
-            throw new DietAlreadyExistsException();
+            throw new BusinessException(ErrorCode.DIET_DUPLICATED_EXCEPTION);
         }
         Diet diet = mapToDiet(dietRequestDto);
         dietRequestDto.getFoodList()
@@ -50,13 +50,13 @@ public class DietService {
     @Transactional(readOnly = true)
     public Diet getDietByMealDateTimeAndUser(MealDateTime mealDateTime, User user) {
         return dietRepository.findByMealDateTimeAndUser(mealDateTime, user)
-                .orElseThrow(DietNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.DIET_NOT_FOUND_EXCEPTION));
     }
 
     @Transactional(readOnly = true)
     public Diet getDietById(Long dietId) {
         return dietRepository.findById(dietId)
-                .orElseThrow(DietNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.DIET_NOT_FOUND_EXCEPTION));
     }
 
     public void deleteDiet(Long dietId) {

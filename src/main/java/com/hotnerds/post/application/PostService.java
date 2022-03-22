@@ -1,15 +1,13 @@
 package com.hotnerds.post.application;
 
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.post.domain.comment.Comment;
 import com.hotnerds.post.domain.dto.*;
 import com.hotnerds.post.domain.repository.PostRepository;
-import com.hotnerds.post.exception.CommentInvalidException;
-import com.hotnerds.post.exception.CommentNotFoundException;
-import com.hotnerds.post.exception.PostNotFoundException;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
-import com.hotnerds.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,11 +35,10 @@ public class PostService {
         return findPosts.stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
-
     }
 
     public List<PostResponseDto> searchByWriter(PostByUserRequestDto requestDto) {
-        User user = userRepository.findByUsername(requestDto.getUsername()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByUsername(requestDto.getUsername()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         return postRepository.findAllByUser(user, requestDto.getPageable())
                 .stream()
@@ -52,7 +49,7 @@ public class PostService {
     private Post createPost(PostRequestDto postRequestDto) {
         Optional<User> optionalUser = userRepository.findByUsername(postRequestDto.getUsername());
 
-        User user = optionalUser.orElseThrow(UserNotFoundException::new);
+        User user = optionalUser.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         return Post.builder()
                 .title(postRequestDto.getTitle())
@@ -63,9 +60,9 @@ public class PostService {
 
     public void deletePost(PostDeleteRequestDto requestDto) {
 
-        userRepository.findByUsername(requestDto.getUsername()).orElseThrow(UserNotFoundException::new);
+        userRepository.findByUsername(requestDto.getUsername()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        postRepository.findById(requestDto.getPostId()).orElseThrow(PostNotFoundException::new);
+        postRepository.findById(requestDto.getPostId()).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
 
         postRepository.deleteById(requestDto.getPostId());
     }
@@ -73,12 +70,12 @@ public class PostService {
     @Transactional
     public void addComment(CommentCreateReqDto reqDto) {
         if (reqDto.getContent().equals("") || reqDto.getContent().length() > 1000) {
-            throw new CommentInvalidException();
+            throw new BusinessException(ErrorCode.COMMENT_INVALID_EXCEPTION);
         }
         User user = userRepository.findById(reqDto.getUserId())
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
         Post post = postRepository.findById(reqDto.getPostId())
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
 
         Comment comment = Comment.builder()
                 .writer(user)
@@ -91,19 +88,52 @@ public class PostService {
 
     @Transactional
     public void deleteComment(CommentDeleteReqDto reqDto) {
-        Post post = postRepository.findById(reqDto.getPostId()).orElseThrow(PostNotFoundException::new);
+        Post post = postRepository.findById(reqDto.getPostId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
         post.removeComment(reqDto.getCommentId());
     }
 
     @Transactional
     public void updateComment(CommentUpdateReqDto reqDto) {
-        Post post = postRepository.findById(reqDto.getPostId()).orElseThrow(PostNotFoundException::new);
+        Post post = postRepository.findById(reqDto.getPostId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
         post.updateComment(reqDto.getCommentId(), reqDto.getContent());
     }
 
     @Transactional(readOnly = true)
     public List<Comment> getComments(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
         return post.getAllComments();
+    }
+
+    public LikeResponseDto like(String username, Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        post.like(user);
+
+        return LikeResponseDto.builder()
+                .likeCount(post.getLikeCount())
+                .username(user.getUsername())
+                .postId(post.getId())
+                .build();
+    }
+
+    public LikeResponseDto unlike(String username, Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        post.unlike(user);
+
+        return LikeResponseDto.builder()
+                .likeCount(post.getLikeCount())
+                .username(user.getUsername())
+                .postId(post.getId())
+                .build();
     }
 }
