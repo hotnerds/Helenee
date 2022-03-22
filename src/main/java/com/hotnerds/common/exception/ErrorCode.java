@@ -16,8 +16,11 @@ public enum ErrorCode {
     METHOD_NOT_ALLOWED(405, "C003", "허용된 메서드가 아닙니다."),
     INVALID_TYPE_VALUE(400, "C004", "타입이 유효하지 않습니다"),
 
-    // Post
+    //Post
     POST_NOT_FOUND_EXCEPTION(404, "P001", "해당하는 게시물을 찾을 수 없습니다."),
+
+    //Tag
+    TAG_NAME_NOT_VALID_EXCEPTION(400, "T001", "유효하지 않은 태그 이름입니다."),
 
     //Like
     LIKE_NOT_FOUND_EXCEPTION(404, "P002", "게시물에 좋아요를 누르지 않았습니다."),
