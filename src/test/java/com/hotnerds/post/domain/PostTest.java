@@ -3,6 +3,7 @@ package com.hotnerds.post.domain;
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.like.Like;
+import com.hotnerds.tag.domain.Tag;
 import com.hotnerds.user.domain.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,11 +18,13 @@ class PostTest {
 
     Post post;
     User user;
+    Tag tag;
 
     @BeforeEach
     void init() {
         user = new User("garam", "kgr4163@korea.ac.kr");
         post = new Post("title", "content", user);
+        tag = new Tag("tag");
     }
 
     @DisplayName("게시글에 유저는 좋아요를 누를 수 있다.")
@@ -65,5 +68,45 @@ class PostTest {
                 .extracting("errorCode")
                 .usingRecursiveComparison()
                 .isEqualTo(ErrorCode.LIKE_NOT_FOUND_EXCEPTION);
+    }
+
+    @DisplayName("게시글에 태그를 추가할 수 있다.")
+    @Test
+    void 태그_추가_성공() {
+        post.addTag(tag);
+
+        assertThat(post.getPostTags().getPostTags().size()).isEqualTo(1);
+    }
+
+    @DisplayName("게시글은 중복된 태그를 가질 수 없다.")
+    @Test
+    void 중복된_태그_실패() {
+        post.addTag(tag);
+
+        assertThatThrownBy(() -> post.addTag(tag))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .usingRecursiveComparison()
+                .isEqualTo(ErrorCode.DUPLICATED_TAG_EXCEPTION);
+    }
+
+    @DisplayName("게시글 붙은 태그를 삭제할 수 있다.")
+    @Test
+    void 태그_삭제_성공() {
+        post.addTag(tag);
+
+        post.removeTag(tag);
+
+        assertThat(post.getPostTags().getPostTags().size()).isEqualTo(0);
+    }
+
+    @DisplayName("게시글에 붙어 있지 않은 태그를 지울 수는 없다.")
+    @Test
+    void 붙어있지않은_태그_삭제_실패() {
+        assertThatThrownBy(() -> post.removeTag(tag))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .usingRecursiveComparison()
+                .isEqualTo(ErrorCode.TAG_NOT_FOUND_EXCEPTION);
     }
 }
