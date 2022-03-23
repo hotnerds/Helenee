@@ -32,11 +32,11 @@ public class DietService {
 
     private final DietRepository dietRepository;
 
-    public Diet findByDateTimeUser(DietReadRequestDto requestDto, Long userId) {
+    public Diet findByMealDateAndMealTimeAndUser(DietReadRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        return dietRepository.findByDateTimeUser(requestDto.getMealDate(), requestDto.getMealTime(), user)
+        return dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(), requestDto.getMealTime(), user)
                 .orElseThrow(() -> new BusinessException(ErrorCode.DIET_NOT_FOUND_EXCEPTION));
     }
 
@@ -57,7 +57,7 @@ public class DietService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        Diet diet = dietRepository.findByDateTimeUser(requestDto.getMealDate(), requestDto.getMealTime(), user)
+        Diet diet = dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(), requestDto.getMealTime(), user)
                 .orElseThrow(() -> new BusinessException(ErrorCode.DIET_NOT_FOUND_EXCEPTION));
 
         Food food = foodService.findById(requestDto.getFoodId());
@@ -67,7 +67,7 @@ public class DietService {
 
     @Transactional
     protected Diet findOrCreate(LocalDate mealDate, MealTime mealTime, User user) {
-        Diet diet = dietRepository.findByDateTimeUser(mealDate, mealTime, user)
+        Diet diet = dietRepository.findByMealDateAndMealTimeAndUser(mealDate, mealTime, user)
                 .orElseGet(() -> Diet.builder()
                         .mealDate(mealDate)
                         .mealTime(mealTime)

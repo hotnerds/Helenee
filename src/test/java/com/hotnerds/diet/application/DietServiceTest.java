@@ -74,17 +74,17 @@ class DietServiceTest {
                 .build();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(dietRepository.findByDateTimeUser(requestDto.getMealDate(),
+        when(dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
                 requestDto.getMealTime(),
                 user)).thenReturn(Optional.empty());
 
         //when then
         assertThatThrownBy(
-                () -> dietService.findByDateTimeUser(requestDto, 1L))
+                () -> dietService.findByMealDateAndMealTimeAndUser(requestDto, 1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.DIET_NOT_FOUND_EXCEPTION.getMessage());
         verify(userRepository, times(1)).findById(1L);
-        verify(dietRepository, times(1)).findByDateTimeUser(requestDto.getMealDate(),
+        verify(dietRepository, times(1)).findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
                 requestDto.getMealTime(),
                 user);
     }
@@ -102,11 +102,11 @@ class DietServiceTest {
 
         //when then
         assertThatThrownBy(
-                () -> dietService.findByDateTimeUser(requestDto, 1L))
+                () -> dietService.findByMealDateAndMealTimeAndUser(requestDto, 1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
         verify(userRepository, times(1)).findById(1L);
-        verify(dietRepository, times(0)).findByDateTimeUser(requestDto.getMealDate(),
+        verify(dietRepository, times(0)).findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
                 requestDto.getMealTime(),
                 user);
     }
@@ -127,17 +127,17 @@ class DietServiceTest {
                 .build();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(dietRepository.findByDateTimeUser(requestDto.getMealDate(),
+        when(dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
                 requestDto.getMealTime(),
                 user)).thenReturn(Optional.of(expectedDiet));
       
         //when
-        Diet actualDiet = dietService.findByDateTimeUser(requestDto, 1L);
+        Diet actualDiet = dietService.findByMealDateAndMealTimeAndUser(requestDto, 1L);
 
         //then
         assertThat(actualDiet).isEqualTo(expectedDiet);
         verify(userRepository, times(1)).findById(1L);
-        verify(dietRepository, times(1)).findByDateTimeUser(requestDto.getMealDate(),
+        verify(dietRepository, times(1)).findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
                 requestDto.getMealTime(),
                 user);
     }
@@ -152,7 +152,7 @@ class DietServiceTest {
                 .user(user)
                 .build();
 
-        when(dietRepository.findByDateTimeUser(mealDate, mealTime, user))
+        when(dietRepository.findByMealDateAndMealTimeAndUser(mealDate, mealTime, user))
                 .thenReturn(Optional.empty());
 
         when(dietRepository.save(any(Diet.class))).thenAnswer(new Answer<Diet>() {
@@ -170,7 +170,7 @@ class DietServiceTest {
         //then
         assertThat(actualDiet).isEqualTo(expectedDiet);
         verify(dietRepository, times(1)).save(any(Diet.class));
-        verify(dietRepository, times(1)).findByDateTimeUser(mealDate, mealTime, user);
+        verify(dietRepository, times(1)).findByMealDateAndMealTimeAndUser(mealDate, mealTime, user);
     }
 
     @Test
@@ -183,7 +183,7 @@ class DietServiceTest {
                 .user(user)
                 .build();
 
-        when(dietRepository.findByDateTimeUser(mealDate, mealTime, user))
+        when(dietRepository.findByMealDateAndMealTimeAndUser(mealDate, mealTime, user))
                 .thenReturn(Optional.of(expectedDiet));
 
         when(dietRepository.save(any(Diet.class))).thenAnswer(new Answer<Diet>() {
@@ -199,7 +199,7 @@ class DietServiceTest {
         //then
         assertThat(actualDiet).isEqualTo(expectedDiet);
         verify(dietRepository, times(1)).save(any(Diet.class));
-        verify(dietRepository, times(1)).findByDateTimeUser(mealDate, mealTime, user);
+        verify(dietRepository, times(1)).findByMealDateAndMealTimeAndUser(mealDate, mealTime, user);
     }
 
     @Test
@@ -276,7 +276,7 @@ class DietServiceTest {
         Diet diet = Mockito.spy(Diet.class);
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(dietRepository.findByDateTimeUser(any(LocalDate.class), any(MealTime.class), any(User.class))).thenReturn(Optional.of(diet));
+        when(dietRepository.findByMealDateAndMealTimeAndUser(any(LocalDate.class), any(MealTime.class), any(User.class))).thenReturn(Optional.of(diet));
         when(foodService.findById(1L)).thenReturn(food);
 
         //when
@@ -284,7 +284,7 @@ class DietServiceTest {
       
         //then
         verify(userRepository, times(1)).findById(1L);
-        verify(dietRepository, times(1)).findByDateTimeUser(mealDate, mealTime, user);
+        verify(dietRepository, times(1)).findByMealDateAndMealTimeAndUser(mealDate, mealTime, user);
         verify(diet, times(1)).removeFood(food);
     }
 }

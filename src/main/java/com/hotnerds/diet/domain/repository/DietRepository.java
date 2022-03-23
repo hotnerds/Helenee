@@ -10,6 +10,6 @@ import java.util.Optional;
 
 public interface DietRepository extends JpaRepository<Diet, Long> {
 
-    Optional<Diet> findByDateTimeUser(LocalDate mealDate, MealTime mealTime, User user);
+    Optional<Diet> findByMealDateAndMealTimeAndUser(LocalDate mealDate, MealTime mealTime, User user);
 
 }
