@@ -1,7 +1,7 @@
 package com.hotnerds.diet.domain;
 
-public enum MealTimeType {
+public enum MealTime {
     BREAKFAST,
     LUNCH,
-    DINNER;
+    DINNER
 }

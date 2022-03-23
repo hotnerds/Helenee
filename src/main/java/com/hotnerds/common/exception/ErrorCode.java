@@ -35,6 +35,9 @@ public enum ErrorCode {
     DIET_DUPLICATED_EXCEPTION(400, "D001", "동일한 정보를 가진 식단이 이미 존재합니다."),
     DIET_NOT_FOUND_EXCEPTION(404, "D002", "해당하는 식단이 없습니다."),
 
+    //Food
+    FOOD_NOT_FOUND_EXCEPTION(404, "F001", "음식이 존재하지 않습니다."),
+
     //Auth
     AUTHENTICATION_EXCEPTION(400, "AU001", "인증 관련 오류가 발생했습니다.");
 

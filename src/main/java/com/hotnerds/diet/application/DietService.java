@@ -4,71 +4,78 @@ package com.hotnerds.diet.application;
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
-import com.hotnerds.diet.domain.MealDateTime;
-import com.hotnerds.diet.domain.dto.DietRequestDto;
+import com.hotnerds.diet.domain.MealTime;
+import com.hotnerds.diet.domain.dto.DietAddFoodRequestDto;
+import com.hotnerds.diet.domain.dto.DietReadRequestDto;
+import com.hotnerds.diet.domain.dto.DietRemoveFoodRequestDto;
+import com.hotnerds.diet.domain.dto.DietResponseDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
-import com.hotnerds.user.application.UserService;
+import com.hotnerds.food.application.FoodService;
+import com.hotnerds.food.domain.Food;
 import com.hotnerds.user.domain.User;
+import com.hotnerds.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class DietService {
 
-    private final UserService userService;
+    private final FoodService foodService;
+
+    private final UserRepository userRepository;
 
     private final DietRepository dietRepository;
 
-    public Diet createDiet(DietRequestDto dietRequestDto) {
-        User user = userService.getUserById(dietRequestDto.getUserId());
-        if (isExistedDiet(dietRequestDto.getMealDateTime(), user)) {
-            throw new BusinessException(ErrorCode.DIET_DUPLICATED_EXCEPTION);
-        }
-        Diet diet = mapToDiet(dietRequestDto);
-        dietRequestDto.getFoodList()
-                .forEach(e -> diet.addFood(e.getName(), e.getNutrient()));
-        return dietRepository.save(diet);
-    }
+    public Diet findByMealDateAndMealTimeAndUser(DietReadRequestDto requestDto, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-    public Diet updateDiet(Long dietId, DietRequestDto dietRequestDto) {
-        User user = userService.getUserById(dietRequestDto.getUserId());
-        Diet diet = getDietById(dietId);
-        diet.getFoodList().clear();
-        dietRequestDto.getFoodList()
-                .forEach(e -> diet.addFood(e.getName(), e.getNutrient()));
-        return dietRepository.save(diet);
-    }
-
-    @Transactional(readOnly = true)
-    public boolean isExistedDiet(MealDateTime mealDateTime, User user) {
-        return dietRepository.existsByMealDateTimeAndUser(mealDateTime, user);
-    }
-
-    @Transactional(readOnly = true)
-    public Diet getDietByMealDateTimeAndUser(MealDateTime mealDateTime, User user) {
-        return dietRepository.findByMealDateTimeAndUser(mealDateTime, user)
+        return dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(), requestDto.getMealTime(), user)
                 .orElseThrow(() -> new BusinessException(ErrorCode.DIET_NOT_FOUND_EXCEPTION));
     }
 
-    @Transactional(readOnly = true)
-    public Diet getDietById(Long dietId) {
-        return dietRepository.findById(dietId)
+    @Transactional
+    public void addFood(DietAddFoodRequestDto requestDto, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        Diet diet = findOrCreate(requestDto.getMealDate(), requestDto.getMealTime(), user);
+
+        Food food = foodService.findOrCreate(requestDto.getApiId());
+
+        diet.addFood(food);
+    }
+
+    @Transactional
+    public void removeFood(DietRemoveFoodRequestDto requestDto, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        Diet diet = dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(), requestDto.getMealTime(), user)
                 .orElseThrow(() -> new BusinessException(ErrorCode.DIET_NOT_FOUND_EXCEPTION));
+
+        Food food = foodService.findById(requestDto.getFoodId());
+
+        diet.removeFood(food);
     }
 
-    public void deleteDiet(Long dietId) {
-        dietRepository.deleteById(dietId);
+    @Transactional
+    protected Diet findOrCreate(LocalDate mealDate, MealTime mealTime, User user) {
+        Diet diet = dietRepository.findByMealDateAndMealTimeAndUser(mealDate, mealTime, user)
+                .orElseGet(() -> Diet.builder()
+                        .mealDate(mealDate)
+                        .mealTime(mealTime)
+                        .user(user)
+                        .build());
+
+        return dietRepository.save(diet);
     }
 
-    public Diet mapToDiet(DietRequestDto dietRequestDto) {
-        User user = userService.getUserById(dietRequestDto.getUserId());
-        return Diet.builder()
-                .mealDateTime(dietRequestDto.getMealDateTime())
-                .user(user)
-                .nutrient(dietRequestDto.getNutrient())
-                .build();
-    }
+
 }
