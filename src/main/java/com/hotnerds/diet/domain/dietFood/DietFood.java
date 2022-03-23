@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -35,5 +36,18 @@ public class DietFood {
     public DietFood(Diet diet, Food food) {
         this.diet = diet;
         this.food = food;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DietFood dietFood = (DietFood) o;
+        return Objects.equals(diet, dietFood.diet) && Objects.equals(food, dietFood.food);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(diet, food);
     }
 }
