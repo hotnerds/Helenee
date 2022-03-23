@@ -26,7 +26,7 @@ import java.util.Objects;
 })
 public class Diet extends BaseTimeEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "diet_id")
     private Long dietId;
 
