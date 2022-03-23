@@ -21,6 +21,8 @@ public enum ErrorCode {
 
     //Tag
     TAG_NAME_NOT_VALID_EXCEPTION(400, "T001", "유효하지 않은 태그 이름입니다."),
+    DUPLICATED_TAG_EXCEPTION(400, "T002", "태그가 중복되었습니다."),
+    TAG_NOT_FOUND_EXCEPTION(404, "T003", "태그를 찾을 수 없습니다."),
 
     //Like
     LIKE_NOT_FOUND_EXCEPTION(404, "P002", "게시물에 좋아요를 누르지 않았습니다."),
