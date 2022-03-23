@@ -1,0 +1,69 @@
+package com.hotnerds.post.domain;
+
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
+import com.hotnerds.post.domain.like.Like;
+import com.hotnerds.user.domain.User;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
+
+class PostTest {
+
+    Post post;
+    User user;
+
+    @BeforeEach
+    void init() {
+        user = new User("garam", "kgr4163@korea.ac.kr");
+        post = new Post("title", "content", user);
+    }
+
+    @DisplayName("게시글에 유저는 좋아요를 누를 수 있다.")
+    @Test
+    void 게시글에_좋아요_추가_성공() {
+        post.like(user);
+
+        assertThat(post.getLikeCount()).isEqualTo(1);
+    }
+
+    @DisplayName("게시글에 중복된 유저가 좋아요를 누를 수 없다.")
+    @Test
+    void 중복된_게시글_좋아요_실패() {
+        post.like(user);
+
+        assertThatThrownBy(() -> post.like(user))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .usingRecursiveComparison()
+                .isEqualTo(ErrorCode.DUPLICATED_LIKE_EXCEPTION);
+    }
+
+    @DisplayName("게시글에서 좋아요를 취소할 수 있다.")
+    @Test
+    void 게시글_좋아요_취소_성공() {
+        //given
+        post.like(user);
+
+        //when
+        post.unlike(user);
+
+        //then
+        assertThat(post.getLikeCount()).isEqualTo(0);
+    }
+
+    @DisplayName("좋아요를 누른 적 없는 유저가 좋아요를 취소할 수 없다.")
+    @Test
+    void 좋아요누른적없는유저_좋아요_취소_실패() {
+        assertThatThrownBy(() -> post.unlike(user))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .usingRecursiveComparison()
+                .isEqualTo(ErrorCode.LIKE_NOT_FOUND_EXCEPTION);
+    }
+}
