@@ -143,11 +143,10 @@ class FatSecretApiClientTest {
         mockServer.expect(requestTo(requestURL))
                 .andExpect(header("Authorization", "Bearer valid token"))
                 .andRespond(withNoContent());
+        when(fatSecretToken.getToken()).thenReturn("valid token");
 
-        //when
-        fatSecretApiClient.searchFoodById(38821L);
-
-        //then
+        //when then
+        assertDoesNotThrow(() -> fatSecretApiClient.searchFoodById(38821L));
 
     }
 
@@ -159,11 +158,10 @@ class FatSecretApiClientTest {
         mockServer.expect(requestTo(requestURL))
                 .andExpect(header("Authorization", "Bearer valid token"))
                 .andRespond(withNoContent());
+        when(fatSecretToken.getToken()).thenReturn("valid token");
 
-        //when
-        fatSecretApiClient.searchFoods("Chicken", 0, 5);
-
-        //then
+        //when then
+        assertDoesNotThrow(() -> fatSecretApiClient.searchFoods("Chicken", 0, 5));
 
     }
 
