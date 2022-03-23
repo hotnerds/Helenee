@@ -5,6 +5,8 @@ import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.post.domain.dto.*;
 import com.hotnerds.post.domain.repository.PostRepository;
+import com.hotnerds.tag.application.TagService;
+import com.hotnerds.tag.domain.Tag;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +27,10 @@ public class PostService {
 
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final TagService tagService;
 
     public void write(PostRequestDto requestDto) {
-        Post savedPost = postRepository.save(createPost(requestDto));
+        postRepository.save(createPost(requestDto));
     }
 
     public List<PostResponseDto> searchByTitle(String title) {
@@ -48,16 +51,19 @@ public class PostService {
     }
 
     private Post createPost(PostRequestDto postRequestDto) {
-        Optional<User> optionalUser = userRepository.findByUsername(postRequestDto.getUsername());
+        User user = userRepository.findByUsername(postRequestDto.getUsername())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        User user = optionalUser.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+        Post post = new Post(
+                postRequestDto.getTitle(),
+                postRequestDto.getContent(),
+                user);
 
-        return Post.builder()
-                .title(postRequestDto.getTitle())
-                .content(postRequestDto.getContent())
-                .writer(user)
-                .build();
+        postRequestDto.getTagNames().stream()
+                .map(tagService::findOrCreateTag)
+                .forEach(post::addTag);
 
+        return post;
     }
 
     public void deletePost(PostDeleteRequestDto requestDto) {
