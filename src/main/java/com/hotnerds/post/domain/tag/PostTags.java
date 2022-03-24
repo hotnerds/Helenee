@@ -43,6 +43,10 @@ public class PostTags {
         postTags.remove(wantRemoveTag);
     }
 
+    public void clear() {
+        postTags.clear();
+    }
+
     public static PostTags empty() {
         return new PostTags(new ArrayList<>());
     }

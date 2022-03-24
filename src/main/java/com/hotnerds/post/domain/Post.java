@@ -36,6 +36,15 @@ public class Post extends BaseTimeEntity {
     @Embedded
     PostTags postTags;
 
+    public boolean isWriter(User user) {
+        return this.writer.equals(user);
+    }
+
+    public void updateTitleAndContent(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
     public void like(User user) {
         Like like = Like.builder()
                 .id(null)
@@ -60,6 +69,10 @@ public class Post extends BaseTimeEntity {
 
     public void removeTag(Tag tag) {
         postTags.removeTag(tag);
+    }
+
+    public void clearTag() {
+        postTags.clear();
     }
 
     public int getLikeCount() {
