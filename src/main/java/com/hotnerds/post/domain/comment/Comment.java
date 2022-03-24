@@ -16,15 +16,16 @@ import java.util.Objects;
 @Getter
 @Embeddable
 public class Comment extends BaseTimeEntity {
-    @GeneratedValue
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comment_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User writer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
@@ -52,7 +53,7 @@ public class Comment extends BaseTimeEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(writer, post, content);
+        return Objects.hash(this.id, this.writer, this.post, this.content);
     }
 
     public void updateContent(String content) {
