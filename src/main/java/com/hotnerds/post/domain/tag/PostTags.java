@@ -13,6 +13,9 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Getter
 @Embeddable
@@ -41,6 +44,12 @@ public class PostTags {
                 .orElseThrow(() -> new BusinessException(ErrorCode.TAG_NOT_FOUND_EXCEPTION));
 
         postTags.remove(wantRemoveTag);
+    }
+
+    public List<String> getAllTagNames() {
+        return postTags.stream()
+                .map(PostTag::getTagName)
+                .collect(toList());
     }
 
     public void clear() {

@@ -36,6 +36,10 @@ public class PostTag {
         return Objects.equals(this.tag, tag);
     }
 
+    public String getTagName() {
+        return tag.getName();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

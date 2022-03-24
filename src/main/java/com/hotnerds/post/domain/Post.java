@@ -10,6 +10,7 @@ import lombok.*;
 import org.hibernate.mapping.Join;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -73,6 +74,10 @@ public class Post extends BaseTimeEntity {
 
     public void clearTag() {
         postTags.clear();
+    }
+
+    public List<String> getTagNames() {
+        return postTags.getAllTagNames();
     }
 
     public int getLikeCount() {
