@@ -18,6 +18,7 @@ public enum ErrorCode {
 
     //Post
     POST_NOT_FOUND_EXCEPTION(404, "P001", "해당하는 게시물을 찾을 수 없습니다."),
+    POST_WRITER_NOT_MATCH_EXCEPTION(400, "P002", "해당 게시물 작성자가 아닙니다."),
 
     //Tag
     TAG_NAME_NOT_VALID_EXCEPTION(400, "T001", "유효하지 않은 태그 이름입니다."),
