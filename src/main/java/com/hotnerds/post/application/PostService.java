@@ -5,6 +5,7 @@ import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.post.domain.comment.Comment;
 import com.hotnerds.post.domain.dto.*;
+import com.hotnerds.post.domain.repository.CommentRepository;
 import com.hotnerds.post.domain.repository.PostRepository;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
@@ -65,46 +66,6 @@ public class PostService {
         postRepository.findById(requestDto.getPostId()).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
 
         postRepository.deleteById(requestDto.getPostId());
-    }
-
-    @Transactional
-    public void addComment(CommentCreateReqDto reqDto) {
-        if (reqDto.getContent().equals("") || reqDto.getContent().length() > 1000) {
-            throw new BusinessException(ErrorCode.COMMENT_INVALID_EXCEPTION);
-        }
-        User user = userRepository.findById(reqDto.getUserId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
-        Post post = postRepository.findById(reqDto.getPostId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
-
-        Comment comment = Comment.builder()
-                .writer(user)
-                .post(post)
-                .content(reqDto.getContent())
-                .build();
-
-        post.addComment(comment);
-    }
-
-    @Transactional
-    public void deleteComment(CommentDeleteReqDto reqDto) {
-        Post post = postRepository.findById(reqDto.getPostId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
-        post.removeComment(reqDto.getCommentId());
-    }
-
-    @Transactional
-    public void updateComment(CommentUpdateReqDto reqDto) {
-        Post post = postRepository.findById(reqDto.getPostId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
-        post.updateComment(reqDto.getCommentId(), reqDto.getContent());
-    }
-
-    @Transactional(readOnly = true)
-    public CommentResponseDto getComments(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
-        return CommentResponseDto.builder().commentList(post.getAllComments()).build();
     }
 
     public LikeResponseDto like(String username, Long postId) {
