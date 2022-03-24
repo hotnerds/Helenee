@@ -15,8 +15,7 @@ public class Comments {
     @OneToMany(
             mappedBy = "post",
             fetch = FetchType.LAZY,
-            cascade = CascadeType.PERSIST,
-            orphanRemoval = true
+            cascade = CascadeType.REMOVE
     )
     private List<Comment> comments = new ArrayList<>();
 
