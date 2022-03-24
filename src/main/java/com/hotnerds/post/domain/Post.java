@@ -52,6 +52,7 @@ public class Post extends BaseTimeEntity {
     public List<Comment> getAllComments() {
         return comments.getComments();
     }
+
     @Embedded
     Likes likes;
 

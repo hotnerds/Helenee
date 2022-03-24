@@ -101,10 +101,10 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<Comment> getComments(Long postId) {
+    public CommentResponseDto getComments(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
-        return post.getAllComments();
+        return CommentResponseDto.builder().commentList(post.getAllComments()).build();
     }
 
     public LikeResponseDto like(String username, Long postId) {
