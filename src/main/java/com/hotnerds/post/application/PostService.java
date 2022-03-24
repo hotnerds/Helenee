@@ -6,17 +6,13 @@ import com.hotnerds.post.domain.Post;
 import com.hotnerds.post.domain.dto.*;
 import com.hotnerds.post.domain.repository.PostRepository;
 import com.hotnerds.tag.application.TagService;
-import com.hotnerds.tag.domain.Tag;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
@@ -66,13 +62,34 @@ public class PostService {
         return post;
     }
 
-    public void deletePost(PostDeleteRequestDto requestDto) {
+    public void delete(PostDeleteRequestDto requestDto) {
 
-        userRepository.findByUsername(requestDto.getUsername()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+        userRepository.findByUsername(requestDto.getUsername())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        postRepository.findById(requestDto.getPostId()).orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
+        postRepository.findById(requestDto.getPostId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
 
         postRepository.deleteById(requestDto.getPostId());
+    }
+
+    public void update(PostUpdateRequestDto updateRequestDto) {
+        Post post = postRepository.findById(updateRequestDto.getPostId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
+        User user = userRepository.findByUsername(updateRequestDto.getUsername())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        if(!post.isWriter(user)) {
+            throw new BusinessException(ErrorCode.POST_WRITER_NOT_MATCH_EXCEPTION);
+        }
+
+        post.updateTitleAndContent(updateRequestDto.getTitle(), updateRequestDto.getContent());
+
+        post.clearTag();
+
+        updateRequestDto.getTagNames().stream()
+                .map(tagService::findOrCreateTag)
+                .forEach(post::addTag);
     }
 
     public LikeResponseDto like(String username, Long postId) {
