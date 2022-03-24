@@ -1,4 +1,4 @@
-package com.hotnerds.post.application;
+package com.hotnerds.comment.application;
 
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
@@ -8,7 +8,7 @@ import com.hotnerds.post.domain.dto.CommentCreateReqDto;
 import com.hotnerds.post.domain.dto.CommentDeleteReqDto;
 import com.hotnerds.post.domain.dto.CommentResponseDto;
 import com.hotnerds.post.domain.dto.CommentUpdateReqDto;
-import com.hotnerds.post.domain.repository.CommentRepository;
+import com.hotnerds.comment.repository.CommentRepository;
 import com.hotnerds.post.domain.repository.PostRepository;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;

@@ -7,11 +7,9 @@ import com.hotnerds.post.domain.comment.Comment;
 import com.hotnerds.post.domain.comment.Comments;
 import com.hotnerds.user.domain.User;
 import lombok.*;
-import org.hibernate.mapping.Join;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Builder
 @Entity

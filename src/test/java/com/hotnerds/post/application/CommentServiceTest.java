@@ -1,5 +1,6 @@
 package com.hotnerds.post.application;
 
+import com.hotnerds.comment.application.CommentService;
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
@@ -9,7 +10,7 @@ import com.hotnerds.post.domain.dto.CommentCreateReqDto;
 import com.hotnerds.post.domain.dto.CommentDeleteReqDto;
 import com.hotnerds.post.domain.dto.CommentResponseDto;
 import com.hotnerds.post.domain.dto.CommentUpdateReqDto;
-import com.hotnerds.post.domain.repository.CommentRepository;
+import com.hotnerds.comment.repository.CommentRepository;
 import com.hotnerds.post.domain.repository.PostRepository;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
@@ -22,7 +23,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
