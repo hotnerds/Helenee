@@ -96,20 +96,16 @@ public class Post extends BaseTimeEntity {
         comments.remove(commentId);
     }
 
-    public void updateComment(Long commentId, String content) {
-        comments.update(commentId, content);
-    }
-
     public List<Comment> getAllComments() {
         return comments.getComments();
     }
 
     public Post(String title, String content, User writer) {
-        this(null, title, content, writer, null, Likes.empty(), PostTags.empty());
+        this(null, title, content, writer, Comments.empty(), Likes.empty(), PostTags.empty());
     }
 
     public Post(Long id, String title, String content, User writer) {
-        this(id, title, content, writer, null, Likes.empty(), PostTags.empty());
+        this(id, title, content, writer, Comments.empty(), Likes.empty(), PostTags.empty());
     }
 
     @Builder
