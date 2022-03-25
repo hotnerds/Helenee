@@ -5,17 +5,17 @@ import com.hotnerds.post.domain.like.Like;
 import com.hotnerds.post.domain.like.Likes;
 import com.hotnerds.post.domain.comment.Comment;
 import com.hotnerds.post.domain.comment.Comments;
+import com.hotnerds.post.domain.tag.PostTags;
+import com.hotnerds.tag.domain.Tag;
 import com.hotnerds.user.domain.User;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
-@Builder
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Post extends BaseTimeEntity {
 
     @Id
@@ -29,7 +29,7 @@ public class Post extends BaseTimeEntity {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User writer;
 
     @Embedded
@@ -54,6 +54,18 @@ public class Post extends BaseTimeEntity {
     @Embedded
     Likes likes;
 
+    @Embedded
+    PostTags postTags;
+
+    public boolean isWriter(User user) {
+        return this.writer.equals(user);
+    }
+
+    public void updateTitleAndContent(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
     public void like(User user) {
         Like like = Like.builder()
                 .id(null)
@@ -72,8 +84,41 @@ public class Post extends BaseTimeEntity {
         likes.remove(like);
     }
 
+    public void addTag(Tag tag) {
+        postTags.addTag(this, tag);
+    }
+
+    public void removeTag(Tag tag) {
+        postTags.removeTag(tag);
+    }
+
+    public void clearTag() {
+        postTags.clear();
+    }
+
+    public List<String> getTagNames() {
+        return postTags.getAllTagNames();
+    }
+
     public int getLikeCount() {
         return likes.getCount();
     }
 
+    public Post(String title, String content, User writer) {
+        this(null, title, content, writer, Likes.empty(), PostTags.empty());
+    }
+
+    public Post(Long id, String title, String content, User writer) {
+        this(id, title, content, writer, Likes.empty(), PostTags.empty());
+    }
+
+    @Builder
+    public Post(Long id, String title, String content, User writer, Likes likes, PostTags postTags) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.writer = writer;
+        this.likes = likes;
+        this.postTags = postTags;
+    }
 }

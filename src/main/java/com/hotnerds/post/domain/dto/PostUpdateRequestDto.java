@@ -6,17 +6,19 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class PostRequestDto {
+public class PostUpdateRequestDto {
+    private Long postId;
+    private String username;
     private String title;
     private String content;
-    private String username;
     private List<String> tagNames;
 
     @Builder
-    public PostRequestDto(String title, String content, String username, List<String> tagNames) {
+    public PostUpdateRequestDto(Long postId, String username, String title, String content, List<String> tagNames) {
+        this.postId = postId;
+        this.username = username;
         this.title = title;
         this.content = content;
-        this.username = username;
         this.tagNames = tagNames;
     }
 }
