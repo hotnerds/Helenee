@@ -253,6 +253,7 @@ class CommentServiceTest {
                 .build();
 
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+        when(commentRepository.findById(anyLong())).thenReturn(Optional.of(comment));
 
         // when
         commentService.updateComment(reqDto);
