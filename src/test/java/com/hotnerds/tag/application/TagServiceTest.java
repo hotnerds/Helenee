@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TagServiceTest {
@@ -49,6 +49,8 @@ class TagServiceTest {
         assertAll(
                 () -> assertThat(findTag.getId()).isNotNull(),
                 () -> assertThat(findTag.getName()).isEqualTo(tag.getName()));
+
+        verify(tagRepository, times(1)).findByName(anyString());
     }
 
     @DisplayName("태그가 존재하지 않으면 생성한다.")
@@ -65,6 +67,9 @@ class TagServiceTest {
         assertAll(
                 () -> assertThat(findTag.getId()).isNotNull(),
                 () -> assertThat(findTag.getName()).isEqualTo(tag.getName()));
+
+        verify(tagRepository, times(1)).findByName(anyString());
+        verify(tagRepository, times(1)).save(any());
     }
 
     @DisplayName("생성할 태그의 이름이 잘못되면 예외가 발생한다.")
@@ -80,6 +85,7 @@ class TagServiceTest {
                 .usingRecursiveComparison()
                 .isEqualTo(ErrorCode.TAG_NAME_NOT_VALID_EXCEPTION);
 
+        verify(tagRepository, times(1)).findByName(anyString());
     }
 
 }
