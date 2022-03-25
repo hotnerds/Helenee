@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
@@ -123,4 +124,29 @@ class PostRepositoryTest {
         assertThat(findPosts.get(0).getWriter().getUsername()).isEqualTo(user.getUsername());
     }
 
+    @DisplayName("Post 저장 시 태그를 저장하지 않으면 예외가 발생한다.")
+    @Test
+    void Post저장시_Tag가_저장안되면_예외_발생() {
+        //given
+        userRepository.save(user);
+        //when, then
+        assertThatThrownBy(() -> postRepository.save(post))
+                .isInstanceOf(InvalidDataAccessApiUsageException.class);
+
+    }
+
+    @DisplayName("태그 이름으로 게시글을 조회할 수 있다.")
+    @Test
+    void 태그_이름으로_게시글_조회() {
+        //given
+        userRepository.save(user);
+        tagRepository.save(tag);
+        postRepository.save(post);
+
+        //when
+        List<Post> findPosts = postRepository.findAllByTagNames(List.of(tag.getName()), PageRequest.of(0, 10));
+
+        //then
+        assertThat(findPosts.size()).isEqualTo(1);
+    }
 }
