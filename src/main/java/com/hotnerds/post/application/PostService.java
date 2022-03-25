@@ -6,13 +6,16 @@ import com.hotnerds.post.domain.Post;
 import com.hotnerds.post.domain.dto.*;
 import com.hotnerds.post.domain.repository.PostRepository;
 import com.hotnerds.tag.application.TagService;
+import com.hotnerds.tag.domain.Tag;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
@@ -40,8 +43,16 @@ public class PostService {
     public List<PostResponseDto> searchByWriter(PostByUserRequestDto requestDto) {
         User user = userRepository.findByUsername(requestDto.getUsername()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        return postRepository.findAllByUser(user, requestDto.getPageable())
-                .stream()
+        return postRepository.findAllByUser(user, requestDto.getPageable()).stream()
+                .map(PostResponseDto::of)
+                .collect(toList());
+    }
+
+    public List<PostResponseDto> searchByTagNames(PostByTagRequestDto requestDto) {
+        requestDto.getTagNames()
+                .forEach(Tag::validateTagName);
+
+        return postRepository.findAllByTagNames(requestDto.getTagNames(), requestDto.getPageable()).stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }
