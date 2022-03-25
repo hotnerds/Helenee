@@ -23,9 +23,7 @@ public class Tag {
     private String name;
 
     public Tag(Long id, String name) {
-        if(isTagNameNotValid(name)) {
-            throw new BusinessException(ErrorCode.TAG_NAME_NOT_VALID_EXCEPTION);
-        }
+        validateTagName(name);
         this.id = id;
         this.name = name;
     }
@@ -34,9 +32,11 @@ public class Tag {
         this(null, name);
     }
 
-    private boolean isTagNameNotValid(String name) {
-        return Objects.isNull(name)
+    public static void validateTagName(String name) {
+        if(Objects.isNull(name)
                 || name.isBlank()
-                || name.length() > MAX_TAG_NAME_LENGTH;
+                || name.length() > MAX_TAG_NAME_LENGTH) {
+            throw new BusinessException(ErrorCode.TAG_NAME_NOT_VALID_EXCEPTION);
+        }
     }
 }
