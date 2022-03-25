@@ -3,6 +3,7 @@ package com.hotnerds.post.domain.like;
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.user.domain.User;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.CascadeType;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@AllArgsConstructor
 @Embeddable
 public class Likes {
     @OneToMany(
@@ -52,7 +54,7 @@ public class Likes {
                 .collect(Collectors.toList());
     }
 
-    public Likes(List<Like> likes) {
-        this.likes = likes;
+    public static Likes empty() {
+        return new Likes(new ArrayList<>());
     }
 }

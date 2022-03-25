@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 public class PostResponseDto {
@@ -12,22 +13,29 @@ public class PostResponseDto {
     private String content;
     private String username;
     private LocalDateTime createdAt;
+    private int likeCount;
+    private List<String> tagNames;
 
 
     @Builder
-    public PostResponseDto(String title, String content, String username, LocalDateTime createdAt) {
+    public PostResponseDto(String title, String content, String username, LocalDateTime createdAt, int likeCount, List<String> tagNames) {
         this.title = title;
         this.content = content;
         this.username = username;
         this.createdAt = createdAt;
+        this.likeCount = likeCount;
+        this.tagNames = tagNames;
     }
 
+    @Builder
     public static PostResponseDto of(Post post) {
         return PostResponseDto.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
                 .username(post.getWriter().getUsername())
                 .createdAt(post.getCreatedAt())
+                .likeCount(post.getLikeCount())
+                .tagNames(post.getTagNames())
                 .build();
     }
 }

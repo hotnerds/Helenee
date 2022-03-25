@@ -1,28 +1,31 @@
 package com.hotnerds.post.domain.repository;
 
+import com.hotnerds.common.JpaConfig;
 import com.hotnerds.post.domain.Post;
+import com.hotnerds.tag.domain.Tag;
+import com.hotnerds.tag.domain.repository.TagRepository;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Year;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
-@DataJpaTest
+@DataJpaTest(includeFilters = @ComponentScan.Filter(
+        type = FilterType.ASSIGNABLE_TYPE,
+        classes = JpaConfig.class
+))
 class PostRepositoryTest {
 
     @Autowired
@@ -31,31 +34,46 @@ class PostRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @DisplayName("게시글 등록 성공")
-    @Test
-    public void 게시글_등록_성공() {
-        //given
-        User user = User.builder()
+    @Autowired
+    private TagRepository tagRepository;
+
+    private User user;
+    private Post post;
+    private Tag tag;
+
+    @BeforeEach
+    void init() {
+        user = User.builder()
                 .username("username")
                 .email("email")
                 .build();
 
-        User savedUser = userRepository.save(user);
+        post = new Post("title", "content", user);
 
-        Post post = Post.builder()
-                .title("temp title")
-                .content("body")
-                .writer(savedUser)
-                .build();
+        tag = new Tag("tagName");
 
+        post.like(user);
+        post.addTag(tag);
+    }
+
+    @DisplayName("게시글 등록 성공")
+    @Test
+    public void 게시글_등록_성공() {
+        //given
+        userRepository.save(user);
+        tagRepository.save(tag);
         //when
         Post savedPost = postRepository.save(post);
 
+
         //then
-        assertThat(savedPost.getId()).isNotNull();
-        assertThat(savedPost.getTitle()).isEqualTo("temp title");
-        assertThat(savedPost.getContent()).isEqualTo("body");
-        assertThat(savedPost.getWriter().getId()).isNotNull();
+        assertAll(
+                () -> assertThat(savedPost.getId()).isNotNull(),
+                () -> assertThat(savedPost.getTitle()).isEqualTo(post.getTitle()),
+                () -> assertThat(savedPost.getContent()).isEqualTo(post.getContent()),
+                () -> assertThat(savedPost.getWriter().getId()).isNotNull(),
+                () -> assertThat(savedPost.getLikeCount()).isEqualTo(1),
+                () -> assertThat(savedPost.getTagNames().size()).isEqualTo(1));
 
     }
 
@@ -63,53 +81,27 @@ class PostRepositoryTest {
     @Test
     public void 게시글_제목으로_조회_성공() {
         //given
-        User user = User.builder()
-                .username("username")
-                .email("email")
-                .build();
-
-        User savedUser = userRepository.save(user);
-
-        Post post = Post.builder()
-                .title("temp")
-                .content("content")
-                .writer(savedUser)
-                .build();
-
+        userRepository.save(user);
+        tagRepository.save(tag);
         postRepository.save(post);
+
         //when
+        List<Post> findPosts = postRepository.findAllByTitle(post.getTitle());
 
-        List<Post> findPosts = postRepository.findAllByTitle("temp");
-
-        Post findPost = findPosts.get(0);
 
         //then
-        assertThat(findPost.getId()).isNotNull();
-        assertThat(findPost.getContent()).isEqualTo("content");
-        assertThat(findPost.getWriter()).isNotNull();
+        assertThat(findPosts.size()).isEqualTo(1);
     }
 
     @DisplayName("특정 시간 이후에 생성된 게시글 조회")
     @Test
     public void 특정시간_이후에_생성된_게시글_조회() {
         //given
-        User user = User.builder()
-                .username("username")
-                .email("email")
-                .build();
-
-        User savedUser = userRepository.save(user);
-
-        Post post1 = Post.builder()
-                .title("temp")
-                .content("content")
-                .writer(savedUser)
-                .build();
-
-        postRepository.save(post1);
+        userRepository.save(user);
+        tagRepository.save(tag);
+        postRepository.save(post);
 
         //when
-
         List<Post> findPosts = postRepository.findAllPostsAfter(LocalDateTime.MIN);
 
         //then
@@ -121,42 +113,40 @@ class PostRepositoryTest {
     @Test
     void 사용자가_작성한_게시글_조회() {
         //given
-        User user = User.builder()
-                .username("username")
-                .email("email")
-                .build();
-
-        User savedUser = userRepository.save(user);
-
-        Post post1 = Post.builder()
-                .title("temp")
-                .content("content")
-                .writer(savedUser)
-                .build();
-
-        Post post2 = Post.builder()
-                .title("temp2")
-                .content("content2")
-                .writer(savedUser)
-                .build();
-
-
-        postRepository.save(post1);
-        postRepository.save(post2);
-
+        userRepository.save(user);
+        tagRepository.save(tag);
+        postRepository.save(post);
         //when
         List<Post> findPosts = postRepository.findAllByUser(user, PageRequest.of(0, 10));
 
         //then
-        assertThat(findPosts.size()).isEqualTo(2);
+        assertThat(findPosts.size()).isEqualTo(1);
+        assertThat(findPosts.get(0).getWriter().getUsername()).isEqualTo(user.getUsername());
+    }
 
-        assertThat(findPosts)
-                .extracting("title", "content")
-                .contains(
-                        tuple("temp", "content"),
-                        tuple("temp2", "content2")
-                );
+    @DisplayName("Post 저장 시 태그를 저장하지 않으면 예외가 발생한다.")
+    @Test
+    void Post저장시_Tag가_저장안되면_예외_발생() {
+        //given
+        userRepository.save(user);
+        //when, then
+        assertThatThrownBy(() -> postRepository.save(post))
+                .isInstanceOf(InvalidDataAccessApiUsageException.class);
 
     }
 
+    @DisplayName("태그 이름으로 게시글을 조회할 수 있다.")
+    @Test
+    void 태그_이름으로_게시글_조회() {
+        //given
+        userRepository.save(user);
+        tagRepository.save(tag);
+        postRepository.save(post);
+
+        //when
+        List<Post> findPosts = postRepository.findAllByTagNames(List.of(tag.getName()), PageRequest.of(0, 10));
+
+        //then
+        assertThat(findPosts.size()).isEqualTo(1);
+    }
 }
