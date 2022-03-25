@@ -4,6 +4,7 @@ import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.post.domain.comment.Comment;
+import com.hotnerds.post.domain.comment.Comments;
 import com.hotnerds.post.domain.dto.CommentCreateReqDto;
 import com.hotnerds.post.domain.dto.CommentDeleteReqDto;
 import com.hotnerds.post.domain.dto.CommentResponseDto;
@@ -56,7 +57,9 @@ public class CommentService {
     public void updateComment(CommentUpdateReqDto reqDto) {
         Post post = postRepository.findById(reqDto.getPostId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
-        post.updateComment(reqDto.getCommentId(), reqDto.getContent());
+        Comment comment = commentRepository.findById(reqDto.getCommentId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION));
+        comment.updateContent(reqDto.getContent());
     }
 
     public CommentResponseDto getComments(Long postId) {
