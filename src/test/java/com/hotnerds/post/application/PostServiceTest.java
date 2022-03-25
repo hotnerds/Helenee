@@ -230,10 +230,46 @@ public class PostServiceTest {
 
         verify(userRepository, times(1)).findByUsername(user.getUsername());
         verify(postRepository, times(1)).findAllByUser(user, requestDto.getPageable());
-
-
     }
 
+    @DisplayName("특정 태그가 붙어 있는 게시글 조회할 수 있다.")
+    @Test
+    void 태그로_게시글_조회() {
+        //given
+        post.addTag(tag);
+        PostByTagRequestDto requestDto = PostByTagRequestDto.builder()
+                .tagNames(List.of(tag.getName()))
+                .pageable(PageRequest.of(0, 10))
+                .build();
+
+        when(postRepository.findAllByTagNames(any(), any())).thenReturn(List.of(post));
+
+        //when
+        List<PostResponseDto> findPosts = postService.searchByTagNames(requestDto);
+
+        //then
+        assertThat(findPosts.size()).isEqualTo(1);
+
+        verify(postRepository, times(1)).findAllByTagNames(any(),any());
+    }
+
+    @DisplayName("유효하지 않은 태그 이름으로 게시글 조회 시 예외가 발생한다.")
+    @Test
+    void 유효하지_않은_태그이름_게시글_조회_실패() {
+        //given
+        post.addTag(tag);
+        PostByTagRequestDto requestDto = PostByTagRequestDto.builder()
+                .tagNames(List.of("", "     "))
+                .pageable(PageRequest.of(0, 10))
+                .build();
+
+        //when then
+        assertThatThrownBy(() -> postService.searchByTagNames(requestDto))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .usingRecursiveComparison()
+                .isEqualTo(ErrorCode.TAG_NAME_NOT_VALID_EXCEPTION);
+    }
 
     @DisplayName("유효하지 않은 사용자는 게시글을 삭제할 수 없다.")
     @Test
