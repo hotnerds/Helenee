@@ -21,13 +21,14 @@ import static java.util.stream.Collectors.*;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class PostService {
 
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final TagService tagService;
 
+    @Transactional
     public void write(PostRequestDto requestDto) {
         postRepository.save(createPost(requestDto));
     }
@@ -73,6 +74,7 @@ public class PostService {
         return post;
     }
 
+    @Transactional
     public void delete(PostDeleteRequestDto requestDto) {
 
         userRepository.findByUsername(requestDto.getUsername())
@@ -84,6 +86,7 @@ public class PostService {
         postRepository.deleteById(requestDto.getPostId());
     }
 
+    @Transactional
     public void update(PostUpdateRequestDto updateRequestDto) {
         Post post = postRepository.findById(updateRequestDto.getPostId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
@@ -103,6 +106,7 @@ public class PostService {
                 .forEach(post::addTag);
     }
 
+    @Transactional
     public LikeResponseDto like(String username, Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
@@ -118,6 +122,7 @@ public class PostService {
                 .build();
     }
 
+    @Transactional
     public LikeResponseDto unlike(String username, Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
