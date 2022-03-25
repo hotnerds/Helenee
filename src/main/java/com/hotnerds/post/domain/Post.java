@@ -35,22 +35,6 @@ public class Post extends BaseTimeEntity {
     @Embedded
     private Comments comments;
 
-    public void addComment(Comment comment) {
-        comments.add(comment);
-    }
-
-    public void removeComment(Long commentId) {
-        comments.remove(commentId);
-    }
-
-    public void updateComment(Long commentId, String content) {
-        comments.update(commentId, content);
-    }
-
-    public List<Comment> getAllComments() {
-        return comments.getComments();
-    }
-
     @Embedded
     Likes likes;
 
@@ -104,20 +88,37 @@ public class Post extends BaseTimeEntity {
         return likes.getCount();
     }
 
+    public void addComment(Comment comment) {
+        comments.add(comment);
+    }
+
+    public void removeComment(Long commentId) {
+        comments.remove(commentId);
+    }
+
+    public void updateComment(Long commentId, String content) {
+        comments.update(commentId, content);
+    }
+
+    public List<Comment> getAllComments() {
+        return comments.getComments();
+    }
+
     public Post(String title, String content, User writer) {
-        this(null, title, content, writer, Likes.empty(), PostTags.empty());
+        this(null, title, content, writer, null, Likes.empty(), PostTags.empty());
     }
 
     public Post(Long id, String title, String content, User writer) {
-        this(id, title, content, writer, Likes.empty(), PostTags.empty());
+        this(id, title, content, writer, null, Likes.empty(), PostTags.empty());
     }
 
     @Builder
-    public Post(Long id, String title, String content, User writer, Likes likes, PostTags postTags) {
+    public Post(Long id, String title, String content, User writer, Comments comments, Likes likes, PostTags postTags) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.writer = writer;
+        this.comments = comments;
         this.likes = likes;
         this.postTags = postTags;
     }
