@@ -25,11 +25,9 @@ jobs:
     
     - name: Grant permission for gradlew
       run: chmod +x gradlew
-      shell: bash
     
     - name: Build with Gradle
       run: ./gradlew clean build
-      shell: bash
     
     - name: Notify build result to slack
       uses: 8398a7/action-slack@v3
