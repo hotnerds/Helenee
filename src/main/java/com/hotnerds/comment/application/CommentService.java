@@ -55,7 +55,7 @@ public class CommentService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         if (!user.getId().equals(requesterId)) {
-            throw new BusinessException(ErrorCode.INVALID_USER_EXCEPTION);
+            throw new BusinessException(ErrorCode.USER_INVALID_EXCEPTION);
         }
 
         post.removeComment(reqDto.getCommentId());
@@ -63,15 +63,13 @@ public class CommentService {
     }
 
     public void updateComment(CommentUpdateReqDto reqDto, Long requesterId) {
-        Post post = postRepository.findById(reqDto.getPostId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
         Comment comment = commentRepository.findById(reqDto.getCommentId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION));
         User user = userRepository.findById(comment.getWriter().getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         if (!user.getId().equals(requesterId)) {
-            throw new BusinessException(ErrorCode.INVALID_USER_EXCEPTION);
+            throw new BusinessException(ErrorCode.USER_INVALID_EXCEPTION);
         }
 
         comment.updateContent(reqDto.getContent());

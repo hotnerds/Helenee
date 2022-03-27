@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -61,16 +62,16 @@ class CommentServiceTest {
     void init() {
         comments = new Comments(new ArrayList<>());
 
+        user = Mockito.spy(User.builder()
+                .username("name")
+                .email("email")
+                .build());
+
         comment = Comment.builder()
                 .id(1L)
                 .writer(user)
                 .post(post)
                 .content(TEXT)
-                .build();
-
-        user = User.builder()
-                .username("name")
-                .email("email")
                 .build();
 
         post = Post.builder()
@@ -128,7 +129,6 @@ class CommentServiceTest {
                 .isInstanceOf(BusinessException.class).hasMessage(ErrorCode.POST_NOT_FOUND_EXCEPTION.getMessage());
         verify(userRepository, times(1)).findById(anyLong());
         verify(postRepository, times(1)).findById(anyLong());
-        verify(commentRepository, times(1)).save(any());
     }
 
     @DisplayName("댓글 생성 요청의 content 길이가 1000 이상일 때 에러 발생")
@@ -169,6 +169,7 @@ class CommentServiceTest {
         assertThat(post.getComments().getComments().size()).isEqualTo(1);
         verify(userRepository, times(1)).findById(anyLong());
         verify(postRepository, times(1)).findById(anyLong());
+        verify(commentRepository, times(1)).save(any());
     }
 
     @DisplayName("존재하지 않는 댓글에 대한 삭제 요청 시 에러를 발생")
@@ -177,27 +178,31 @@ class CommentServiceTest {
         // given
         CommentDeleteReqDto reqDto = CommentDeleteReqDto.builder()
                 .postId(post.getId()) // id for post
-                .commentId(1L) // id comment
+                .commentId(comment.getId()) // id comment
                 .build();
+        when(user.getId()).thenReturn(1L);
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+        when(commentRepository.findById(anyLong())).thenReturn(Optional.of(comment));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
         // when then
-        assertThatThrownBy(() -> commentService.deleteComment(reqDto))
+        assertThatThrownBy(() -> commentService.deleteComment(reqDto, user.getId()))
                 .isInstanceOf(BusinessException.class).hasMessage(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION.getMessage());
         verify(postRepository, times(1)).findById(anyLong());
+        verify(commentRepository, times(1)).findById(anyLong());
+        verify(userRepository, times(1)).findById(anyLong());
     }
 
-    @DisplayName("댓글 삭제 성공")
+    @DisplayName("댓글 삭제 요청자와 댓글 작성자의 id가 다르면 에러를 발생")
     @Test
-    void 댓글_삭제_성공() {
+    void 댓글_삭제_타당성_오류_확인() {
         // given
         CommentDeleteReqDto reqDto = CommentDeleteReqDto.builder()
                 .postId(post.getId()) // id for post
-                .commentId(1L) // id comment
+                .commentId(comment.getId()) // id comment
                 .build();
-
+        when(user.getId()).thenReturn(1L);
         comments.add(comment);
-
         post = Post.builder()
                 .id(post.getId())
                 .title("title")
@@ -207,18 +212,53 @@ class CommentServiceTest {
                 .build();
 
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+        when(commentRepository.findById(anyLong())).thenReturn(Optional.of(comment));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+
+        // when then
+        assertThatThrownBy(() -> commentService.deleteComment(reqDto, 2L))
+                .isInstanceOf(BusinessException.class).hasMessage(ErrorCode.USER_INVALID_EXCEPTION.getMessage());
+        verify(postRepository, times(1)).findById(anyLong());
+        verify(commentRepository, times(1)).findById(anyLong());
+        verify(userRepository, times(1)).findById(anyLong());
+    }
+
+    @DisplayName("댓글 삭제 성공")
+    @Test
+    void 댓글_삭제_성공() {
+        // given
+        CommentDeleteReqDto reqDto = CommentDeleteReqDto.builder()
+                .postId(post.getId()) // id for post
+                .commentId(comment.getId()) // id comment
+                .build();
+        when(user.getId()).thenReturn(1L);
+        comments.add(comment);
+        post = Post.builder()
+                .id(post.getId())
+                .title("title")
+                .content("content")
+                .writer(user)
+                .comments(comments)
+                .build();
+
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+        when(commentRepository.findById(anyLong())).thenReturn(Optional.of(comment));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
         // when
-        commentService.deleteComment(reqDto);
+        commentService.deleteComment(reqDto, user.getId());
 
         // then
         assertThat(post.getComments().getComments().size()).isEqualTo(0);
         verify(postRepository, times(1)).findById(anyLong());
+        verify(commentRepository, times(1)).findById(anyLong());
+        verify(commentRepository, times(1)).deleteById(anyLong());
+        verify(userRepository, times(1)).findById(anyLong());
     }
 
     @DisplayName("존재하지 않는 댓글에 대한 수정 요청 시 에러 발생")
     @Test
-    void 댓글_수정_실패() {
+    void 댓글_수정_실패_댓글없음() {
         // given
         String NEW_TEXT = TEXT + "asdf";
         CommentUpdateReqDto reqDto = CommentUpdateReqDto.builder()
@@ -226,13 +266,53 @@ class CommentServiceTest {
                 .commentId(comment.getId()) // id comment
                 .content(NEW_TEXT)
                 .build();
-
-        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+        when(user.getId()).thenReturn(1L);
 
         // when then
-        assertThatThrownBy(() -> commentService.updateComment(reqDto))
+        assertThatThrownBy(() -> commentService.updateComment(reqDto, user.getId()))
                 .isInstanceOf(BusinessException.class).hasMessage(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION.getMessage());
-        verify(postRepository, times(1)).findById(anyLong());
+        verify(commentRepository, times(1)).findById(anyLong());
+    }
+
+    @DisplayName("존재하지 않는 유저의 댓글에 대한 수정 요청 시 에러 발생")
+    @Test
+    void 댓글_수정_실패_유저없음() {
+        // given
+        String NEW_TEXT = TEXT + "asdf";
+        CommentUpdateReqDto reqDto = CommentUpdateReqDto.builder()
+                .postId(post.getId()) // id for post
+                .commentId(comment.getId()) // id comment
+                .content(NEW_TEXT)
+                .build();
+        when(user.getId()).thenReturn(1L);
+        when(commentRepository.findById(anyLong())).thenReturn(Optional.of(comment));
+
+        // when then
+        assertThatThrownBy(() -> commentService.updateComment(reqDto, user.getId()))
+                .isInstanceOf(BusinessException.class).hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
+        verify(commentRepository, times(1)).findById(anyLong());
+        verify(userRepository, times(1)).findById(anyLong());
+    }
+
+    @DisplayName("댓글 수정 요청자의 타당성이 만족하지 않을 때 에러 발생")
+    @Test
+    void 댓글_수정_실패_타당성() {
+        // given
+        String NEW_TEXT = TEXT + "asdf";
+        CommentUpdateReqDto reqDto = CommentUpdateReqDto.builder()
+                .postId(post.getId()) // id for post
+                .commentId(comment.getId()) // id comment
+                .content(NEW_TEXT)
+                .build();
+        when(user.getId()).thenReturn(1L);
+        when(commentRepository.findById(anyLong())).thenReturn(Optional.of(comment));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+
+        // when then
+        assertThatThrownBy(() -> commentService.updateComment(reqDto, 2L))
+                .isInstanceOf(BusinessException.class).hasMessage(ErrorCode.USER_INVALID_EXCEPTION.getMessage());
+        verify(commentRepository, times(1)).findById(anyLong());
+        verify(userRepository, times(1)).findById(anyLong());
     }
 
     @DisplayName("댓글 수정 성공")
@@ -245,7 +325,7 @@ class CommentServiceTest {
                 .commentId(comment.getId()) // id comment
                 .content(NEW_TEXT)
                 .build();
-
+        when(user.getId()).thenReturn(1L);
         comments.add(comment);
         post = Post.builder()
                 .id(post.getId())
@@ -255,15 +335,16 @@ class CommentServiceTest {
                 .comments(comments)
                 .build();
 
-        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
         when(commentRepository.findById(anyLong())).thenReturn(Optional.of(comment));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
         // when
-        commentService.updateComment(reqDto);
+        commentService.updateComment(reqDto, user.getId());
 
         // then
         assertThat(post.getComments().getComments().get(0).getContent()).isEqualTo(NEW_TEXT);
-        verify(postRepository, times(1)).findById(anyLong());
+        verify(commentRepository, times(1)).findById(anyLong());
+        verify(userRepository, times(1)).findById(anyLong());
     }
 
     @DisplayName("존재하지 않는 게시글에 대한 댓글 요청할 시 에러 발생")
