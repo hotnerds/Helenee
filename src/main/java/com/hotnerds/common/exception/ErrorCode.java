@@ -15,6 +15,7 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(500, "C002", "서버에 문제가 있습니다."),
     METHOD_NOT_ALLOWED(405, "C003", "허용된 메서드가 아닙니다."),
     INVALID_TYPE_VALUE(400, "C004", "타입이 유효하지 않습니다"),
+    INVALID_USER_EXCEPTION(400, "C005", "유효하지 않은 사용자의 요청입니다."),
 
     // Post
     POST_NOT_FOUND_EXCEPTION(404, "P001", "해당하는 게시물을 찾을 수 없습니다."),

@@ -46,18 +46,34 @@ public class CommentService {
         post.addComment(comment);
     }
 
-    public void deleteComment(CommentDeleteReqDto reqDto) {
-        Post post = postRepository.findById(reqDto.getPostId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
-        post.removeComment(reqDto.getCommentId());
-        commentRepository.deleteById(reqDto.getCommentId());
-    }
-
-    public void updateComment(CommentUpdateReqDto reqDto) {
+    public void deleteComment(CommentDeleteReqDto reqDto, Long requesterId) {
         Post post = postRepository.findById(reqDto.getPostId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
         Comment comment = commentRepository.findById(reqDto.getCommentId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION));
+        User user = userRepository.findById(comment.getWriter().getId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        if (!user.getId().equals(requesterId)) {
+            throw new BusinessException(ErrorCode.INVALID_USER_EXCEPTION);
+        }
+
+        post.removeComment(reqDto.getCommentId());
+        commentRepository.deleteById(reqDto.getCommentId());
+    }
+
+    public void updateComment(CommentUpdateReqDto reqDto, Long requesterId) {
+        Post post = postRepository.findById(reqDto.getPostId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
+        Comment comment = commentRepository.findById(reqDto.getCommentId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION));
+        User user = userRepository.findById(comment.getWriter().getId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        if (!user.getId().equals(requesterId)) {
+            throw new BusinessException(ErrorCode.INVALID_USER_EXCEPTION);
+        }
+
         comment.updateContent(reqDto.getContent());
     }
 
