@@ -1,13 +1,14 @@
-package com.hotnerds.post.domain.comment;
+package com.hotnerds.comment.domain;
 
 import javax.persistence.Entity;
 
 import com.hotnerds.common.BaseTimeEntity;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -58,5 +59,9 @@ public class Comment extends BaseTimeEntity {
 
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    public static boolean checkContentValid(String content) {
+        return !content.equals("") && !(content.length() > 1000);
     }
 }

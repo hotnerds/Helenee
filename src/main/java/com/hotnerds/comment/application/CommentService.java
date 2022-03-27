@@ -3,8 +3,7 @@ package com.hotnerds.comment.application;
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
-import com.hotnerds.post.domain.comment.Comment;
-import com.hotnerds.post.domain.comment.Comments;
+import com.hotnerds.comment.domain.Comment;
 import com.hotnerds.post.domain.dto.CommentCreateReqDto;
 import com.hotnerds.post.domain.dto.CommentDeleteReqDto;
 import com.hotnerds.post.domain.dto.CommentResponseDto;
@@ -27,7 +26,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     public void addComment(CommentCreateReqDto reqDto) {
-        if (reqDto.getContent().equals("") || reqDto.getContent().length() > 1000) {
+        if (!Comment.checkContentValid(reqDto.getContent())) {
             throw new BusinessException(ErrorCode.COMMENT_INVALID_EXCEPTION);
         }
 

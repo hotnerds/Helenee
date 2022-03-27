@@ -1,6 +1,6 @@
 package com.hotnerds.post.domain.dto;
 
-import com.hotnerds.post.domain.comment.Comment;
+import com.hotnerds.comment.domain.Comment;
 import lombok.Builder;
 import lombok.Getter;
 

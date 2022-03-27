@@ -1,8 +1,7 @@
-package com.hotnerds.post.domain.comment;
+package com.hotnerds.comment.domain;
 
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
-import com.hotnerds.post.domain.like.Likes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
