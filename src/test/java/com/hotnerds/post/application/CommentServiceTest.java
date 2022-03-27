@@ -309,6 +309,7 @@ class CommentServiceTest {
                 () -> assertEquals(comment, commentList.getCommentList().get(0)),
                 () -> assertEquals(comment2, commentList.getCommentList().get(1))
         );
+        verify(postRepository, times(1)).findById(anyLong());
     }
 
 }
