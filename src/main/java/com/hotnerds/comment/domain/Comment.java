@@ -58,6 +58,9 @@ public class Comment extends BaseTimeEntity {
     }
 
     public void updateContent(String content) {
+        if (!checkContentValid(content)) {
+            throw new BusinessException(ErrorCode.COMMENT_INVALID_EXCEPTION);
+        }
         this.content = content;
     }
 
