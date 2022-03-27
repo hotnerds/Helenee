@@ -47,7 +47,7 @@ class CommentServiceTest {
     @InjectMocks
     CommentService commentService;
 
-    String TEXT = "An apple a day keeps the doctor away";
+    final static String TEXT = "An apple a day keeps the doctor away";
 
     User user;
 
@@ -126,6 +126,9 @@ class CommentServiceTest {
         // when then
         assertThatThrownBy(() -> commentService.addComment(reqDto))
                 .isInstanceOf(BusinessException.class).hasMessage(ErrorCode.POST_NOT_FOUND_EXCEPTION.getMessage());
+        verify(userRepository, times(1)).findById(anyLong());
+        verify(postRepository, times(1)).findById(anyLong());
+        verify(commentRepository, times(1)).save(any());
     }
 
     @DisplayName("댓글 생성 요청의 content 길이가 1000 이상일 때 에러 발생")
@@ -153,7 +156,7 @@ class CommentServiceTest {
         // given
         CommentCreateReqDto reqDto = CommentCreateReqDto.builder()
                 .userId(1L) // id for user
-                .postId(1L)
+                .postId(post.getId())
                 .content(TEXT)
                 .build();
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
@@ -173,7 +176,7 @@ class CommentServiceTest {
     void 존재하지_않는_댓글에_대한_삭제() {
         // given
         CommentDeleteReqDto reqDto = CommentDeleteReqDto.builder()
-                .postId(1L) // id for post
+                .postId(post.getId()) // id for post
                 .commentId(1L) // id comment
                 .build();
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
@@ -189,14 +192,14 @@ class CommentServiceTest {
     void 댓글_삭제_성공() {
         // given
         CommentDeleteReqDto reqDto = CommentDeleteReqDto.builder()
-                .postId(1L) // id for post
+                .postId(post.getId()) // id for post
                 .commentId(1L) // id comment
                 .build();
 
         comments.add(comment);
 
         post = Post.builder()
-                .id(1L)
+                .id(post.getId())
                 .title("title")
                 .content("content")
                 .writer(user)
@@ -219,8 +222,8 @@ class CommentServiceTest {
         // given
         String NEW_TEXT = TEXT + "asdf";
         CommentUpdateReqDto reqDto = CommentUpdateReqDto.builder()
-                .postId(1L) // id for post
-                .commentId(1L) // id comment
+                .postId(post.getId()) // id for post
+                .commentId(comment.getId()) // id comment
                 .content(NEW_TEXT)
                 .build();
 
@@ -238,14 +241,14 @@ class CommentServiceTest {
         // given
         String NEW_TEXT = TEXT + "asdf";
         CommentUpdateReqDto reqDto = CommentUpdateReqDto.builder()
-                .postId(1L) // id for post
-                .commentId(1L) // id comment
+                .postId(post.getId()) // id for post
+                .commentId(comment.getId()) // id comment
                 .content(NEW_TEXT)
                 .build();
 
         comments.add(comment);
         post = Post.builder()
-                .id(1L)
+                .id(post.getId())
                 .title("title")
                 .content("content")
                 .writer(user)
@@ -288,7 +291,7 @@ class CommentServiceTest {
         comments.add(comment);
         comments.add(comment2);
         post = Post.builder()
-                .id(1L)
+                .id(post.getId())
                 .title("title")
                 .content(TEXT)
                 .writer(user)
