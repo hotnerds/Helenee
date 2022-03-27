@@ -92,6 +92,7 @@ public class Post extends BaseTimeEntity {
         this(id, title, content, writer, Likes.empty(), PostTags.empty());
     }
 
+    @Generated
     @Builder
     public Post(Long id, String title, String content, User writer, Likes likes, PostTags postTags) {
         this.id = id;
