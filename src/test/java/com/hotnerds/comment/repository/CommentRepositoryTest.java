@@ -5,7 +5,6 @@ import com.hotnerds.comment.domain.Comments;
 import com.hotnerds.common.JpaConfig;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.post.domain.repository.PostRepository;
-import com.hotnerds.tag.domain.Tag;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -119,13 +118,13 @@ class CommentRepositoryTest {
         // given
         userRepository.save(user);
         postRepository.save(post);
-        commentRepository.save(comment);
+        Comment commentReturned = commentRepository.save(comment);
 
-        int expectedEntryNum = 0;
+        Long expectedEntryNum = 0L;
 
         // when
-        commentRepository.deleteById(comment.getId());
-        int resultEntryNum = commentRepository.findAll().size();
+        commentRepository.deleteById(commentReturned.getId());
+        Long resultEntryNum = commentRepository.count();
 
         // then
         assertThat(resultEntryNum).isEqualTo(expectedEntryNum);
