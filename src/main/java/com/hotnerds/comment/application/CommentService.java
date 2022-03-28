@@ -1,13 +1,10 @@
 package com.hotnerds.comment.application;
 
+import com.hotnerds.comment.domain.Dto.*;
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.comment.domain.Comment;
-import com.hotnerds.comment.domain.Dto.CommentCreateReqDto;
-import com.hotnerds.comment.domain.Dto.CommentDeleteReqDto;
-import com.hotnerds.comment.domain.Dto.CommentResponseDto;
-import com.hotnerds.comment.domain.Dto.CommentUpdateReqDto;
 import com.hotnerds.comment.repository.CommentRepository;
 import com.hotnerds.post.domain.repository.PostRepository;
 import com.hotnerds.user.domain.User;
@@ -15,6 +12,9 @@ import com.hotnerds.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -75,11 +75,11 @@ public class CommentService {
         comment.updateContent(reqDto.getContent());
     }
 
-    public CommentResponseDto getComments(Long postId) {
-        Post post = postRepository.findById(postId)
+    public List<CommentResponseDto> getComments(CommentByPostReqDto reqDto) {
+        Post post = postRepository.findById(reqDto.getPostId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
-        return CommentResponseDto.builder()
-                .commentList(post.getAllComments())
-                .build();
+        return commentRepository.findAllByPost(post, reqDto.getPageable()).stream()
+                .map(CommentResponseDto::Of)
+                .collect(Collectors.toList());
     }
 }
