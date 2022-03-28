@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.6.3'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'jacoco'
 }
 
 group = 'com'
@@ -56,6 +57,53 @@ dependencies {
 
 }
 
+jacoco {
+	toolVersion = '0.8.7'
+}
+
+jacocoTestReport {
+	reports {
+		html.enabled true
+		xml.enabled true
+		csv.enabled false
+	}
+
+	finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+
+	violationRules {
+		rule {
+			enabled = true
+
+			element = 'CLASS'
+
+			limit {
+				counter = 'BRANCH'
+				value = 'COVEREDRATIO'
+				minimum = 0.00
+			}
+
+			limit {
+				counter = 'INSTRUCTION'
+				value = 'COVEREDRATIO'
+				minimum = 0.00
+			}
+
+			excludes = [
+					"*.dto.*",
+					"*.HotnerdsApplication",
+					"*.common.*",
+					"*.security.*",
+					"*.exception.*",
+			]
+		}
+	}
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
+
+	finalizedBy 'jacocoTestReport'
 }
