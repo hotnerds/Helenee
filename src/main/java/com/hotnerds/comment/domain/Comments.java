@@ -4,6 +4,7 @@ import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 public class Comments {
     @OneToMany(
@@ -19,7 +21,7 @@ public class Comments {
             fetch = FetchType.LAZY,
             cascade = CascadeType.REMOVE
     )
-    private List<Comment> comments = new ArrayList<>();
+    private List<Comment> comments;
 
     public Comment add(Comment comment) {
         if (comments.contains(comment)) {

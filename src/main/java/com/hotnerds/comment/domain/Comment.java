@@ -7,8 +7,7 @@ import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.user.domain.User;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -16,10 +15,10 @@ import java.util.Objects;
 @Entity
 @Getter
 @Embeddable
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,10 +45,7 @@ public class Comment extends BaseTimeEntity {
         if (this == o) return true;
         if (this.getClass() != o.getClass()) return false;
         Comment comment = (Comment) o;
-        return Objects.equals(this.getId(), comment.getId())
-                && Objects.equals(this.getWriter(), comment.getWriter())
-                && Objects.equals(this.getPost(), comment.getPost())
-                && Objects.equals(this.getContent(), comment.getContent());
+        return Objects.equals(this.getId(), comment.getId());
     }
 
     @Override

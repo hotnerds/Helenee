@@ -65,7 +65,6 @@ class PostRepositoryTest {
         //when
         Post savedPost = postRepository.save(post);
 
-
         //then
         assertAll(
                 () -> assertThat(savedPost.getId()).isNotNull(),

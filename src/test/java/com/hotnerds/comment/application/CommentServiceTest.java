@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,19 +67,19 @@ class CommentServiceTest {
                 .email("email")
                 .build());
 
-        comment = Comment.builder()
-                .id(1L)
-                .writer(user)
-                .post(post)
-                .content(TEXT)
-                .build();
-
         post = Post.builder()
                 .id(1L)
                 .title("title")
                 .content("content")
                 .writer(user)
                 .comments(comments)
+                .build();
+
+        comment = Comment.builder()
+                .id(1L)
+                .writer(user)
+                .post(post)
+                .content(TEXT)
                 .build();
     }
 
@@ -353,6 +354,7 @@ class CommentServiceTest {
         Long postId = 2L;
         CommentByPostReqDto reqDto = CommentByPostReqDto.builder()
                 .postId(postId)
+                .pageable(PageRequest.of(0, 10))
                 .build();
 
         // when then
@@ -360,12 +362,13 @@ class CommentServiceTest {
                 .isInstanceOf(BusinessException.class).hasMessage(ErrorCode.POST_NOT_FOUND_EXCEPTION.getMessage());
     }
 
-    @DisplayName("특정 게시글의 모든 댓글 데이터를 조회")
+    @DisplayName("특정 게시글의 모든 댓글 데이터를 페이징하여서 조회")
     @Test
     void 게시글_댓글_전체_조회() {
         // given
         CommentByPostReqDto reqDto = CommentByPostReqDto.builder()
                 .postId(post.getId())
+                .pageable(PageRequest.of(0, 10))
                 .build();
 
         Comment comment2 = Comment.builder()
@@ -375,28 +378,24 @@ class CommentServiceTest {
                 .content(TEXT)
                 .build();
 
-        comments.add(comment);
-        comments.add(comment2);
-        post = Post.builder()
-                .id(post.getId())
-                .title("title")
-                .content(TEXT)
-                .writer(user)
-                .comments(comments)
-                .build();
-
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+        when(commentRepository.findAllByPost(any(Post.class), any(PageRequest.class))).thenReturn(List.of(comment, comment2));
+
+        List<CommentResponseDto> expectedList = List.of(CommentResponseDto.Of(comment), CommentResponseDto.Of(comment2));
 
         // when
-        List<CommentResponseDto> commentList = commentService.getComments(reqDto);
+        List<CommentResponseDto> responseDtoList = commentService.getComments(reqDto);
 
         // then
         assertAll(
-                () -> assertThat(post.getComments().getComments().size()).isEqualTo(2),
-                () -> assertEquals(comment.getId(), commentList.get(0).getCommentId()),
-                () -> assertEquals(comment2.getId(), commentList.get(1).getCommentId())
+                () -> assertThat(responseDtoList.size()).isEqualTo(2),
+                () -> assertThat(responseDtoList)
+                        .usingRecursiveComparison()
+                        .isEqualTo(expectedList)
         );
+
         verify(postRepository, times(1)).findById(anyLong());
+        verify(commentRepository, times(1)).findAllByPost(any(), any());
     }
 
 }
