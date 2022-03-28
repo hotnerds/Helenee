@@ -1,15 +1,12 @@
-package com.hotnerds.post.application;
+package com.hotnerds.comment.application;
 
 import com.hotnerds.comment.application.CommentService;
+import com.hotnerds.comment.domain.Dto.*;
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.comment.domain.Comment;
 import com.hotnerds.comment.domain.Comments;
-import com.hotnerds.comment.domain.Dto.CommentCreateReqDto;
-import com.hotnerds.comment.domain.Dto.CommentDeleteReqDto;
-import com.hotnerds.comment.domain.Dto.CommentResponseDto;
-import com.hotnerds.comment.domain.Dto.CommentUpdateReqDto;
 import com.hotnerds.comment.repository.CommentRepository;
 import com.hotnerds.post.domain.repository.PostRepository;
 import com.hotnerds.user.domain.User;
@@ -22,8 +19,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -352,9 +351,12 @@ class CommentServiceTest {
     void 게시글_댓글_조회_실패() {
         // given
         Long postId = 2L;
+        CommentByPostReqDto reqDto = CommentByPostReqDto.builder()
+                .postId(postId)
+                .build();
 
         // when then
-        assertThatThrownBy(() -> commentService.getComments(postId))
+        assertThatThrownBy(() -> commentService.getComments(reqDto))
                 .isInstanceOf(BusinessException.class).hasMessage(ErrorCode.POST_NOT_FOUND_EXCEPTION.getMessage());
     }
 
@@ -362,6 +364,10 @@ class CommentServiceTest {
     @Test
     void 게시글_댓글_전체_조회() {
         // given
+        CommentByPostReqDto reqDto = CommentByPostReqDto.builder()
+                .postId(post.getId())
+                .build();
+
         Comment comment2 = Comment.builder()
                 .id(2L)
                 .writer(user)
@@ -382,13 +388,13 @@ class CommentServiceTest {
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
         // when
-        CommentResponseDto commentList = commentService.getComments(1L);
+        List<CommentResponseDto> commentList = commentService.getComments(reqDto);
 
         // then
         assertAll(
                 () -> assertThat(post.getComments().getComments().size()).isEqualTo(2),
-                () -> assertEquals(comment, commentList.getCommentList().get(0)),
-                () -> assertEquals(comment2, commentList.getCommentList().get(1))
+                () -> assertEquals(comment.getId(), commentList.get(0).getCommentId()),
+                () -> assertEquals(comment2.getId(), commentList.get(1).getCommentId())
         );
         verify(postRepository, times(1)).findById(anyLong());
     }
