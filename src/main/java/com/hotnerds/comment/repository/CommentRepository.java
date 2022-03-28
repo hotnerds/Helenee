@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    @Query("select c from Comment c where c.post = :post order by c.createdAt desc")
+    @Query("select c from Comment c where c.post = :post order by c.createdAt asc")
     List<Comment> findAllByPost(@Param("post") Post post, Pageable pageable);
 
 }
