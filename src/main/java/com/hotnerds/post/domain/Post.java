@@ -3,11 +3,12 @@ package com.hotnerds.post.domain;
 import com.hotnerds.common.BaseTimeEntity;
 import com.hotnerds.post.domain.like.Like;
 import com.hotnerds.post.domain.like.Likes;
+import com.hotnerds.comment.domain.Comment;
+import com.hotnerds.comment.domain.Comments;
 import com.hotnerds.post.domain.tag.PostTags;
 import com.hotnerds.tag.domain.Tag;
 import com.hotnerds.user.domain.User;
 import lombok.*;
-import org.hibernate.mapping.Join;
 
 import javax.persistence.*;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.List;
 public class Post extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, length = 50)
@@ -30,6 +31,9 @@ public class Post extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User writer;
+
+    @Embedded
+    private Comments comments;
 
     @Embedded
     Likes likes;
@@ -84,21 +88,34 @@ public class Post extends BaseTimeEntity {
         return likes.getCount();
     }
 
+    public void addComment(Comment comment) {
+        comments.add(comment);
+    }
+
+    public void removeComment(Long commentId) {
+        comments.remove(commentId);
+    }
+
+    public List<Comment> getAllComments() {
+        return comments.getComments();
+    }
+
     public Post(String title, String content, User writer) {
-        this(null, title, content, writer, Likes.empty(), PostTags.empty());
+        this(null, title, content, writer, Comments.empty(), Likes.empty(), PostTags.empty());
     }
 
     public Post(Long id, String title, String content, User writer) {
-        this(id, title, content, writer, Likes.empty(), PostTags.empty());
+        this(id, title, content, writer, Comments.empty(), Likes.empty(), PostTags.empty());
     }
 
     @Generated
     @Builder
-    public Post(Long id, String title, String content, User writer, Likes likes, PostTags postTags) {
+    public Post(Long id, String title, String content, User writer, Comments comments, Likes likes, PostTags postTags) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.writer = writer;
+        this.comments = comments;
         this.likes = likes;
         this.postTags = postTags;
     }

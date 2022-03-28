@@ -35,7 +35,7 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: ./build/reports/jacoco/test/jacocoTestReport.xml
-    
+
     - name: Notify build result to slack
       uses: 8398a7/action-slack@v3
       with:
