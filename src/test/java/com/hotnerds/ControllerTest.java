@@ -11,7 +11,11 @@ import com.hotnerds.common.security.oauth2.service.CustomOAuth2UserService;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -19,10 +23,11 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-//@ExtendWith(MockitoExtension.class)
+@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 public class ControllerTest {
 
     public static final String USER_EMAIL = "kgr4163@naver.com";
@@ -49,13 +54,14 @@ public class ControllerTest {
     protected ObjectMapper objectMapper;
 
     @BeforeEach
-    protected void setUp(WebApplicationContext webApplicationContext) throws Exception {
+    protected void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) throws Exception {
         JwtAuthenticationFilter jwtAuthenticationFilter = (JwtAuthenticationFilter) webApplicationContext.getBean("jwtAuthenticationFilter");
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
                 .addFilter(jwtAuthenticationFilter)
                 .apply(springSecurity())
+                .apply(documentationConfiguration(restDocumentation))
                 .alwaysDo(print())
                 .build();
 

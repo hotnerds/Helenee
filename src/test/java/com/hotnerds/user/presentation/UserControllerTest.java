@@ -9,12 +9,20 @@ import com.hotnerds.user.domain.dto.UserUpdateReqDto;
 import com.hotnerds.user.domain.User;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import org.junit.Rule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -27,9 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = UserController.class)
 class UserControllerTest extends ControllerTest {
-//
-//    @Autowired
-//    private MockMvc mockMvc;
 
     @MockBean
     private UserService userService;
@@ -38,10 +43,11 @@ class UserControllerTest extends ControllerTest {
     @WithCustomMockUser
     void getAllUser() throws Exception {
         // given
-        List<User> userData = Arrays.asList(User.builder()
-                .username("RetepMil")
-                .email("lkslyj2@naver.com")
-                .build(),
+        List<User> userData = Arrays.asList(
+                User.builder()
+                        .username("RetepMil")
+                        .email("lkslyj2@naver.com")
+                        .build(),
                 User.builder()
                         .username("PeterLim")
                         .email("lkslyj8@naver.com")
@@ -56,7 +62,8 @@ class UserControllerTest extends ControllerTest {
         // when
         MvcResult result = mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
-                .andDo(print()).andReturn();
+                .andDo(document("/users/getAll"))
+                .andReturn();
         DocumentContext documentContext = JsonPath.parse(result.getResponse().getContentAsString());
 
         //then
@@ -74,7 +81,7 @@ class UserControllerTest extends ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(newUserReqDto)))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(document("/users/create"));
     }
 
     @Test
@@ -92,7 +99,7 @@ class UserControllerTest extends ControllerTest {
         // when
         MvcResult result = mockMvc.perform(get("/users/1"))
                 .andExpect(status().isOk())
-                .andDo(print()).andReturn();
+                .andDo(document("/users/getOne")).andReturn();
         DocumentContext documentContext = JsonPath.parse(result.getResponse().getContentAsString());
 
         // then
@@ -105,7 +112,8 @@ class UserControllerTest extends ControllerTest {
     void deleteUser() throws Exception {
         mockMvc.perform(delete("/users/1")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("/users/delete"));
     }
 
     @Test
@@ -117,7 +125,8 @@ class UserControllerTest extends ControllerTest {
         mockMvc.perform(put("/users/1")
                 .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(userUpdateReqDto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("/users/update"));
     }
 
 }
