@@ -5,6 +5,7 @@ import com.hotnerds.comment.domain.Dto.*;
 import com.hotnerds.common.security.oauth2.annotation.AuthenticatedUser;
 import com.hotnerds.user.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,14 +27,14 @@ public class CommentController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{comment_id}")
     public ResponseEntity<Void> deleteComment(@RequestBody CommentDeleteReqDto reqDto, @AuthenticatedUser User user) {
         commentService.deleteComment(reqDto, user.getId());
 
         return ResponseEntity.accepted().build();
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{comment_id}")
     public ResponseEntity<Void> updateComment(@RequestBody CommentUpdateReqDto reqDto, @AuthenticatedUser User user) {
         commentService.updateComment(reqDto, user.getId());
 
@@ -41,8 +42,11 @@ public class CommentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CommentResponseDto>> getComment(@RequestBody CommentByPostReqDto reqDto) {
-        return ResponseEntity.ok(commentService.getComments(reqDto));
+    public ResponseEntity<List<CommentResponseDto>> getComment(@RequestParam Long postid, @RequestParam Integer page, @RequestParam Integer size) {
+        return ResponseEntity.ok(commentService.getComments(CommentByPostReqDto.builder()
+                .postId(postid)
+                .pageable(PageRequest.of(page, size))
+                .build()));
     }
 
 }
