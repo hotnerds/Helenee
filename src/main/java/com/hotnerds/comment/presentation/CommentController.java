@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.hotnerds.user.presentation.UserController.DEFAULT_URL;
+import static com.hotnerds.comment.presentation.CommentController.DEFAULT_URL;
 
 @RestController
 @RequiredArgsConstructor
