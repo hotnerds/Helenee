@@ -4,11 +4,25 @@ plugins {
 	id 'java'
 	id 'jacoco'
 	id "org.sonarqube" version "3.3"
+	id "org.asciidoctor.jvm.convert" version "3.3.2"
 }
 
 group = 'com'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
+
+ext {
+	snippetsDir = file('build/generated-snippets')
+}
+
+
+bootJar {
+	dependsOn asciidoctor
+	copy {
+		from "${asciidoctor.outputDir}"
+		into 'static/docs'
+	}
+}
 
 configurations {
 	compileOnly {
@@ -44,6 +58,9 @@ dependencies {
 
 	//rest-assured
 	testImplementation 'io.rest-assured:rest-assured'
+
+	//spring rest docs
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
 	implementation 'junit:junit:4.13.1'
 	implementation 'org.jetbrains:annotations:20.1.0'
@@ -116,4 +133,19 @@ tasks.named('test') {
 	useJUnitPlatform()
 
 	finalizedBy 'jacocoTestReport'
+}
+
+asciidoctor {
+	dependsOn test
+	inputs.dir snippetsDir
+}
+
+asciidoctor.doFirst {
+	delete file('src/main/resources/static/docs')
+}
+
+task copyDocument(type: Copy) {
+	dependsOn asciidoctor
+	from file("build/docs/asciidoc")
+	into file("src/main/resources/static/docs")
 }
