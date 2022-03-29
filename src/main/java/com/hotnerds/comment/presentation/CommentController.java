@@ -45,5 +45,4 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getComments(reqDto));
     }
 
-
 }
