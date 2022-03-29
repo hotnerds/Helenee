@@ -25,7 +25,7 @@ public class CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
-    public void addComment(CommentCreateReqDto reqDto) {
+    public Comment addComment(CommentCreateReqDto reqDto) {
         if (!Comment.checkContentValid(reqDto.getContent())) {
             throw new BusinessException(ErrorCode.COMMENT_INVALID_EXCEPTION);
         }
@@ -41,9 +41,11 @@ public class CommentService {
                 .content(reqDto.getContent())
                 .build();
 
-        commentRepository.save(comment);
+        Comment newComment = commentRepository.save(comment);
 
-        post.addComment(comment);
+        post.addComment(newComment);
+
+        return newComment;
     }
 
     public void deleteComment(CommentDeleteReqDto reqDto, Long requesterId) {
