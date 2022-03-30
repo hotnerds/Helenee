@@ -2,9 +2,9 @@ package com.hotnerds.user.application;
 
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
-import com.hotnerds.user.domain.Dto.FollowServiceReqDto;
-import com.hotnerds.user.domain.Dto.NewUserReqDto;
-import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
+import com.hotnerds.user.domain.dto.FollowServiceReqDto;
+import com.hotnerds.user.domain.dto.NewUserReqDto;
+import com.hotnerds.user.domain.dto.UserUpdateReqDto;
 import com.hotnerds.user.domain.Follow;
 import com.hotnerds.user.domain.FollowedList;
 import com.hotnerds.user.domain.FollowerList;

@@ -1,10 +1,10 @@
 package com.hotnerds.user.presentation;
 
 import com.hotnerds.user.application.UserService;
-import com.hotnerds.user.domain.Dto.FollowServiceReqDto;
-import com.hotnerds.user.domain.Dto.NewUserReqDto;
-import com.hotnerds.user.domain.Dto.UserResponseDto;
-import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
+import com.hotnerds.user.domain.dto.FollowServiceReqDto;
+import com.hotnerds.user.domain.dto.NewUserReqDto;
+import com.hotnerds.user.domain.dto.UserResponseDto;
+import com.hotnerds.user.domain.dto.UserUpdateReqDto;
 import com.hotnerds.user.domain.Follow;
 import com.hotnerds.user.domain.User;
 import lombok.RequiredArgsConstructor;
