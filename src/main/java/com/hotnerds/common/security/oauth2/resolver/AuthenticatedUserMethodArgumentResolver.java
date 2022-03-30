@@ -1,6 +1,7 @@
 package com.hotnerds.common.security.oauth2.resolver;
 
-import com.hotnerds.common.security.oauth2.annotation.AuthenticatedUser;
+import com.hotnerds.common.security.oauth2.annotation.Authenticated;
+import com.hotnerds.common.security.oauth2.service.AuthenticatedUser;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,16 +22,18 @@ public class AuthenticatedUserMethodArgumentResolver implements HandlerMethodArg
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.hasParameterAnnotation(AuthenticatedUser.class) &&
+        return parameter.hasParameterAnnotation(Authenticated.class) &&
                 User.class.isAssignableFrom(parameter.getParameterType());
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+    public AuthenticatedUser resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         String email = (String) authentication.getPrincipal().getAttributes().get("email");
 
-        return userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("회원을 찾지 못하였습니다."));
+
+        return AuthenticatedUser.of(user);
     }
 }
