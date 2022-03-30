@@ -3,19 +3,15 @@ package com.hotnerds;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hotnerds.common.security.filter.JwtAuthenticationFilter;
 import com.hotnerds.common.security.handler.OAuth2SuccessHandler;
-import com.hotnerds.common.security.oauth2.annotation.AuthenticatedUser;
 import com.hotnerds.common.security.oauth2.provider.JwtTokenProvider;
 import com.hotnerds.common.security.oauth2.resolver.AuthenticatedUserMethodArgumentResolver;
+import com.hotnerds.common.security.oauth2.service.AuthenticatedUser;
 import com.hotnerds.common.security.oauth2.service.CustomOAuth2UserService;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -70,6 +66,6 @@ public class ControllerTest {
                 .build();
 
         when(resolver.supportsParameter(any())).thenReturn(true);
-        when(resolver.resolveArgument(any(), any(), any(), any())).thenReturn(user);
+        when(resolver.resolveArgument(any(), any(), any(), any())).thenReturn(AuthenticatedUser.of(user));
     }
 }
