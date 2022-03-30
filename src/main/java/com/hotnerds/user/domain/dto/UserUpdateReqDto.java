@@ -1,4 +1,4 @@
-package com.hotnerds.user.domain.Dto;
+package com.hotnerds.user.domain.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;

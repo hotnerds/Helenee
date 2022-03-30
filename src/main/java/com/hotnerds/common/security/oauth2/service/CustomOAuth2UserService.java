@@ -1,12 +1,11 @@
 package com.hotnerds.common.security.oauth2.service;
 
-import com.hotnerds.user.domain.Dto.UserUpdateReqDto;
+import com.hotnerds.user.domain.dto.UserUpdateReqDto;
 import com.hotnerds.user.domain.ROLE;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Optional;
 
 @Service
