@@ -37,7 +37,6 @@ class CommentRepositoryTest {
     private UserRepository userRepository;
 
     private Post post;
-    private Comments comments;
     private Comment comment;
     private User user;
 
@@ -45,7 +44,7 @@ class CommentRepositoryTest {
 
     @BeforeEach
     void init() {
-        comments = new Comments(new ArrayList<>());
+        Comments comments = new Comments(new ArrayList<>());
 
         user = User.builder()
                 .username("user")
@@ -109,8 +108,8 @@ class CommentRepositoryTest {
         //then
         assertAll(
                 () -> assertThat(commentList.size()).isEqualTo(2),
-                () -> assertThat(commentList.get(1).getContent()).isEqualTo(comment.getContent()),
-                () -> assertThat(commentList.get(0).getContent()).isEqualTo(comment2.getContent())
+                () -> assertThat(commentList.get(0).getContent()).isEqualTo(comment.getContent()),
+                () -> assertThat(commentList.get(1).getContent()).isEqualTo(comment2.getContent())
         );
 
     }
