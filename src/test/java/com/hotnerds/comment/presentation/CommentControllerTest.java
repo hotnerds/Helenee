@@ -37,6 +37,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = CommentController.class)
@@ -67,7 +68,7 @@ class CommentControllerTest extends ControllerTest {
         // when then
         mockMvc.perform(post("/comment")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsString(reqDto)))
+                    .content(objectMapper.writeValueAsString(reqDto)))
                 .andExpect(status().isOk());
     }
 
@@ -86,7 +87,7 @@ class CommentControllerTest extends ControllerTest {
         // when then
         mockMvc.perform(delete("/comment/1")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(reqDto)))
+                    .content(objectMapper.writeValueAsString(reqDto)))
                 .andExpect(status().isAccepted());
     }
 
@@ -105,7 +106,7 @@ class CommentControllerTest extends ControllerTest {
         // when then
         mockMvc.perform(patch("/comment/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(reqDto)))
+                        .content(objectMapper.writeValueAsString(reqDto)))
                 .andExpect(status().isAccepted());
     }
 
@@ -134,14 +135,11 @@ class CommentControllerTest extends ControllerTest {
         when(commentService.getComments(any(CommentByPostReqDto.class))).thenReturn(response);
 
         // when
-        MvcResult result = mockMvc.perform(get("/comment?postid=" + reqDto.getPostId() + "&page=" + Integer.toString(page) +"&size=" + Integer.toString(size)))
+        MvcResult result = mockMvc.perform(get("/comment?postid=" + reqDto.getPostId() + "&page=" + page +"&size=" + size))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].content").value(TEXT))
+                .andExpect(jsonPath("$[1].content").value(NEW_TEXT))
                 .andReturn();
-        DocumentContext documentContext = JsonPath.parse(result.getResponse().getContentAsString());
-
-        // then
-        Assertions.assertEquals(documentContext.read("$[0]['content']").toString(), TEXT);
-        Assertions.assertEquals(documentContext.read("$[1]['content']").toString(), NEW_TEXT);
     }
 
 }
