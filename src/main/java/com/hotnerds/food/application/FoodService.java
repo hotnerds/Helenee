@@ -23,10 +23,10 @@ public class FoodService {
     FoodRepository foodRepository;
 
     @Transactional
-    public Food findOrCreate(Long apiId) {
-        Food food = foodRepository.findByApiId(apiId)
+    public Food findOrCreate(Long foodId) {
+        Food food = foodRepository.findById(foodId)
                 .orElseGet(() -> mapApiResponseToFood(
-                        apiClient.searchFoodById(apiId)));
+                        apiClient.searchFoodById(foodId)));
 
         return foodRepository.save(food);
     }
@@ -41,7 +41,7 @@ public class FoodService {
         Map<String, Object> servings = (Map<String, Object>) food.get("servings");
         Map<String, String> serving = ((ArrayList<Map<String, String>>) servings.get("serving")).get(0);
 
-        String apiId = food.get("food_id").toString();
+        String foodId = food.get("food_id").toString();
         String foodName = food.get("food_name").toString();
         String calories = serving.get("calories");
         String carbs = serving.get("carbohydrate");
@@ -49,7 +49,7 @@ public class FoodService {
         String fat = serving.get("fat");
 
         return Food.builder()
-                .apiId(Long.parseLong(apiId))
+                .foodId(Long.parseLong(foodId))
                 .foodName(foodName)
                 .nutrient(Nutrient.builder()
                         .calories(Double.parseDouble(calories))

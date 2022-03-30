@@ -27,7 +27,7 @@ public class FoodResponseDto {
     public static FoodResponseDto of(final Food food) {
         return FoodResponseDto.builder()
                 .foodId(food.getFoodId())
-                .apiId(food.getApiId())
+                .apiId(food.getFoodId())
                 .foodName(food.getFoodName())
                 .nutrient(food.getNutrient())
                 .build();
