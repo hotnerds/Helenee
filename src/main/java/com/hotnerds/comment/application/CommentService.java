@@ -64,7 +64,7 @@ public class CommentService {
         commentRepository.deleteById(reqDto.getCommentId());
     }
 
-    public void updateComment(CommentUpdateReqDto reqDto, Long requesterId) {
+    public Comment updateComment(CommentUpdateReqDto reqDto, Long requesterId) {
         Comment comment = commentRepository.findById(reqDto.getCommentId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION));
         User user = userRepository.findById(comment.getWriter().getId())
@@ -75,6 +75,8 @@ public class CommentService {
         }
 
         comment.updateContent(reqDto.getContent());
+
+        return comment;
     }
 
     public List<CommentResponseDto> getComments(CommentByPostReqDto reqDto) {
