@@ -103,11 +103,14 @@ class CommentRepositoryTest {
         //when
         List<Comment> commentList = commentRepository.findAllByPost(post, PageRequest.of(0, 10));
 
+        System.out.println(commentList.get(0).getCreatedAt());
+        System.out.println(commentList.get(1).getCreatedAt());
+
         //then
         assertAll(
                 () -> assertThat(commentList.size()).isEqualTo(2),
-                () -> assertThat(commentList.get(0).getContent()).isEqualTo(comment.getContent()),
-                () -> assertThat(commentList.get(1).getContent()).isEqualTo(comment2.getContent())
+                () -> assertThat(commentList.get(1).getContent()).isEqualTo(comment.getContent()),
+                () -> assertThat(commentList.get(0).getContent()).isEqualTo(comment2.getContent())
         );
 
     }
