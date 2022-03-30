@@ -7,9 +7,13 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
-@Builder
 public class CommentDeleteReqDto {
     private Long postId;
     private Long commentId;
-    private LocalDateTime createAt;
+
+    @Builder
+    public CommentDeleteReqDto(Long postId, Long commentId) {
+        this.postId = postId;
+        this.commentId = commentId;
+    }
 }
