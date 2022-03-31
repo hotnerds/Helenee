@@ -14,8 +14,10 @@ import org.springframework.http.MediaType;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -53,7 +55,7 @@ class UserControllerTest extends ControllerTest {
 
         // mocking
         // when
-        MvcResult result = mockMvc.perform(get("/users"))
+        MvcResult result = mockMvc.perform(RestDocumentationRequestBuilders.get("/users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].username").value(userData.get(0).getUsername()))
                 .andExpect(jsonPath("$[1].username").value(userData.get(1).getUsername()))
@@ -74,12 +76,15 @@ class UserControllerTest extends ControllerTest {
         when(userService.getUserById(1L)).thenReturn(user);
 
         // when then
-        MvcResult result = mockMvc.perform(get("/users/{user_id}", 1L))
+        MvcResult result = mockMvc.perform(RestDocumentationRequestBuilders.get("/users/{user_id}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value(user.getUsername()))
                 .andExpect(jsonPath("$.email").value(user.getEmail()))
                 .andDo(document("/users/getOne",
-                        responseFields(
+                        pathParameters(
+                                parameterWithName("user_id").description("유저ID")
+                        ),
+                        relaxedResponseFields(
                                 fieldWithPath("username").type(JsonFieldType.STRING).description("사용자 이름"),
                                 fieldWithPath("email").type(JsonFieldType.STRING).description("전자메일주소")
                         )))
@@ -91,12 +96,12 @@ class UserControllerTest extends ControllerTest {
     void createUser() throws Exception {
         NewUserReqDto newUserReqDto = new NewUserReqDto("PeterLim", "lkslyj2@naver.com");
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(newUserReqDto)))
                 .andExpect(status().isOk())
                 .andDo(document("/users/create",
-                        requestFields(
+                        relaxedRequestFields(
                                 fieldWithPath("username").type(JsonFieldType.STRING).description("사용자 이름"),
                                 fieldWithPath("email").type(JsonFieldType.STRING).description("전자메일주소")
                         )));
@@ -105,10 +110,13 @@ class UserControllerTest extends ControllerTest {
     @Test
     @WithCustomMockUser
     void deleteUser() throws Exception {
-        mockMvc.perform(delete("/users/{user_id}", 1L)
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/users/{user_id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
-                .andDo(document("/users/delete"));
+                .andDo(document("/users/delete",
+                        pathParameters(
+                                parameterWithName("user_id").description("유저ID")
+                        )));
     }
 
     @Test
@@ -117,12 +125,15 @@ class UserControllerTest extends ControllerTest {
         // given
         UserUpdateReqDto userUpdateReqDto = new UserUpdateReqDto("PeterLim");
 
-        mockMvc.perform(put("/users/1")
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/users/{user_id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(userUpdateReqDto)))
                 .andExpect(status().isOk())
                 .andDo(document("/users/update",
-                        requestFields(
+                        pathParameters(
+                                parameterWithName("user_id").description("유저ID")
+                        ),
+                        relaxedRequestFields(
                                 fieldWithPath("username").type(JsonFieldType.STRING).description("사용자 이름")
                         )));
     }

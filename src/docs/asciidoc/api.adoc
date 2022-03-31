@@ -93,7 +93,7 @@ operation::users/getAll[snippets='curl-request,http-response']
 
 `GET/\{user_id\}` 요청을 통해 하나의 유저에 대한 정보를 가져올 수 있다.
 
-operation::users/getOne[snippets='response-fields,curl-request,http-response']
+operation::users/getOne[snippets='path-parameters,response-fields,curl-request,http-response']
 
 
 [[resources_users_create]]
@@ -109,12 +109,12 @@ operation::users/create[snippets='request-fields,curl-request,http-response']
 
 `DELETE/\{user-id\}` 요청을 통해 새로운 유저를 등록할 수 있다.
 
-operation::users/delete[snippets='curl-request,http-response']
+operation::users/delete[snippets='path-parameters,curl-request,http-response']
 
 
 [[resources_users_update]]
 === Updating user data
 
-`DELETE/\{user-id\}` 요청을 통해 새로운 유저를 등록할 수 있다.
+`PATCH/\{user-id\}` 요청을 통해 새로운 유저를 등록할 수 있다.
 
-operation::users/update[snippets='request-fields,curl-request,http-response']
+operation::users/update[snippets='path-parameters,request-fields,curl-request,http-response']

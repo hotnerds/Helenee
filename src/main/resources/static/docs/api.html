@@ -467,6 +467,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#resources_users_list">Getting a user</a>
 <ul class="sectlevel3">
+<li><a href="#resources_users_list_path_parameters">Path parameters</a></li>
 <li><a href="#resources_users_list_response_fields">Response fields</a></li>
 <li><a href="#resources_users_list_curl_request">Example request</a></li>
 <li><a href="#resources_users_list_http_response">Example response</a></li>
@@ -481,12 +482,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#resources_users_delete">Deleting a user</a>
 <ul class="sectlevel3">
+<li><a href="#resources_users_delete_path_parameters">Path parameters</a></li>
 <li><a href="#resources_users_delete_curl_request">Example request</a></li>
 <li><a href="#resources_users_delete_http_response">Example response</a></li>
 </ul>
 </li>
 <li><a href="#resources_users_update">Updating user data</a>
 <ul class="sectlevel3">
+<li><a href="#resources_users_update_path_parameters">Path parameters</a></li>
 <li><a href="#resources_users_update_request_fields">Request fields</a></li>
 <li><a href="#resources_users_update_curl_request">Example request</a></li>
 <li><a href="#resources_users_update_http_response">Example response</a></li>
@@ -644,6 +647,28 @@ Content-Length: 105
 <p><code>GET/{user_id}</code> 요청을 통해 하나의 유저에 대한 정보를 가져올 수 있다.</p>
 </div>
 <div class="sect3">
+<h4 id="resources_users_list_path_parameters"><a class="link" href="#resources_users_list_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /users/{user_id}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>user_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">유저ID</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
 <h4 id="resources_users_list_response_fields"><a class="link" href="#resources_users_list_response_fields">Response fields</a></h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -764,6 +789,28 @@ X-Frame-Options: DENY</code></pre>
 <p><code>DELETE/{user-id}</code> 요청을 통해 새로운 유저를 등록할 수 있다.</p>
 </div>
 <div class="sect3">
+<h4 id="resources_users_delete_path_parameters"><a class="link" href="#resources_users_delete_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /users/{user_id}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>user_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">유저ID</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
 <h4 id="resources_users_delete_curl_request"><a class="link" href="#resources_users_delete_curl_request">Example request</a></h4>
 <div class="listingblock">
 <div class="content">
@@ -790,7 +837,29 @@ X-Frame-Options: DENY</code></pre>
 <div class="sect2">
 <h3 id="resources_users_update"><a class="link" href="#resources_users_update">Updating user data</a></h3>
 <div class="paragraph">
-<p><code>DELETE/{user-id}</code> 요청을 통해 새로운 유저를 등록할 수 있다.</p>
+<p><code>PATCH/{user-id}</code> 요청을 통해 새로운 유저를 등록할 수 있다.</p>
+</div>
+<div class="sect3">
+<h4 id="resources_users_update_path_parameters"><a class="link" href="#resources_users_update_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /users/{user_id}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>user_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">유저ID</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect3">
 <h4 id="resources_users_update_request_fields"><a class="link" href="#resources_users_update_request_fields">Request fields</a></h4>
@@ -847,7 +916,7 @@ X-Frame-Options: DENY</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2022-03-31 12:32:40 +0900
+Last updated 2022-03-31 13:56:31 +0900
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
