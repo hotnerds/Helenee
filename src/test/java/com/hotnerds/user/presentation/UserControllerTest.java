@@ -7,31 +7,24 @@ import com.hotnerds.user.application.UserService;
 import com.hotnerds.user.domain.dto.NewUserReqDto;
 import com.hotnerds.user.domain.dto.UserUpdateReqDto;
 import com.hotnerds.user.domain.User;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import org.junit.Rule;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.JUnitRestDocumentation;
-import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WebMvcTest(controllers = UserController.class)
 class UserControllerTest extends ControllerTest {
@@ -62,26 +55,10 @@ class UserControllerTest extends ControllerTest {
         // when
         MvcResult result = mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].username").value(userData.get(0).getUsername()))
+                .andExpect(jsonPath("$[1].username").value(userData.get(1).getUsername()))
                 .andDo(document("/users/getAll"))
                 .andReturn();
-        DocumentContext documentContext = JsonPath.parse(result.getResponse().getContentAsString());
-
-        //then
-        Assertions.assertEquals(documentContext.read("$[*]['username']").toString(), "[\"RetepMil\",\"PeterLim\"]");
-        Assertions.assertEquals(documentContext.read("$[*]['email']").toString(), "[\"lkslyj2@naver.com\",\"lkslyj8@naver.com\"]");
-
-    }
-
-    @Test
-    @WithCustomMockUser
-    void createUser() throws Exception {
-        NewUserReqDto newUserReqDto = new NewUserReqDto("PeterLim", "lkslyj2@naver.com");
-
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(newUserReqDto)))
-                .andExpect(status().isOk())
-                .andDo(document("/users/create"));
     }
 
     @Test
@@ -96,21 +73,39 @@ class UserControllerTest extends ControllerTest {
         // mocking
         when(userService.getUserById(1L)).thenReturn(user);
 
-        // when
-        MvcResult result = mockMvc.perform(get("/users/1"))
+        // when then
+        MvcResult result = mockMvc.perform(get("/users/{user_id}", 1L))
                 .andExpect(status().isOk())
-                .andDo(document("/users/getOne")).andReturn();
-        DocumentContext documentContext = JsonPath.parse(result.getResponse().getContentAsString());
+                .andExpect(jsonPath("$.username").value(user.getUsername()))
+                .andExpect(jsonPath("$.email").value(user.getEmail()))
+                .andDo(document("/users/getOne",
+                        responseFields(
+                                fieldWithPath("username").type(JsonFieldType.STRING).description("사용자 이름"),
+                                fieldWithPath("email").type(JsonFieldType.STRING).description("전자메일주소")
+                        )))
+                .andReturn();
+    }
 
-        // then
-        Assertions.assertEquals((String)documentContext.read("username"), "RetepMil");
-        Assertions.assertEquals((String)documentContext.read("email"), "lkslyj2@naver.com");
+    @Test
+    @WithCustomMockUser
+    void createUser() throws Exception {
+        NewUserReqDto newUserReqDto = new NewUserReqDto("PeterLim", "lkslyj2@naver.com");
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(newUserReqDto)))
+                .andExpect(status().isOk())
+                .andDo(document("/users/create",
+                        requestFields(
+                                fieldWithPath("username").type(JsonFieldType.STRING).description("사용자 이름"),
+                                fieldWithPath("email").type(JsonFieldType.STRING).description("전자메일주소")
+                        )));
     }
 
     @Test
     @WithCustomMockUser
     void deleteUser() throws Exception {
-        mockMvc.perform(delete("/users/1")
+        mockMvc.perform(delete("/users/{user_id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andDo(document("/users/delete"));
@@ -126,7 +121,10 @@ class UserControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(userUpdateReqDto)))
                 .andExpect(status().isOk())
-                .andDo(document("/users/update"));
+                .andDo(document("/users/update",
+                        requestFields(
+                                fieldWithPath("username").type(JsonFieldType.STRING).description("사용자 이름")
+                        )));
     }
 
 }
