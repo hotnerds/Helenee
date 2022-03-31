@@ -59,7 +59,7 @@ class UserControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].username").value(userData.get(0).getUsername()))
                 .andExpect(jsonPath("$[1].username").value(userData.get(1).getUsername()))
-                .andDo(document("/users/getAll"))
+                .andDo(document("users/getAll"))
                 .andReturn();
     }
 
@@ -80,11 +80,11 @@ class UserControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value(user.getUsername()))
                 .andExpect(jsonPath("$.email").value(user.getEmail()))
-                .andDo(document("/users/getOne",
+                .andDo(document("users/getOne",
                         pathParameters(
                                 parameterWithName("user_id").description("유저ID")
                         ),
-                        relaxedResponseFields(
+                        responseFields(
                                 fieldWithPath("username").type(JsonFieldType.STRING).description("사용자 이름"),
                                 fieldWithPath("email").type(JsonFieldType.STRING).description("전자메일주소")
                         )))
@@ -100,8 +100,8 @@ class UserControllerTest extends ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(newUserReqDto)))
                 .andExpect(status().isOk())
-                .andDo(document("/users/create",
-                        relaxedRequestFields(
+                .andDo(document("users/create",
+                        requestFields(
                                 fieldWithPath("username").type(JsonFieldType.STRING).description("사용자 이름"),
                                 fieldWithPath("email").type(JsonFieldType.STRING).description("전자메일주소")
                         )));
@@ -113,7 +113,7 @@ class UserControllerTest extends ControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/users/{user_id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
-                .andDo(document("/users/delete",
+                .andDo(document("users/delete",
                         pathParameters(
                                 parameterWithName("user_id").description("유저ID")
                         )));
@@ -129,11 +129,11 @@ class UserControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(userUpdateReqDto)))
                 .andExpect(status().isOk())
-                .andDo(document("/users/update",
+                .andDo(document("users/update",
                         pathParameters(
                                 parameterWithName("user_id").description("유저ID")
                         ),
-                        relaxedRequestFields(
+                        requestFields(
                                 fieldWithPath("username").type(JsonFieldType.STRING).description("사용자 이름")
                         )));
     }
