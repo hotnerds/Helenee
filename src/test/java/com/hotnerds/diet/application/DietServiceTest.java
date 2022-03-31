@@ -4,6 +4,7 @@ import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
+import com.hotnerds.diet.domain.dto.DietRequestByDateDto;
 import com.hotnerds.diet.domain.dto.DietSaveFoodRequestDto;
 import com.hotnerds.diet.domain.dto.DietReadRequestDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
@@ -247,6 +248,40 @@ class DietServiceTest {
         //then
         verify(diet, times(1)).addFood(food, foodRequestDto.getAmount());
         verify(userRepository, times(1)).findById(1L);
+
+    }
+
+    @Test
+    @DisplayName("식단 날짜로 식단을 조회한다.")
+    void 식단_날짜로_식단_조회() {
+        //given
+        DietRequestByDateDto requestDto = DietRequestByDateDto.builder()
+                .mealDate(mealDate)
+                .build();
+
+        Diet diet1 = Diet.builder()
+                .mealDate(mealDate)
+                .mealTime(MealTime.BREAKFAST)
+                .user(user)
+                .build();
+
+        Diet diet2 = Diet.builder()
+                .mealDate(mealDate)
+                .mealTime(MealTime.LUNCH)
+                .user(user)
+                .build();
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(dietRepository.findAllByMealDateAndUser(any(LocalDate.class), any(User.class)))
+                .thenReturn(List.of(diet1, diet2));
+
+        //when
+        List<Diet> diets = dietService.searchByDate(requestDto, 1L);
+
+        //then
+        assertThat(diets.size()).isEqualTo(2);
+        verify(userRepository, times(1)).findById(1L);
+        verify(dietRepository, times(1)).findAllByMealDateAndUser(mealDate, user);
 
     }
 }
