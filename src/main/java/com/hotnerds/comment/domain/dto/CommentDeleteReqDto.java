@@ -1,10 +1,7 @@
-package com.hotnerds.comment.domain.Dto;
+package com.hotnerds.comment.domain.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Getter
 public class CommentDeleteReqDto {

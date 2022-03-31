@@ -1,4 +1,4 @@
-package com.hotnerds.comment.domain.Dto;
+package com.hotnerds.comment.domain.dto;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.hotnerds.comment.application;
 
-import com.hotnerds.comment.domain.Dto.*;
+import com.hotnerds.comment.domain.dto.*;
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;

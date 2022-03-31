@@ -1,7 +1,6 @@
 package com.hotnerds.comment.application;
 
-import com.hotnerds.comment.application.CommentService;
-import com.hotnerds.comment.domain.Dto.*;
+import com.hotnerds.comment.domain.dto.*;
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
@@ -22,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
