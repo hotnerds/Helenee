@@ -22,15 +22,15 @@ public class DietFood {
 
     @Id
     @GeneratedValue
-    Long dietFoodId;
+    private Long dietFoodId;
 
     @ManyToOne
     @JoinColumn(name = "diet_id")
-    Diet diet;
+    private Diet diet;
 
     @ManyToOne
     @JoinColumn(name = "food_id")
-    Food food;
+    private Food food;
 
     @Builder
     public DietFood(Diet diet, Food food) {
