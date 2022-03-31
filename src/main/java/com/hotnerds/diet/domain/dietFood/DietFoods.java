@@ -37,15 +37,16 @@ public class DietFoods {
                 .collect(Collectors.toList());
     }
 
-    public void associate(Diet diet, Food food) {
+    public void associate(Diet diet, Food food, Long amount) {
         DietFood dietFood = DietFood.builder()
                 .diet(diet)
                 .food(food)
+                .amount(amount)
                 .build();
 
-        if(dietFoods.contains(dietFood)) {
-            throw new BusinessException(ErrorCode.DUPLICATED_FOOD_EXCEPTION);
-        }
+        dietFoods.stream().filter(dietFood::equals)
+                .findAny()
+                .ifPresent(dietFoods::remove);
 
         dietFoods.add(dietFood);
     }

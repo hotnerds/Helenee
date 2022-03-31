@@ -9,6 +9,7 @@ import com.hotnerds.diet.domain.dto.DietReadRequestDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
 import com.hotnerds.food.application.FoodService;
 import com.hotnerds.food.domain.Food;
+import com.hotnerds.food.domain.dto.FoodRequestDto;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +51,7 @@ class DietServiceTest {
     Food food;
     LocalDate mealDate;
     MealTime mealTime;
+    FoodRequestDto foodRequestDto;
 
     @BeforeEach
     void setUp() {
@@ -60,6 +62,11 @@ class DietServiceTest {
         user = User.builder().build();
 
         food = Food.builder().build();
+
+        foodRequestDto = FoodRequestDto.builder()
+                .foodId(1L)
+                .amount(2L)
+                .build();
     }
 
     @Test
@@ -207,7 +214,7 @@ class DietServiceTest {
         DietSaveFoodRequestDto requestDto = DietSaveFoodRequestDto.builder()
                 .mealDate(mealDate)
                 .mealTime(mealTime)
-                .foodIds(List.of(1L))
+                .foods(List.of(foodRequestDto))
                 .build();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -225,7 +232,7 @@ class DietServiceTest {
         DietSaveFoodRequestDto requestDto = DietSaveFoodRequestDto.builder()
                 .mealDate(mealDate)
                 .mealTime(mealTime)
-                .foodIds(List.of(1L))
+                .foods(List.of(foodRequestDto))
                 .build();
 
         Diet diet = Mockito.spy(Diet.class);
@@ -238,7 +245,7 @@ class DietServiceTest {
         dietService.saveFoods(requestDto, 1L);
 
         //then
-        verify(diet, times(1)).addFood(food);
+        verify(diet, times(1)).addFood(food, foodRequestDto.getAmount());
         verify(userRepository, times(1)).findById(1L);
 
     }

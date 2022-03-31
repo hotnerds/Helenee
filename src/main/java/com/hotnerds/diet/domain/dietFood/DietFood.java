@@ -32,10 +32,14 @@ public class DietFood {
     @JoinColumn(name = "food_id")
     private Food food;
 
+    @Column(name = "amount")
+    private Long amount;
+
     @Builder
-    public DietFood(Diet diet, Food food) {
+    public DietFood(Diet diet, Food food, Long amount) {
         this.diet = diet;
         this.food = food;
+        this.amount = amount;
     }
 
     @Override

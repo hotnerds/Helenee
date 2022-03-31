@@ -1,6 +1,7 @@
 package com.hotnerds.diet.domain.dto;
 
 import com.hotnerds.diet.domain.MealTime;
+import com.hotnerds.food.domain.dto.FoodRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,12 +18,12 @@ public class DietSaveFoodRequestDto {
 
     private MealTime mealTime;
 
-    private List<Long> foodIds;
+    private List<FoodRequestDto> foods;
 
     @Builder
-    public DietSaveFoodRequestDto(LocalDate mealDate, MealTime mealTime, List<Long> foodIds) {
+    public DietSaveFoodRequestDto(LocalDate mealDate, MealTime mealTime, List<FoodRequestDto> foods) {
         this.mealDate = mealDate;
         this.mealTime = mealTime;
-        this.foodIds = foodIds;
+        this.foods = foods;
     }
 }

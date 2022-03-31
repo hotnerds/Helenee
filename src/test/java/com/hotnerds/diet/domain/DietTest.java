@@ -33,27 +33,10 @@ class DietTest {
                 .build();
 
         //when
-        diet.addFood(food1);
-        diet.addFood(food2);
+        diet.addFood(food1, 1L);
+        diet.addFood(food2, 1L);
 
         //then
         assertThat(diet.getFoods().size()).isEqualTo(2);
-    }
-
-    @Test
-    @DisplayName("음식은 중복될 수 없다.")
-    void 중복된_음식은_포함할_수_없다() {
-        //given
-        Food food = Food.builder()
-                .foodId(1L)
-                .foodName("치킨")
-                .build();
-
-        diet.addFood(food);
-
-        //when then
-        assertThatThrownBy(() -> diet.addFood(food))
-                .isInstanceOf(BusinessException.class)
-                .hasMessage(ErrorCode.DUPLICATED_FOOD_EXCEPTION.getMessage());
     }
 }
