@@ -5,6 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 application.yml
+api.html
 
 ### STS ###
 .apt_generated
@@ -19,7 +20,6 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-
 .idea
 *.iws
 *.iml
