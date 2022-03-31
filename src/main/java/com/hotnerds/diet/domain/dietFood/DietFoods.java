@@ -1,7 +1,5 @@
 package com.hotnerds.diet.domain.dietFood;
 
-import com.hotnerds.common.exception.BusinessException;
-import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.Nutrient;

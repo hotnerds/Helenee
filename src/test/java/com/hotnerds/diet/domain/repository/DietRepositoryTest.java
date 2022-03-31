@@ -114,6 +114,6 @@ class DietRepositoryTest {
         List<Diet> diets = dietRepository.findAllByMealDateAndUser(mealDate, user);
 
         //then
-        assertThat(diets.size()).isEqualTo(2);
+        assertThat(diets).hasSize(2);
     }
 }

@@ -150,7 +150,7 @@ class DietServiceTest {
 
     @Test
     @DisplayName("식단이 존재하지 않으면 식단을 생성한다.")
-    public void 식단이_존재하지_않으면_생성() {
+    void 식단이_존재하지_않으면_생성() {
         //given
         Diet expectedDiet = Diet.builder()
                 .mealDate(mealDate)
@@ -181,7 +181,7 @@ class DietServiceTest {
 
     @Test
     @DisplayName("식단이 이미 존재하면 가져온다.")
-    public void 식단이_존재하면_가져옴() {
+    void 식단이_존재하면_가져옴() {
         //given
         Diet expectedDiet = Diet.builder()
                 .mealDate(mealDate)
@@ -210,7 +210,7 @@ class DietServiceTest {
 
     @Test
     @DisplayName("존재하지 않는 유저는 식단에 음식을 추가할 수 없다.")
-    public void 존재하지_않는_유저가_식단에_음식_추가시_실패() {
+    void 존재하지_않는_유저가_식단에_음식_추가시_실패() {
         //given
         DietSaveFoodRequestDto requestDto = DietSaveFoodRequestDto.builder()
                 .mealDate(mealDate)
@@ -228,7 +228,7 @@ class DietServiceTest {
 
     @Test
     @DisplayName("식단에 음식을 저장한다.")
-    public void 식단에_음식_저장() {
+    void 식단에_음식_저장() {
         //given
         DietSaveFoodRequestDto requestDto = DietSaveFoodRequestDto.builder()
                 .mealDate(mealDate)
@@ -279,7 +279,7 @@ class DietServiceTest {
         List<Diet> diets = dietService.searchByDate(requestDto, 1L);
 
         //then
-        assertThat(diets.size()).isEqualTo(2);
+        assertThat(diets).hasSize(2);
         verify(userRepository, times(1)).findById(1L);
         verify(dietRepository, times(1)).findAllByMealDateAndUser(mealDate, user);
 
