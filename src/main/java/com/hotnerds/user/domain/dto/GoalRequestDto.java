@@ -1,5 +1,6 @@
 package com.hotnerds.user.domain.dto;
 
+import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.goal.Goal;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,13 +28,14 @@ public class GoalRequestDto {
         this.date = date;
     }
 
-    public Goal toEntity() {
+    public Goal toEntity(User user) {
         return Goal.builder()
                 .calories(calories)
                 .carbs(carbs)
                 .protein(protein)
                 .fat(fat)
                 .date(date)
+                .user(user)
                 .build();
     }
 }

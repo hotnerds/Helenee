@@ -1,15 +1,13 @@
 package com.hotnerds.user.domain.goal;
 
 import com.hotnerds.common.BaseTimeEntity;
+import com.hotnerds.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -31,6 +29,10 @@ public class Goal extends BaseTimeEntity {
 
     private LocalDate date;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     public void change(Goal newGoal) {
         this.calories = newGoal.calories;
         this.carbs = newGoal.carbs;
@@ -39,12 +41,13 @@ public class Goal extends BaseTimeEntity {
     }
 
     @Builder
-    public Goal(Double calories, Double carbs, Double protein, Double fat, LocalDate date) {
+    public Goal(Double calories, Double carbs, Double protein, Double fat, LocalDate date, User user) {
         this.calories = calories;
         this.carbs = carbs;
         this.protein = protein;
         this.fat = fat;
         this.date = date;
+        this.user = user;
     }
 
     @Override
@@ -52,11 +55,11 @@ public class Goal extends BaseTimeEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Goal goal = (Goal) o;
-        return date.equals(goal.date);
+        return Objects.equals(date, goal.date) && Objects.equals(user, goal.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(date);
+        return Objects.hash(date, user);
     }
 }

@@ -137,7 +137,7 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        user.addOrChangeGoal(requestDto.toEntity());
+        user.addOrChangeGoal(requestDto.toEntity(user));
     }
 
     public GoalResponseDto findGoalByDate(final LocalDate date, final String username) {

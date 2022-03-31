@@ -83,6 +83,7 @@ class UserServiceTest {
                 .protein(1.0)
                 .fat(1.0)
                 .date(LocalDate.of(2022, 3, 30))
+                .user(user1)
                 .build();
     }
 
@@ -526,7 +527,6 @@ class UserServiceTest {
         //given
         when(userRepository.findByUsername(any())).thenReturn(Optional.of(user1));
 
-        //when then
         //when then
         assertThatThrownBy(() -> userService.findGoalByDate(goal.getDate(), user1.getUsername()))
                 .isInstanceOf(BusinessException.class)

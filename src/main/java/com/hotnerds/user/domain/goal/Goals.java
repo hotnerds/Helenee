@@ -5,7 +5,10 @@ import com.hotnerds.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +17,12 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class Goals {
+    @OneToMany(
+            mappedBy = "user",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.PERSIST,
+            orphanRemoval = true
+    )
     private List<Goal> goals;
 
     public void addOrChangeGoal(Goal newGoal) {
