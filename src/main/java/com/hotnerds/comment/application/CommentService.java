@@ -83,7 +83,7 @@ public class CommentService {
         Post post = postRepository.findById(reqDto.getPostId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
         return commentRepository.findAllByPost(post, reqDto.getPageable()).stream()
-                .map(CommentResponseDto::Of)
+                .map(CommentResponseDto::of)
                 .collect(Collectors.toList());
     }
 }

@@ -5,7 +5,6 @@ import com.hotnerds.comment.domain.Comment;
 import com.hotnerds.comment.domain.dto.*;
 import com.hotnerds.common.security.oauth2.annotation.Authenticated;
 import com.hotnerds.common.security.oauth2.service.AuthenticatedUser;
-import com.hotnerds.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +24,12 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<CommentResponseDto> createComment(@RequestBody CommentCreateReqDto reqDto) {
         Comment newComment = commentService.addComment(reqDto);
-        CommentResponseDto responseDto = CommentResponseDto.Of(newComment);
+        CommentResponseDto responseDto = CommentResponseDto.of(newComment);
         return ResponseEntity.ok(responseDto);
     }
 
     @DeleteMapping("/{comment_id}")
-    public ResponseEntity<?> deleteComment(@PathVariable("post_id") Long postId, @PathVariable("comment_id") Long commentId, @Authenticated AuthenticatedUser user) {
+    public ResponseEntity<Void> deleteComment(@PathVariable("post_id") Long postId, @PathVariable("comment_id") Long commentId, @Authenticated AuthenticatedUser user) {
         CommentDeleteReqDto reqDto = new CommentDeleteReqDto(postId, commentId);
         commentService.deleteComment(reqDto, user.getId());
         return ResponseEntity.noContent().build();
@@ -39,7 +38,7 @@ public class CommentController {
     @PatchMapping("/{comment_id}")
     public ResponseEntity<CommentResponseDto> updateComment(@RequestBody CommentUpdateReqDto reqDto, @Authenticated AuthenticatedUser user) {
         Comment updatedComment = commentService.updateComment(reqDto, user.getId());
-        CommentResponseDto responseDto = CommentResponseDto.Of(updatedComment);
+        CommentResponseDto responseDto = CommentResponseDto.of(updatedComment);
         return ResponseEntity.ok(responseDto);
     }
 

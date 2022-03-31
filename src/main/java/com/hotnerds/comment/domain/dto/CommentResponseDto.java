@@ -15,7 +15,7 @@ public class CommentResponseDto {
     private String content;
     private LocalDateTime createdAt;
 
-    public static CommentResponseDto Of(Comment comment) {
+    public static CommentResponseDto of(Comment comment) {
         return CommentResponseDto.builder()
                 .commentId(comment.getId())
                 .userId(comment.getWriter().getId())

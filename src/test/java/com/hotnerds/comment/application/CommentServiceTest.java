@@ -379,7 +379,7 @@ class CommentServiceTest {
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
         when(commentRepository.findAllByPost(any(Post.class), any(PageRequest.class))).thenReturn(List.of(comment, comment2));
 
-        List<CommentResponseDto> expectedList = List.of(CommentResponseDto.Of(comment), CommentResponseDto.Of(comment2));
+        List<CommentResponseDto> expectedList = List.of(CommentResponseDto.of(comment), CommentResponseDto.of(comment2));
 
         // when
         List<CommentResponseDto> responseDtoList = commentService.getComments(reqDto);

@@ -111,8 +111,8 @@ class CommentControllerTest extends ControllerTest {
         int size = 10;
 
         List<CommentResponseDto> response = List.of(
-                CommentResponseDto.Of(comment),
-                CommentResponseDto.Of(comment2)
+                CommentResponseDto.of(comment),
+                CommentResponseDto.of(comment2)
         );
         when(commentService.getComments(any(CommentByPostReqDto.class))).thenReturn(response);
 
