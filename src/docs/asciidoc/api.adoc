@@ -1,0 +1,120 @@
+= Helenee API Guide
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+:operation-curl-request-title: Example request
+:operation-http-response-title: Example response
+
+[[overview]]
+= Overview
+
+[[overview_http_verbs]]
+== HTTP verbs
+
+RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its
+use of HTTP verbs.
+
+|===
+| Verb | Usage
+
+| `GET`
+| Used to retrieve a resource
+
+| `POST`
+| Used to create a new resource
+
+| `PATCH`
+| Used to update an existing resource, including partial updates
+
+| `DELETE`
+| Used to delete an existing resource
+|===
+
+[[overview_http_status_codes]]
+== HTTP status codes
+
+RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its
+use of HTTP status codes.
+
+|===
+| Status code | Usage
+
+| `200 OK`
+| The request completed successfully
+
+| `201 Created`
+| A new resource has been created successfully. The resource's URI is available from the response's
+`Location` header
+
+| `204 No Content`
+| An update to an existing resource has been applied successfully
+
+| `400 Bad Request`
+| The request was malformed. The response body will include an error providing further information
+
+| `404 Not Found`
+| The requested resource did not exist
+|===
+
+[[overview_headers]]
+== Headers
+
+
+[[overview_errors]]
+== Errors
+
+
+[[overview_hypermedia]]
+== Hypermedia
+
+
+
+[[resources]]
+= Resources
+
+
+
+[[resources_users]]
+== Users
+
+[[resources_uers_list]]
+=== Getting a list of users
+
+`GET` 요청을 통해 모든 유저의 정보를 가져올 수 있다.
+
+operation::users/getAll[snippets='curl-request,http-response']
+
+
+[[resources_users_list]]
+=== Getting a user
+
+`GET/\{user_id\}` 요청을 통해 하나의 유저에 대한 정보를 가져올 수 있다.
+
+operation::users/getOne[snippets='response-fields,curl-request,http-response']
+
+
+[[resources_users_create]]
+=== Creating a user
+
+`POST` 요청을 통해 새로운 유저를 등록할 수 있다.
+
+operation::users/create[snippets='request-fields,curl-request,http-response']
+
+
+[[resources_users_delete]]
+=== Deleting a user
+
+`DELETE/\{user-id\}` 요청을 통해 새로운 유저를 등록할 수 있다.
+
+operation::users/delete[snippets='curl-request,http-response']
+
+
+[[resources_users_update]]
+=== Updating user data
+
+`DELETE/\{user-id\}` 요청을 통해 새로운 유저를 등록할 수 있다.
+
+operation::users/update[snippets='request-fields,curl-request,http-response']

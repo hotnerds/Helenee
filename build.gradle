@@ -15,19 +15,11 @@ ext {
 	snippetsDir = file('build/generated-snippets')
 }
 
-
-bootJar {
-	dependsOn asciidoctor
-	copy {
-		from "${asciidoctor.outputDir}"
-		into 'static/docs'
-	}
-}
-
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+	asciidoctorExtensions
 }
 
 repositories {
@@ -60,6 +52,7 @@ dependencies {
 	testImplementation 'io.rest-assured:rest-assured'
 
 	//spring rest docs
+	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
 	implementation 'junit:junit:4.13.1'
@@ -74,6 +67,33 @@ dependencies {
 	testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
 
+}
+
+asciidoctor {
+	configurations "asciidoctorExtensions"
+	inputs.dir snippetsDir
+	dependsOn test
+}
+
+asciidoctor.doFirst {
+	delete file('src/main/resources/static/docs')
+}
+
+test {
+	outputs.dir snippetsDir
+}
+
+bootJar {
+	dependsOn asciidoctor
+	from ("${asciidoctor.outputDir}") {
+		into 'static/docs'
+	}
+}
+
+task copyDocument(type: Copy) {
+	dependsOn asciidoctor
+	from file("build/docs/asciidoc")
+	into file("src/main/resources/static/docs")
 }
 
 jacoco {
@@ -135,17 +155,6 @@ tasks.named('test') {
 	finalizedBy 'jacocoTestReport'
 }
 
-asciidoctor {
-	dependsOn test
-	inputs.dir snippetsDir
-}
-
-asciidoctor.doFirst {
-	delete file('src/main/resources/static/docs')
-}
-
-task copyDocument(type: Copy) {
-	dependsOn asciidoctor
-	from file("build/docs/asciidoc")
-	into file("src/main/resources/static/docs")
+build {
+	dependsOn copyDocument
 }
