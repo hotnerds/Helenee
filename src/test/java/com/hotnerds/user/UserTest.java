@@ -11,10 +11,9 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 
-public class UserTest {
+class UserTest {
 
     User user;
 
@@ -41,7 +40,7 @@ public class UserTest {
     void 목표_생성_성공() {
         user.addOrChangeGoal(goal);
 
-        assertThat(user.getGoals().getGoals().size()).isEqualTo(1);
+        assertThat(user.getGoals().getGoalList()).hasSize(1);
     }
 
     @DisplayName("같은 날짜에 이미 등록된 목표가 있다면 목표를 수정 한다.")
@@ -69,7 +68,8 @@ public class UserTest {
     @DisplayName("특정 날짜에 찾으려는 목표가 없을 때 예외를 발생시킨다.")
     @Test
     void 찾으려는_목표_없을때_예외_발생() {
-        assertThatThrownBy(() -> user.getGoalOfUser(LocalDate.of(2022, 3, 30)))
+        LocalDate target = LocalDate.of(2022, 3, 22);
+        assertThatThrownBy(() -> user.getGoalOfUser(target))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()

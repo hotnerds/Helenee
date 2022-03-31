@@ -449,7 +449,7 @@ class UserServiceTest {
 
     @DisplayName("유저는 목표를 생성할 수 있다.")
     @Test
-    public void 목표_생성_성공() {
+    void 목표_생성_성공() {
         //given
         GoalRequestDto requestDto = GoalRequestDto.builder()
                 .calories(goal.getCalories())
@@ -465,7 +465,7 @@ class UserServiceTest {
         userService.createOrChangeGoal(requestDto, user1.getUsername());
 
         //then
-        assertThat(user1.getGoals().getGoals().size()).isEqualTo(1);
+        assertThat(user1.getGoals().getGoalList()).hasSize(1);
 
     }
 
@@ -481,10 +481,11 @@ class UserServiceTest {
                 .date(goal.getDate())
                 .build();
 
+        String username = user1.getUsername();
         when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
 
         //when then
-        assertThatThrownBy(() -> userService.createOrChangeGoal(requestDto, user1.getUsername()))
+        assertThatThrownBy(() -> userService.createOrChangeGoal(requestDto, username))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
@@ -498,7 +499,6 @@ class UserServiceTest {
         user1.addOrChangeGoal(goal);
 
         when(userRepository.findByUsername(any())).thenReturn(Optional.of(user1));
-
         //when
         GoalResponseDto response = userService.findGoalByDate(goal.getDate(), user1.getUsername());
 
@@ -513,8 +513,10 @@ class UserServiceTest {
         user1.addOrChangeGoal(goal);
         when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
 
+        String username = user1.getUsername();
+        LocalDate date = goal.getDate();
         //when then
-        assertThatThrownBy(() -> userService.findGoalByDate(goal.getDate(), user1.getUsername()))
+        assertThatThrownBy(() -> userService.findGoalByDate(date, user1.getUsername()))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
@@ -527,8 +529,10 @@ class UserServiceTest {
         //given
         when(userRepository.findByUsername(any())).thenReturn(Optional.of(user1));
 
+        String username = user1.getUsername();
+        LocalDate date = goal.getDate();
         //when then
-        assertThatThrownBy(() -> userService.findGoalByDate(goal.getDate(), user1.getUsername()))
+        assertThatThrownBy(() -> userService.findGoalByDate(date, username))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()

@@ -23,17 +23,17 @@ public class Goals {
             cascade = CascadeType.PERSIST,
             orphanRemoval = true
     )
-    private List<Goal> goals;
+    private List<Goal> goalList;
 
     public void addOrChangeGoal(Goal newGoal) {
-        goals.stream()
+        goalList.stream()
                 .filter(goal -> goal.equals(newGoal))
                 .findFirst()
-                .ifPresentOrElse(goal -> goal.change(newGoal), () -> goals.add(newGoal));
+                .ifPresentOrElse(goal -> goal.change(newGoal), () -> goalList.add(newGoal));
     }
 
     public Goal getGoalForDate(LocalDate date) {
-        return goals.stream()
+        return goalList.stream()
                 .filter(g -> g.getDate().equals(date))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(ErrorCode.GOAL_NOT_FOUND_EXCEPTION));
