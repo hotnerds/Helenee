@@ -3,12 +3,15 @@ package com.hotnerds.user.domain;
 import com.hotnerds.common.BaseTimeEntity;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.user.domain.dto.UserUpdateReqDto;
+import com.hotnerds.user.domain.goal.Goal;
+import com.hotnerds.user.domain.goal.Goals;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -39,12 +42,16 @@ public class User extends BaseTimeEntity {
     @Embedded
     private FollowedList followedList;
 
+    @Embedded
+    private Goals goals;
+
     @Builder
     public User(String username, String email) {
         this.username = username;
         this.email = email;
         this.followerList = new FollowerList();
         this.followedList = new FollowedList();
+        this.goals = Goals.empty();
     }
 
     @Override
@@ -98,5 +105,13 @@ public class User extends BaseTimeEntity {
         Follow newFollow = new Follow(this, followed);
         this.getFollowedList().delete(newFollow);
         followed.getFollowerList().delete(newFollow);
+    }
+
+    public void addOrChangeGoal(Goal goal) {
+        goals.addOrChangeGoal(goal);
+    }
+
+    public Goal getGoalOfUser(LocalDate date) {
+        return goals.getGoalForDate(date);
     }
 }

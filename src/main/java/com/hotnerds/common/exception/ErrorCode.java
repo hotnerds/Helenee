@@ -51,7 +51,10 @@ public enum ErrorCode {
     FOOD_NOT_FOUND_EXCEPTION(404, "F001", "음식이 존재하지 않습니다."),
 
     // Auth
-    AUTHENTICATION_EXCEPTION(400, "AU001", "인증 관련 오류가 발생했습니다.");
+    AUTHENTICATION_EXCEPTION(400, "AU001", "인증 관련 오류가 발생했습니다."),
+
+    //Goal
+    GOAL_NOT_FOUND_EXCEPTION(404, "G001", "특정 날짜에 Goal을 찾지 못했습니다.");
 
     private final int status;
     private final String code;

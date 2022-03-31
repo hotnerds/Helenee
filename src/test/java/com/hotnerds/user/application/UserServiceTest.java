@@ -2,13 +2,12 @@ package com.hotnerds.user.application;
 
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
-import com.hotnerds.user.domain.dto.FollowServiceReqDto;
-import com.hotnerds.user.domain.dto.NewUserReqDto;
-import com.hotnerds.user.domain.dto.UserUpdateReqDto;
+import com.hotnerds.user.domain.dto.*;
 import com.hotnerds.user.domain.Follow;
 import com.hotnerds.user.domain.FollowedList;
 import com.hotnerds.user.domain.FollowerList;
 import com.hotnerds.user.domain.User;
+import com.hotnerds.user.domain.goal.Goal;
 import com.hotnerds.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,11 +17,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,12 +33,12 @@ import static org.mockito.Mockito.*;
 class UserServiceTest {
 
     @Mock
-    private UserRepository userRepository;
+    UserRepository userRepository;
 
     @InjectMocks
-    private UserService userService;
+    UserService userService;
 
-    private List<NewUserReqDto> actualNewUserReqDtoList = Arrays.asList(
+    List<NewUserReqDto> actualNewUserReqDtoList = Arrays.asList(
             NewUserReqDto.builder()
                     .username("RetepMil")
                     .email("lkslyj2@naver.com")
@@ -48,10 +49,11 @@ class UserServiceTest {
                     .build()
     );
 
-    private User user1;
-    private User user2;
-    private Follow follow;
-    private FollowServiceReqDto reqDto;
+    User user1;
+    User user2;
+    Follow follow;
+    FollowServiceReqDto reqDto;
+    Goal goal;
 
     @BeforeEach
     void setUp() {
@@ -73,6 +75,15 @@ class UserServiceTest {
         follow = Follow.builder()
                 .follower(user1)
                 .followed(user2)
+                .build();
+
+        goal = Goal.builder()
+                .calories(1.0)
+                .carbs(1.0)
+                .protein(1.0)
+                .fat(1.0)
+                .date(LocalDate.of(2022, 3, 30))
+                .user(user1)
                 .build();
     }
 
@@ -434,5 +445,97 @@ class UserServiceTest {
                 () -> assertEquals(0, user1.getFollowedList().followCounts()),
                 () -> assertEquals(0, user2.getFollowerList().followerCounts())
         );
+    }
+
+    @DisplayName("유저는 목표를 생성할 수 있다.")
+    @Test
+    void 목표_생성_성공() {
+        //given
+        GoalRequestDto requestDto = GoalRequestDto.builder()
+                .calories(goal.getCalories())
+                .carbs(goal.getCarbs())
+                .protein(goal.getProtein())
+                .fat(goal.getFat())
+                .date(goal.getDate())
+                .build();
+
+        when(userRepository.findByUsername(any())).thenReturn(Optional.of(user1));
+
+        //when
+        userService.createOrChangeGoal(requestDto, user1.getUsername());
+
+        //then
+        assertThat(user1.getGoals().getGoalList()).hasSize(1);
+
+    }
+
+    @DisplayName("존재하지 않은 유저는 목표를 생성할 수 없다.")
+    @Test
+    void 존재하지_않은_유저_목표_생성_실패() {
+        //given
+        GoalRequestDto requestDto = GoalRequestDto.builder()
+                .calories(goal.getCalories())
+                .carbs(goal.getCarbs())
+                .protein(goal.getProtein())
+                .fat(goal.getFat())
+                .date(goal.getDate())
+                .build();
+
+        String username = user1.getUsername();
+        when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
+
+        //when then
+        assertThatThrownBy(() -> userService.createOrChangeGoal(requestDto, username))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .usingRecursiveComparison()
+                .isEqualTo(ErrorCode.USER_NOT_FOUND_EXCEPTION);
+    }
+
+    @DisplayName("유저는 특정 날짜에 세운 목표를 조회할 수 있다.")
+    @Test
+    void 특정_날짜_목표_조회_성공() {
+        //given
+        user1.addOrChangeGoal(goal);
+
+        when(userRepository.findByUsername(any())).thenReturn(Optional.of(user1));
+        //when
+        GoalResponseDto response = userService.findGoalByDate(goal.getDate(), user1.getUsername());
+
+        //then
+        assertThat(response.getDate()).isEqualTo(goal.getDate());
+    }
+
+    @DisplayName("존재하지 않은 유저 목표 조회시 예외 발생")
+    @Test
+    void 존재하지_않은_유저_목표_조회_실패() {
+        //given
+        user1.addOrChangeGoal(goal);
+        when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
+
+        String username = user1.getUsername();
+        LocalDate date = goal.getDate();
+        //when then
+        assertThatThrownBy(() -> userService.findGoalByDate(date, user1.getUsername()))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .usingRecursiveComparison()
+                .isEqualTo(ErrorCode.USER_NOT_FOUND_EXCEPTION);
+    }
+
+    @DisplayName("특정 날짜 목표 조회 시 목표가 없으면 예외 발생")
+    @Test
+    void 존재하지_않은_목표_조회_실패() {
+        //given
+        when(userRepository.findByUsername(any())).thenReturn(Optional.of(user1));
+
+        String username = user1.getUsername();
+        LocalDate date = goal.getDate();
+        //when then
+        assertThatThrownBy(() -> userService.findGoalByDate(date, username))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .usingRecursiveComparison()
+                .isEqualTo(ErrorCode.GOAL_NOT_FOUND_EXCEPTION);
     }
 }

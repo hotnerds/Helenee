@@ -2,9 +2,7 @@ package com.hotnerds.user.application;
 
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
-import com.hotnerds.user.domain.dto.FollowServiceReqDto;
-import com.hotnerds.user.domain.dto.NewUserReqDto;
-import com.hotnerds.user.domain.dto.UserUpdateReqDto;
+import com.hotnerds.user.domain.dto.*;
 import com.hotnerds.user.domain.Follow;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
@@ -12,12 +10,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository userRepository;
@@ -40,6 +40,7 @@ public class UserService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
     }
 
+    @Transactional
     public void deleteUserById(final Long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
@@ -47,6 +48,7 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
+    @Transactional
     public void updateUser(final Long userId, final UserUpdateReqDto userUpdateReqDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
@@ -118,6 +120,7 @@ public class UserService {
         return getUserById(userId).getFollowedList().followCounts();
     }
 
+    @Transactional
     public void deleteFollow(final FollowServiceReqDto followServiceReqDto) {
         User followerUser = getUserById(followServiceReqDto.getFollowerId());
         User followedUser = getUserById(followServiceReqDto.getFollowedId());
@@ -127,5 +130,20 @@ public class UserService {
         }
 
         followerUser.unfollow(followedUser);
+    }
+
+    @Transactional
+    public void createOrChangeGoal(final GoalRequestDto requestDto, final String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        user.addOrChangeGoal(requestDto.toEntity(user));
+    }
+
+    public GoalResponseDto findGoalByDate(final LocalDate date, final String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        return GoalResponseDto.of(user.getGoalOfUser(date));
     }
 }
