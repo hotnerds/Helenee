@@ -3,6 +3,7 @@ package com.hotnerds.diet.domain;
 import com.hotnerds.common.BaseTimeEntity;
 import com.hotnerds.diet.domain.dietFood.DietFoods;
 import com.hotnerds.food.domain.Food;
+import com.hotnerds.food.domain.Nutrient;
 import com.hotnerds.post.domain.like.Like;
 import com.hotnerds.user.domain.User;
 import lombok.AccessLevel;
@@ -62,6 +63,10 @@ public class Diet extends BaseTimeEntity {
 
     public void clearFood() {
         dietFoods.clear();
+    }
+
+    public Nutrient calculateTotalNutrient() {
+        return dietFoods.calculateTotalNutrient();
     }
 
     @Override

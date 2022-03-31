@@ -4,6 +4,7 @@ import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.food.domain.Food;
+import com.hotnerds.food.domain.Nutrient;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -53,5 +54,26 @@ public class DietFoods {
 
     public void clear() {
         dietFoods.clear();
+    }
+
+    public Nutrient calculateTotalNutrient() {
+        Nutrient totalNutrient = Nutrient.builder()
+                .calories(0.0)
+                .carbs(0.0)
+                .protein(0.0)
+                .fat(0.0)
+                .build();
+
+        for(DietFood dietFood : dietFoods) {
+            Nutrient nutrient = dietFood.getFood()
+                    .getNutrient();
+            Double amount = dietFood.getAmount()
+                    .doubleValue();
+            totalNutrient = totalNutrient.plus(
+                    nutrient.multiply(amount)
+            );
+        }
+
+        return totalNutrient;
     }
 }
