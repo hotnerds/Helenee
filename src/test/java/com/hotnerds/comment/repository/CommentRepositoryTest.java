@@ -37,7 +37,6 @@ class CommentRepositoryTest {
     private UserRepository userRepository;
 
     private Post post;
-    private Comments comments;
     private Comment comment;
     private User user;
 
@@ -45,7 +44,7 @@ class CommentRepositoryTest {
 
     @BeforeEach
     void init() {
-        comments = new Comments(new ArrayList<>());
+        Comments comments = new Comments(new ArrayList<>());
 
         user = User.builder()
                 .username("user")
@@ -102,6 +101,9 @@ class CommentRepositoryTest {
 
         //when
         List<Comment> commentList = commentRepository.findAllByPost(post, PageRequest.of(0, 10));
+
+        System.out.println(commentList.get(0).getCreatedAt());
+        System.out.println(commentList.get(1).getCreatedAt());
 
         //then
         assertAll(

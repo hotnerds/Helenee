@@ -1,4 +1,4 @@
-package com.hotnerds.comment.domain.Dto;
+package com.hotnerds.comment.domain.dto;
 
 import com.hotnerds.comment.domain.Comment;
 import lombok.Builder;
@@ -15,7 +15,7 @@ public class CommentResponseDto {
     private String content;
     private LocalDateTime createdAt;
 
-    public static CommentResponseDto Of(Comment comment) {
+    public static CommentResponseDto of(Comment comment) {
         return CommentResponseDto.builder()
                 .commentId(comment.getId())
                 .userId(comment.getWriter().getId())

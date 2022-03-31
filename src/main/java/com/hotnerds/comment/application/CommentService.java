@@ -1,6 +1,6 @@
 package com.hotnerds.comment.application;
 
-import com.hotnerds.comment.domain.Dto.*;
+import com.hotnerds.comment.domain.dto.*;
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
@@ -25,7 +25,7 @@ public class CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
-    public void addComment(CommentCreateReqDto reqDto) {
+    public Comment addComment(CommentCreateReqDto reqDto) {
         if (!Comment.checkContentValid(reqDto.getContent())) {
             throw new BusinessException(ErrorCode.COMMENT_INVALID_EXCEPTION);
         }
@@ -41,9 +41,11 @@ public class CommentService {
                 .content(reqDto.getContent())
                 .build();
 
-        commentRepository.save(comment);
+        Comment newComment = commentRepository.save(comment);
 
-        post.addComment(comment);
+        post.addComment(newComment);
+
+        return newComment;
     }
 
     public void deleteComment(CommentDeleteReqDto reqDto, Long requesterId) {
@@ -62,7 +64,7 @@ public class CommentService {
         commentRepository.deleteById(reqDto.getCommentId());
     }
 
-    public void updateComment(CommentUpdateReqDto reqDto, Long requesterId) {
+    public Comment updateComment(CommentUpdateReqDto reqDto, Long requesterId) {
         Comment comment = commentRepository.findById(reqDto.getCommentId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION));
         User user = userRepository.findById(comment.getWriter().getId())
@@ -73,13 +75,15 @@ public class CommentService {
         }
 
         comment.updateContent(reqDto.getContent());
+
+        return comment;
     }
 
     public List<CommentResponseDto> getComments(CommentByPostReqDto reqDto) {
         Post post = postRepository.findById(reqDto.getPostId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
         return commentRepository.findAllByPost(post, reqDto.getPageable()).stream()
-                .map(CommentResponseDto::Of)
+                .map(CommentResponseDto::of)
                 .collect(Collectors.toList());
     }
 }

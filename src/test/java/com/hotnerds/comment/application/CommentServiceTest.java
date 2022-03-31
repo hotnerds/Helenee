@@ -1,7 +1,6 @@
 package com.hotnerds.comment.application;
 
-import com.hotnerds.comment.application.CommentService;
-import com.hotnerds.comment.domain.Dto.*;
+import com.hotnerds.comment.domain.dto.*;
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
@@ -22,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -381,7 +379,7 @@ class CommentServiceTest {
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
         when(commentRepository.findAllByPost(any(Post.class), any(PageRequest.class))).thenReturn(List.of(comment, comment2));
 
-        List<CommentResponseDto> expectedList = List.of(CommentResponseDto.Of(comment), CommentResponseDto.Of(comment2));
+        List<CommentResponseDto> expectedList = List.of(CommentResponseDto.of(comment), CommentResponseDto.of(comment2));
 
         // when
         List<CommentResponseDto> responseDtoList = commentService.getComments(reqDto);

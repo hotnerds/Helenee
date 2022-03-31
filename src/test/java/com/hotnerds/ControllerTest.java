@@ -1,6 +1,7 @@
 package com.hotnerds;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.hotnerds.common.security.filter.JwtAuthenticationFilter;
 import com.hotnerds.common.security.handler.OAuth2SuccessHandler;
 import com.hotnerds.common.security.oauth2.provider.JwtTokenProvider;
@@ -58,7 +59,7 @@ public class ControllerTest {
                 .alwaysDo(print())
                 .build();
 
-        objectMapper = new ObjectMapper();
+        objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
         User user = User.builder()
                 .email(USER_EMAIL)
