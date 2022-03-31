@@ -1,40 +1,23 @@
 package com.hotnerds.comment.presentation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.hotnerds.ControllerTest;
 import com.hotnerds.WithCustomMockUser;
 import com.hotnerds.comment.application.CommentService;
 import com.hotnerds.comment.domain.Comment;
-import com.hotnerds.comment.domain.Dto.*;
-import com.hotnerds.comment.repository.CommentRepository;
+import com.hotnerds.comment.domain.dto.*;
 import com.hotnerds.post.domain.Post;
-import com.hotnerds.post.domain.repository.PostRepository;
 import com.hotnerds.user.domain.ROLE;
 import com.hotnerds.user.domain.User;
-import com.hotnerds.user.domain.repository.UserRepository;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
