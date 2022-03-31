@@ -5,17 +5,13 @@ import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
-import com.hotnerds.diet.domain.dto.DietAddFoodRequestDto;
+import com.hotnerds.diet.domain.dto.DietSaveFoodRequestDto;
 import com.hotnerds.diet.domain.dto.DietReadRequestDto;
-import com.hotnerds.diet.domain.dto.DietRemoveFoodRequestDto;
-import com.hotnerds.diet.domain.dto.DietResponseDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
 import com.hotnerds.food.application.FoodService;
-import com.hotnerds.food.domain.Food;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,28 +37,16 @@ public class DietService {
     }
 
     @Transactional
-    public void addFood(DietAddFoodRequestDto requestDto, Long userId) {
+    public void saveFoods(DietSaveFoodRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         Diet diet = findOrCreate(requestDto.getMealDate(), requestDto.getMealTime(), user);
 
-        Food food = foodService.findOrCreate(requestDto.getApiId());
+        diet.clearFood();
 
-        diet.addFood(food);
-    }
-
-    @Transactional
-    public void removeFood(DietRemoveFoodRequestDto requestDto, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
-
-        Diet diet = dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(), requestDto.getMealTime(), user)
-                .orElseThrow(() -> new BusinessException(ErrorCode.DIET_NOT_FOUND_EXCEPTION));
-
-        Food food = foodService.findById(requestDto.getFoodId());
-
-        diet.removeFood(food);
+        requestDto.getFoodIds()
+                .forEach(e -> diet.addFood(foodService.findOrCreate(e)));
     }
 
     @Transactional

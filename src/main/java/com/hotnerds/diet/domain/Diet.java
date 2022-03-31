@@ -64,6 +64,10 @@ public class Diet extends BaseTimeEntity {
         dietFoods.dissociate(this, food);
     }
 
+    public void clearFood() {
+        dietFoods.clear();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

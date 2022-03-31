@@ -48,4 +48,8 @@ public class DietFoods {
                 .food(food)
                 .build());
     }
+
+    public void clear() {
+        dietFoods.clear();
+    }
 }
