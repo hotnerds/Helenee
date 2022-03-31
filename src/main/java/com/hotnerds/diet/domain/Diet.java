@@ -60,10 +60,6 @@ public class Diet extends BaseTimeEntity {
         dietFoods.associate(this, food);
     }
 
-    public void removeFood(Food food) {
-        dietFoods.dissociate(this, food);
-    }
-
     public void clearFood() {
         dietFoods.clear();
     }

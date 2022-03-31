@@ -1,5 +1,7 @@
 package com.hotnerds.diet.domain.dietFood;
 
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.food.domain.Food;
 import lombok.AccessLevel;
@@ -36,17 +38,16 @@ public class DietFoods {
     }
 
     public void associate(Diet diet, Food food) {
-        dietFoods.add(DietFood.builder()
-                        .diet(diet)
-                        .food(food)
-                .build());
-    }
-
-    public void dissociate(Diet diet, Food food) {
-        dietFoods.remove(DietFood.builder()
+        DietFood dietFood = DietFood.builder()
                 .diet(diet)
                 .food(food)
-                .build());
+                .build();
+
+        if(dietFoods.contains(dietFood)) {
+            throw new BusinessException(ErrorCode.DUPLICATED_FOOD_EXCEPTION);
+        }
+
+        dietFoods.add(dietFood);
     }
 
     public void clear() {

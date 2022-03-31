@@ -1,11 +1,14 @@
 package com.hotnerds.diet.domain;
 
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.food.domain.Food;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DietTest {
@@ -38,24 +41,19 @@ class DietTest {
     }
 
     @Test
-    @DisplayName("식단에 포함된 음식을 삭제할 수 있다.")
-    void 식단에서_음식_삭제() {
-
+    @DisplayName("음식은 중복될 수 없다.")
+    void 중복된_음식은_포함할_수_없다() {
         //given
-        Food food1 = Food.builder()
+        Food food = Food.builder()
+                .foodId(1L)
                 .foodName("치킨")
                 .build();
-        Food food2 = Food.builder()
-                .foodName("햄버거")
-                .build();
 
-        diet.addFood(food1);
-        diet.addFood(food2);
+        diet.addFood(food);
 
-        //when
-        diet.removeFood(food2);
-
-        //then
-        assertThat(diet.getFoods().size()).isEqualTo(1);
+        //when then
+        assertThatThrownBy(() -> diet.addFood(food))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.DUPLICATED_FOOD_EXCEPTION.getMessage());
     }
 }
