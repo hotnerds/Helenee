@@ -4,15 +4,15 @@ import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
-import com.hotnerds.diet.domain.dto.DietAddFoodRequestDto;
+import com.hotnerds.diet.domain.dto.DietRequestByDateDto;
+import com.hotnerds.diet.domain.dto.DietSaveFoodRequestDto;
 import com.hotnerds.diet.domain.dto.DietReadRequestDto;
-import com.hotnerds.diet.domain.dto.DietRemoveFoodRequestDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
 import com.hotnerds.food.application.FoodService;
 import com.hotnerds.food.domain.Food;
+import com.hotnerds.food.domain.dto.FoodRequestDto;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
-import org.apache.tomcat.jni.Local;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,10 +23,10 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,6 +52,7 @@ class DietServiceTest {
     Food food;
     LocalDate mealDate;
     MealTime mealTime;
+    FoodRequestDto foodRequestDto;
 
     @BeforeEach
     void setUp() {
@@ -62,6 +63,11 @@ class DietServiceTest {
         user = User.builder().build();
 
         food = Food.builder().build();
+
+        foodRequestDto = FoodRequestDto.builder()
+                .foodId(1L)
+                .amount(2L)
+                .build();
     }
 
     @Test
@@ -144,7 +150,7 @@ class DietServiceTest {
 
     @Test
     @DisplayName("식단이 존재하지 않으면 식단을 생성한다.")
-    public void 식단이_존재하지_않으면_생성() {
+    void 식단이_존재하지_않으면_생성() {
         //given
         Diet expectedDiet = Diet.builder()
                 .mealDate(mealDate)
@@ -175,7 +181,7 @@ class DietServiceTest {
 
     @Test
     @DisplayName("식단이 이미 존재하면 가져온다.")
-    public void 식단이_존재하면_가져옴() {
+    void 식단이_존재하면_가져옴() {
         //given
         Diet expectedDiet = Diet.builder()
                 .mealDate(mealDate)
@@ -204,30 +210,30 @@ class DietServiceTest {
 
     @Test
     @DisplayName("존재하지 않는 유저는 식단에 음식을 추가할 수 없다.")
-    public void 존재하지_않는_유저가_식단에_음식_추가시_실패() {
+    void 존재하지_않는_유저가_식단에_음식_추가시_실패() {
         //given
-        DietAddFoodRequestDto requestDto = DietAddFoodRequestDto.builder()
+        DietSaveFoodRequestDto requestDto = DietSaveFoodRequestDto.builder()
                 .mealDate(mealDate)
                 .mealTime(mealTime)
-                .apiId(1L)
+                .foods(List.of(foodRequestDto))
                 .build();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when then
-        assertThatThrownBy(() -> dietService.addFood(requestDto, 1L))
+        assertThatThrownBy(() -> dietService.saveFoods(requestDto, 1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test
-    @DisplayName("식단에 음식을 추가한다.")
-    public void 식단에_음식_추가() {
+    @DisplayName("식단에 음식을 저장한다.")
+    void 식단에_음식_저장() {
         //given
-        DietAddFoodRequestDto requestDto = DietAddFoodRequestDto.builder()
+        DietSaveFoodRequestDto requestDto = DietSaveFoodRequestDto.builder()
                 .mealDate(mealDate)
                 .mealTime(mealTime)
-                .apiId(1L)
+                .foods(List.of(foodRequestDto))
                 .build();
 
         Diet diet = Mockito.spy(Diet.class);
@@ -237,54 +243,45 @@ class DietServiceTest {
         when(foodService.findOrCreate(anyLong())).thenReturn(food);
 
         //when
-        dietService.addFood(requestDto, 1L);
+        dietService.saveFoods(requestDto, 1L);
 
         //then
-        verify(diet, times(1)).addFood(food);
+        verify(diet, times(1)).addFood(food, foodRequestDto.getAmount());
         verify(userRepository, times(1)).findById(1L);
 
     }
 
     @Test
-    @DisplayName("존재하지 않는 유저는 식단에서 음식을 삭제할 수 없다.")
-    void 존재하지_않는_유저가_식단에서_음식_삭제시_실패() {
+    @DisplayName("식단 날짜로 식단을 조회한다.")
+    void 식단_날짜로_식단_조회() {
         //given
-        DietRemoveFoodRequestDto requestDto = DietRemoveFoodRequestDto.builder()
+        DietRequestByDateDto requestDto = DietRequestByDateDto.builder()
                 .mealDate(mealDate)
-                .mealTime(mealTime)
-                .foodId(1L)
                 .build();
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        //when then
-        assertThatThrownBy(() -> dietService.removeFood(requestDto, 1L))
-                .isInstanceOf(BusinessException.class)
-                .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
-    }
-
-    @Test
-    @DisplayName("식단에서 음식을 삭제한다.")
-    void 식단에서_음식_삭제() {
-        //given
-        DietRemoveFoodRequestDto requestDto = DietRemoveFoodRequestDto.builder()
+        Diet diet1 = Diet.builder()
                 .mealDate(mealDate)
-                .mealTime(mealTime)
-                .foodId(1L)
+                .mealTime(MealTime.BREAKFAST)
+                .user(user)
                 .build();
 
-        Diet diet = Mockito.spy(Diet.class);
+        Diet diet2 = Diet.builder()
+                .mealDate(mealDate)
+                .mealTime(MealTime.LUNCH)
+                .user(user)
+                .build();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(dietRepository.findByMealDateAndMealTimeAndUser(any(LocalDate.class), any(MealTime.class), any(User.class))).thenReturn(Optional.of(diet));
-        when(foodService.findById(1L)).thenReturn(food);
+        when(dietRepository.findAllByMealDateAndUser(any(LocalDate.class), any(User.class)))
+                .thenReturn(List.of(diet1, diet2));
 
         //when
-        dietService.removeFood(requestDto, 1L);
-      
+        List<Diet> diets = dietService.searchByDate(requestDto, 1L);
+
         //then
+        assertThat(diets).hasSize(2);
         verify(userRepository, times(1)).findById(1L);
-        verify(dietRepository, times(1)).findByMealDateAndMealTimeAndUser(mealDate, mealTime, user);
-        verify(diet, times(1)).removeFood(food);
+        verify(dietRepository, times(1)).findAllByMealDateAndUser(mealDate, user);
+
     }
 }

@@ -3,6 +3,7 @@ package com.hotnerds.diet.domain;
 import com.hotnerds.common.BaseTimeEntity;
 import com.hotnerds.diet.domain.dietFood.DietFoods;
 import com.hotnerds.food.domain.Food;
+import com.hotnerds.food.domain.Nutrient;
 import com.hotnerds.post.domain.like.Like;
 import com.hotnerds.user.domain.User;
 import lombok.AccessLevel;
@@ -56,12 +57,16 @@ public class Diet extends BaseTimeEntity {
         return dietFoods.getFoods();
     }
 
-    public void addFood(Food food) {
-        dietFoods.associate(this, food);
+    public void addFood(Food food, Long amount) {
+        dietFoods.associate(this, food, amount);
     }
 
-    public void removeFood(Food food) {
-        dietFoods.dissociate(this, food);
+    public void clearFood() {
+        dietFoods.clear();
+    }
+
+    public Nutrient calculateTotalNutrient() {
+        return dietFoods.calculateTotalNutrient();
     }
 
     @Override

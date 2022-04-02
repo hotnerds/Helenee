@@ -32,10 +32,6 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     ROLE role;
 
-    @OneToMany
-    @JoinColumn(name = "DIET_ID")
-    private List<Diet> dietList;
-
     @Embedded
     private FollowerList followerList;
 

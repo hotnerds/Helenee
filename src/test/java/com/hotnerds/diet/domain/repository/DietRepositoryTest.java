@@ -15,6 +15,7 @@ import org.springframework.test.annotation.Rollback;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -88,5 +89,31 @@ class DietRepositoryTest {
 
         //then
         assertThat(actualDiet).isEqualTo(diet);
+    }
+
+    @Test
+    @DisplayName("식단의 날짜, 유저로 식단을 조회할 수 있다.")
+    void 식단_날짜_유저로_식단_조회() {
+        //given
+        Diet diet1 = Diet.builder()
+                .mealDate(mealDate)
+                .mealTime(MealTime.BREAKFAST)
+                .user(user)
+                .build();
+
+        Diet diet2 = Diet.builder()
+                .mealDate(mealDate)
+                .mealTime(MealTime.LUNCH)
+                .user(user)
+                .build();
+
+        dietRepository.save(diet1);
+        dietRepository.save(diet2);
+
+        //when
+        List<Diet> diets = dietRepository.findAllByMealDateAndUser(mealDate, user);
+
+        //then
+        assertThat(diets).hasSize(2);
     }
 }

@@ -22,20 +22,24 @@ public class DietFood {
 
     @Id
     @GeneratedValue
-    Long dietFoodId;
+    private Long dietFoodId;
 
     @ManyToOne
     @JoinColumn(name = "diet_id")
-    Diet diet;
+    private Diet diet;
 
     @ManyToOne
     @JoinColumn(name = "food_id")
-    Food food;
+    private Food food;
+
+    @Column(name = "amount")
+    private Long amount;
 
     @Builder
-    public DietFood(Diet diet, Food food) {
+    public DietFood(Diet diet, Food food, Long amount) {
         this.diet = diet;
         this.food = food;
+        this.amount = amount;
     }
 
     @Override

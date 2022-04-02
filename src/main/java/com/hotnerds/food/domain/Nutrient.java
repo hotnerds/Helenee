@@ -32,4 +32,22 @@ public class Nutrient {
         this.protein = protein;
         this.fat = fat;
     }
+
+    public Nutrient plus(Nutrient nutrient) {
+        return Nutrient.builder()
+                .calories(this.calories + nutrient.getCalories())
+                .carbs(this.carbs + nutrient.getCarbs())
+                .protein(this.protein + nutrient.getProtein())
+                .fat(this.fat + nutrient.getFat())
+                .build();
+    }
+
+    public Nutrient multiply(Double value) {
+        return Nutrient.builder()
+                .calories(this.calories * value)
+                .carbs(this.carbs * value)
+                .protein(this.protein * value)
+                .fat(this.fat * value)
+                .build();
+    }
 }
