@@ -1,21 +1,19 @@
 package com.hotnerds.common.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.common.security.oauth2.provider.JwtTokenProvider;
 import com.hotnerds.user.domain.repository.UserRepository;
-import com.nimbusds.jose.util.StandardCharset;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,13 +33,14 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
-        Map<String, Object> kakao_account = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+        Map<String, Object> kakao_account = (Map<String, Object>)attributes.get("kakao_account");
 
 
-        String email = String.valueOf((String)kakao_account.get("email"));
+        String email = String.valueOf(kakao_account.get("email"));
 
         userRepository.findByEmail(email).orElseThrow(
-                () -> new AuthenticationCredentialsNotFoundException("회원을 찾지 못하였습니다."));
+                () -> new BusinessException(ErrorCode.AUTHENTICATION_CREDENTIAL_NOT_FOUND));
 
         String token = jwtTokenProvider.createToken(email);
 

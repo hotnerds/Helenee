@@ -53,6 +53,7 @@ public enum ErrorCode {
 
     // Auth
     AUTHENTICATION_EXCEPTION(400, "AU001", "인증 관련 오류가 발생했습니다."),
+    AUTHENTICATION_CREDENTIAL_NOT_FOUND(404, "AU002", "인증이 성공했지만 유저를 찾지 못했습니다."),
 
     //Goal
     GOAL_NOT_FOUND_EXCEPTION(404, "G001", "특정 날짜에 Goal을 찾지 못했습니다.");
