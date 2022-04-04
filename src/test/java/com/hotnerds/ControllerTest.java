@@ -3,6 +3,7 @@ package com.hotnerds;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.hotnerds.common.security.filter.JwtAuthenticationFilter;
+import com.hotnerds.common.security.handler.OAuth2AuthenticationEntryPoint;
 import com.hotnerds.common.security.handler.OAuth2SuccessHandler;
 import com.hotnerds.common.security.oauth2.provider.JwtTokenProvider;
 import com.hotnerds.common.security.oauth2.resolver.AuthenticatedUserMethodArgumentResolver;
@@ -48,6 +49,9 @@ public class ControllerTest {
 
     @MockBean
     OAuth2SuccessHandler oAuth2SuccessHandler;
+
+    @MockBean
+    OAuth2AuthenticationEntryPoint oAuth2AuthenticationEntryPoint;
 
     protected MockMvc mockMvc;
 

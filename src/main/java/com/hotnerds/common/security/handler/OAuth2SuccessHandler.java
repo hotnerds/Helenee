@@ -1,7 +1,6 @@
 package com.hotnerds.common.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.common.security.oauth2.provider.JwtTokenProvider;
 import com.hotnerds.user.domain.repository.UserRepository;
@@ -9,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -40,7 +40,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String email = String.valueOf(kakao_account.get("email"));
 
         userRepository.findByEmail(email).orElseThrow(
-                () -> new BusinessException(ErrorCode.AUTHENTICATION_CREDENTIAL_NOT_FOUND));
+                () -> new AuthenticationCredentialsNotFoundException(ErrorCode.AUTHENTICATION_CREDENTIAL_NOT_FOUND.getMessage()));
 
         String token = jwtTokenProvider.createToken(email);
 
