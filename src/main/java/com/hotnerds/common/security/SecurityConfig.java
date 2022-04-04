@@ -3,7 +3,6 @@ package com.hotnerds.common.security;
 import com.hotnerds.common.security.filter.JwtAuthenticationFilter;
 import com.hotnerds.common.security.handler.OAuth2AuthenticationEntryPoint;
 import com.hotnerds.common.security.handler.OAuth2SuccessHandler;
-import com.hotnerds.common.security.oauth2.provider.JwtTokenProvider;
 import com.hotnerds.common.security.oauth2.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +19,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuthSuccessHandler;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final OAuth2AuthenticationEntryPoint authenticationEntryPoint;
 
 
@@ -44,7 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .successHandler(oAuthSuccessHandler)
                 .and()
-                    .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), OAuth2LoginAuthenticationFilter.class);
+                    .addFilterBefore(jwtAuthenticationFilter, OAuth2LoginAuthenticationFilter.class);
 
     }
 
