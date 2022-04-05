@@ -4,9 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.ArrayList;
@@ -30,6 +28,10 @@ public class ErrorResponse {
         return new ErrorResponse(code);
     }
 
+    public static ErrorResponse of(final ErrorCode code, final String message) {
+        return new ErrorResponse(code, message);
+    }
+
     public static ErrorResponse of(final ErrorCode code, final List<FieldError> errors) {
         return new ErrorResponse(code, errors);
     }
@@ -37,7 +39,7 @@ public class ErrorResponse {
     public static ErrorResponse of(MethodArgumentTypeMismatchException e) {
         final String value = e.getValue() == null ? "" : e.getValue().toString();
         List<FieldError> errors = FieldError.of(e.getName(), value, e.getMessage());
-        return new ErrorResponse(ErrorCode.INVALID_TYPE_VALUE, errors);
+        return new ErrorResponse(ErrorCode.INVALID_TYPE_VALUE_EXCEPTION, errors);
     }
 
 
@@ -50,6 +52,13 @@ public class ErrorResponse {
 
     public ErrorResponse(final ErrorCode code) {
         this.message = code.getMessage();
+        this.status = code.getStatus();
+        this.errors = new ArrayList<>();
+        this.code = code.getCode();
+    }
+
+    public ErrorResponse(final ErrorCode code, final String message) {
+        this.message = message;
         this.status = code.getStatus();
         this.errors = new ArrayList<>();
         this.code = code.getCode();

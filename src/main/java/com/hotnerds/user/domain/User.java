@@ -1,6 +1,7 @@
 package com.hotnerds.user.domain;
 
 import com.hotnerds.common.BaseTimeEntity;
+import com.hotnerds.common.security.oauth2.service.AuthProvider;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.user.domain.dto.UserUpdateReqDto;
 import com.hotnerds.user.domain.goal.Goal;
@@ -31,6 +32,9 @@ public class User extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     ROLE role;
+
+    @Enumerated(EnumType.STRING)
+    AuthProvider provider;
 
     @Embedded
     private FollowerList followerList;
@@ -87,10 +91,18 @@ public class User extends BaseTimeEntity {
         return this.getFollowerList().isFollowedBy(follower);
     }
 
-    public User(String username, String email, ROLE role) {
+    public User(String username, String email, ROLE role, AuthProvider provider) {
         this.username = username;
         this.email = email;
         this.role = role;
+        this.provider = provider;
+        this.followerList = new FollowerList();
+        this.followedList = new FollowedList();
+        this.goals = Goals.empty();
+    }
+
+    public User(String username, String email, ROLE role) {
+        this(username, email, role, null);
     }
 
     public String getRoleKey() {
@@ -105,6 +117,10 @@ public class User extends BaseTimeEntity {
 
     public void addOrChangeGoal(Goal goal) {
         goals.addOrChangeGoal(goal);
+    }
+
+    public String getRegistrationId() {
+        return this.provider.getRegistrationId();
     }
 
     public Goal getGoalOfUser(LocalDate date) {

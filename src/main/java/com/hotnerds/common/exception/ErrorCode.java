@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+
 @RequiredArgsConstructor
 @Getter
 //enum 자체를 object 형태로 반환.
@@ -11,10 +13,11 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorCode {
 
     // Common
-    INVALID_INPUT_VALUE(400, "C001", "유효하지 않은 입력입니다."),
-    INTERNAL_SERVER_ERROR(500, "C002", "서버에 문제가 있습니다."),
-    METHOD_NOT_ALLOWED(405, "C003", "허용된 메서드가 아닙니다."),
-    INVALID_TYPE_VALUE(400, "C004", "타입이 유효하지 않습니다"),
+    EXCEPTION(500, "C000", "오류가 발생했습니다."),
+    INVALID_INPUT_VALUE_EXCEPTION(400, "C001", "유효하지 않은 입력입니다."),
+    INTERNAL_SERVER_ERROR_EXCEPTION(500, "C002", "서버에 문제가 있습니다."),
+    METHOD_NOT_ALLOWED_EXCEPTION(405, "C003", "허용된 메서드가 아닙니다."),
+    INVALID_TYPE_VALUE_EXCEPTION(400, "C004", "타입이 유효하지 않습니다"),
 
     // Post
     POST_NOT_FOUND_EXCEPTION(404, "P001", "해당하는 게시물을 찾을 수 없습니다."),
@@ -53,6 +56,9 @@ public enum ErrorCode {
 
     // Auth
     AUTHENTICATION_EXCEPTION(400, "AU001", "인증 관련 오류가 발생했습니다."),
+    AUTHENTICATION_CREDENTIAL_NOT_FOUND(404, "AU002", "인증이 성공했지만 유저를 찾지 못했습니다."),
+    AUTHENTICATION_PROVIDER_NOT_FOUND(404, "AU003", "지원하는 Auth Provider가 아닙니다."),
+    AUTHENTICATION_UNAUTHORIZED_EXCEPTION(401, "AU004", "잘못된 인증 요청입니다."),
 
     //Goal
     GOAL_NOT_FOUND_EXCEPTION(404, "G001", "특정 날짜에 Goal을 찾지 못했습니다.");

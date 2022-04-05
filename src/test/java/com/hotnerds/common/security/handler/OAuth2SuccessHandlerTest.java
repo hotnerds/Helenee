@@ -1,6 +1,7 @@
 package com.hotnerds.common.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.common.security.oauth2.provider.JwtTokenProvider;
 import com.hotnerds.user.domain.ROLE;
 import com.hotnerds.user.domain.User;
@@ -95,7 +96,7 @@ class OAuth2SuccessHandlerTest {
         //when then
         assertThatThrownBy(() -> oAuth2SuccessHandler.onAuthenticationSuccess(request, response, authentication))
                 .isInstanceOf(AuthenticationCredentialsNotFoundException.class)
-                .hasMessage("회원을 찾지 못하였습니다.");
+                .hasMessage(ErrorCode.AUTHENTICATION_CREDENTIAL_NOT_FOUND.getMessage());
     }
 
     @DisplayName("인증 성공 후 정상적으로 토큰을 발급한다.")

@@ -1,5 +1,6 @@
 package com.hotnerds.common.security.oauth2.resolver;
 
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.common.security.oauth2.annotation.Authenticated;
 import com.hotnerds.common.security.oauth2.service.AuthenticatedUser;
 import com.hotnerds.user.domain.User;
@@ -29,10 +30,10 @@ public class AuthenticatedUserMethodArgumentResolver implements HandlerMethodArg
     @Override
     public AuthenticatedUser resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        String email = (String) authentication.getPrincipal().getAttributes().get("email");
+        String email = String.valueOf(authentication.getPrincipal().getAttributes().get("email"));
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("회원을 찾지 못하였습니다."));
+                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException(ErrorCode.AUTHENTICATION_CREDENTIAL_NOT_FOUND.getMessage()));
 
         return AuthenticatedUser.of(user);
     }

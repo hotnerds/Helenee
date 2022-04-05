@@ -1,25 +1,16 @@
 package com.hotnerds.common.security;
 
 import com.hotnerds.common.security.filter.JwtAuthenticationFilter;
+import com.hotnerds.common.security.handler.OAuth2AuthenticationEntryPoint;
 import com.hotnerds.common.security.handler.OAuth2SuccessHandler;
-import com.hotnerds.common.security.oauth2.provider.CustomOAuth2Provider;
-import com.hotnerds.common.security.oauth2.provider.JwtTokenProvider;
 import com.hotnerds.common.security.oauth2.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
@@ -28,8 +19,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuthSuccessHandler;
-    private final JwtTokenProvider jwtTokenProvider;
-
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final OAuth2AuthenticationEntryPoint authenticationEntryPoint;
 
 
     @Override
@@ -39,6 +30,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().disable()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                 .and()
                 .authorizeRequests()
                     .antMatchers("/", "/oauth/**").permitAll()
@@ -50,7 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .successHandler(oAuthSuccessHandler)
                 .and()
-                    .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), OAuth2LoginAuthenticationFilter.class);
+                    .addFilterBefore(jwtAuthenticationFilter, OAuth2LoginAuthenticationFilter.class);
 
     }
 

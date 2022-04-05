@@ -7,18 +7,20 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 
 import java.util.function.Function;
 
+import static org.springframework.security.oauth2.core.ClientAuthenticationMethod.*;
+
 public enum CustomOAuth2Provider {
     KAKAO {
         @Override
         public ClientRegistration.Builder getBuilder(String registrationId) {
-            ClientRegistration.Builder builder = getBuilder(registrationId, org.springframework.security.oauth2.core.ClientAuthenticationMethod.CLIENT_SECRET_POST,
+            ClientRegistration.Builder builder = getBuilder(registrationId, CLIENT_SECRET_POST,
                     DEFAULT_LOGIN_REDIRECT_URL)
-                    .scope("profile_nickname", "account_email")
+                    .scope(SCOPE)
                     .authorizationUri(AUTHORIZATION_URI)
                     .tokenUri(TOKEN_URI)
                     .userInfoUri(USER_INFO_URI)
-                    .userNameAttributeName("id")
-                    .clientName("Kakao");
+                    .userNameAttributeName(USER_NAME_ATTRIBUTE_NAME)
+                    .clientName(CLIENT_NAME);
 
             return builder;
 
@@ -39,6 +41,9 @@ public enum CustomOAuth2Provider {
     private static final String AUTHORIZATION_URI = "https://kauth.kakao.com/oauth/authorize";
     private static final String TOKEN_URI = "https://kauth.kakao.com/oauth/token";
     private static final String USER_INFO_URI = "https://kapi.kakao.com/v2/user/me";
+    private static final String[] SCOPE = {"profile_nickname", "account_email"};
+    private static final String USER_NAME_ATTRIBUTE_NAME = "id";
+    private static final String CLIENT_NAME = "Kakao";
 
     public abstract ClientRegistration.Builder getBuilder(String registrationId);
 }

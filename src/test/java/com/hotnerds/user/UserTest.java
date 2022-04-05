@@ -2,6 +2,8 @@ package com.hotnerds.user;
 
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
+import com.hotnerds.common.security.oauth2.service.AuthProvider;
+import com.hotnerds.user.domain.ROLE;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.goal.Goal;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,5 +76,13 @@ class UserTest {
                 .extracting("errorCode")
                 .usingRecursiveComparison()
                 .isEqualTo(ErrorCode.GOAL_NOT_FOUND_EXCEPTION);
+    }
+
+    @DisplayName("사용자는 가입한 플랫폼의 정보를 가질 수 있다.")
+    @Test
+    void 플랫폼_정보_조회() {
+        User newUser = new User("garam", "kgr4163@gmail.com", ROLE.USER, AuthProvider.KAKAO);
+
+        assertThat(newUser.getRegistrationId()).isEqualTo(AuthProvider.KAKAO.getRegistrationId());
     }
 }

@@ -2,6 +2,7 @@ package com.hotnerds.common;
 
 import com.hotnerds.common.security.oauth2.provider.CustomOAuth2Provider;
 import com.hotnerds.common.security.oauth2.resolver.AuthenticatedUserMethodArgumentResolver;
+import com.hotnerds.common.security.oauth2.service.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -33,7 +34,7 @@ public class OAuth2Config implements WebMvcConfigurer {
             @Value("${spring.security.oauth2.client.registration.kakao.clientId}") String kakaoClientId) {
         List<ClientRegistration> registrations = new ArrayList<>();
 
-        registrations.add(CustomOAuth2Provider.KAKAO.getBuilder("kakao")
+        registrations.add(CustomOAuth2Provider.KAKAO.getBuilder(AuthProvider.KAKAO.getRegistrationId())
                 .clientId(kakaoClientId)
                 //.clientSecret(kakaoClientSecret)
                 .build()); // 카카오는 JWT, JWK 방식으로 주고 받지 않으므로 jwtUri설정 안함.

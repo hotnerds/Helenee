@@ -1,5 +1,7 @@
 package com.hotnerds.common.security.oauth2.provider;
 
+import com.hotnerds.common.exception.ErrorCode;
+import com.hotnerds.common.security.oauth2.service.AuthProvider;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import io.jsonwebtoken.*;
@@ -50,26 +52,25 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String getPayload(String token) {
-         return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+   public String getPayload(String token) {
+            return Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
     }
 
     public Authentication getAuthentication(String token) {
         String payload = getPayload(token);
         User user = userRepository.findByEmail(payload).orElseThrow(
-                () -> new AuthenticationCredentialsNotFoundException(
-                        "credential error: 존재하지 않은 회원입니다."));
-
+                () -> new AuthenticationCredentialsNotFoundException(ErrorCode.AUTHENTICATION_CREDENTIAL_NOT_FOUND.getMessage()));
+;
         Map<String, Object> attributes = getAttributes(user);
 
         DefaultOAuth2User oAuth2User = new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority(user.getRoleKey())), attributes, "id");
 
-        return new OAuth2AuthenticationToken(oAuth2User,oAuth2User.getAuthorities() ,"kakao");
+        return new OAuth2AuthenticationToken(oAuth2User,oAuth2User.getAuthorities() , AuthProvider.KAKAO.getRegistrationId());
     }
 
     public Map<String, Object> getAttributes(User user) {
@@ -92,7 +93,7 @@ public class JwtTokenProvider {
 
             return !claims.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
-            throw new AuthenticationCredentialsNotFoundException("유효하지 않은 토큰 입니다.");
+            throw new AuthenticationCredentialsNotFoundException(e.getMessage());
         }
     }
 
