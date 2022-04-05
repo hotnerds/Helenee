@@ -124,6 +124,7 @@ operation::users/update[snippets='path-parameters,request-fields,curl-request,ht
 [[resources_comments]]
 == 댓글
 
+
 [[resources_comments_get]]
 === 특정 게시글에 대한 댓글 조회
 
@@ -131,9 +132,26 @@ operation::users/update[snippets='path-parameters,request-fields,curl-request,ht
 
 operation::comments/get[snippets='path-parameters,response-fields,curl-request,http-response']
 
+
 [[resources_comments_create]]
 === 새로운 댓글 생성
 
 `POST /api/posts/:postId/comments` 요청을 통해 새로운 댓글을 생성할 수 있다.
 
 operation::comments/create[snippets='path-parameters,request-fields,response-fields,curl-request,http-response']
+
+
+[[resources_comments_delete]]
+== 댓글 삭제
+
+`DELETE /api/posts/:postId/comments/:commentId` 댓글을 삭제할 수 있다.
+
+operation::comments/delete[snippets='path-parameters,curl-request,http-response']
+
+
+[[resources_comments_update]]
+== 댓글 수정
+
+`PATCH /api/posts/:postId/comments/:commentId` 요청을 통해 기존 댓글의 내용을 수정할 수 있다.
+
+operation::comments/update[snippets='path-parameters,request-fields,response-fields,curl-request,http-response']

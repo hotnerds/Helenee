@@ -108,7 +108,7 @@ class CommentControllerTest extends ControllerTest {
         when(commentService.addComment(any(CommentCreateReqDto.class))).thenReturn(comment);
 
         // when then
-        mockMvc.perform(post("/api/posts/{post_id}/comments", 1L)
+        mockMvc.perform(post("/api/posts/{postId}/comments", 1L)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(reqDto)))
                 .andExpect(status().isOk())
@@ -116,7 +116,7 @@ class CommentControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.content").value(comment.getContent()))
                 .andDo(document("comments/create",
                         pathParameters(
-                                parameterWithName("post_id").description("게시글ID")
+                                parameterWithName("postId").description("게시글ID")
                         ),
                         requestFields(
                                 fieldWithPath("userId").type(JsonFieldType.NUMBER).description("유저ID"),
@@ -141,8 +141,14 @@ class CommentControllerTest extends ControllerTest {
         // given
 
         // when then
-        mockMvc.perform(delete("/api/posts/1/comments/1"))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/posts/{postId}/comments/{commentId}", 1L, 1L))
+                .andExpect(status().isNoContent())
+                .andDo(document("comments/delete",
+                        pathParameters(
+                                parameterWithName("postId").description("게시글ID"),
+                                parameterWithName("commentId").description("댓글ID")
+                        )
+                ));
         verify(commentService, times(1)).deleteComment(any(CommentDeleteReqDto.class), any());
     }
 
@@ -151,10 +157,6 @@ class CommentControllerTest extends ControllerTest {
     @WithCustomMockUser
     void 댓글_수정_API() throws Exception {
         // given
-        String NEW_TEXT = TEXT + TEXT;
-        User user = new User("user", "email", ROLE.USER);
-        Post post = new Post("title", TEXT, user);
-        Comment comment = new Comment(1L, user, post, NEW_TEXT);
         CommentUpdateReqDto reqDto = CommentUpdateReqDto.builder()
                 .postId(1L)
                 .commentId(1L)
@@ -163,12 +165,30 @@ class CommentControllerTest extends ControllerTest {
         when(commentService.updateComment(any(CommentUpdateReqDto.class), any())).thenReturn(comment); // userId에 anyLong을 주면 user.getId()에서 예외가 발생해서 any()로 넣음
 
         // when then
-        mockMvc.perform(patch("/api/posts/1/comments/1")
+        mockMvc.perform(patch("/api/posts/{postId}/comments/{commentId}", 1L, 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(reqDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.commentId").value(comment.getId()))
-                .andExpect(jsonPath("$.content").value(comment.getContent()));
+                .andExpect(jsonPath("$.content").value(comment.getContent()))
+                .andDo(document("comments/update",
+                        pathParameters(
+                                parameterWithName("postId").description("게시글ID"),
+                                parameterWithName("commentId").description("댓글ID")
+                        ),
+                        requestFields(
+                                fieldWithPath("postId").type(JsonFieldType.NUMBER).description("게시글ID"),
+                                fieldWithPath("commentId").type(JsonFieldType.NUMBER).description("게시글ID"),
+                                fieldWithPath("content").type(JsonFieldType.STRING).description("수정 후 댓글 내용")
+                        ),
+                        responseFields(
+                                fieldWithPath("commentId").type(JsonFieldType.NUMBER).description("조회된 댓글ID"),
+                                fieldWithPath("userId").type(JsonFieldType.NUMBER).description("작성자ID"),
+                                fieldWithPath("postId").type(JsonFieldType.NUMBER).description("게시글ID"),
+                                fieldWithPath("content").type(JsonFieldType.STRING).description("수정된 내용"),
+                                fieldWithPath("createdAt").type(JsonFieldType.STRING).description("생성 시간")
+                        )
+                ));
         verify(commentService, times(1)).updateComment(any(CommentUpdateReqDto.class), any());
     }
 
