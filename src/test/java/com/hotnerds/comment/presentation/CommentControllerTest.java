@@ -13,13 +13,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,6 +35,35 @@ class CommentControllerTest extends ControllerTest {
     private CommentService commentService;
 
     final static String TEXT = "An apple a day keeps the doctor away";
+
+    @DisplayName("GET /api/comment 요청을 보내면 특정 게시글의 댓글을 페이징해서 반환한다")
+    @Test
+    @WithCustomMockUser
+    void 댓글_조회_API() throws Exception {
+        // given
+        String NEW_TEXT = TEXT + TEXT;
+        User user = new User("user", "email", ROLE.USER);
+        Post post = new Post("title", TEXT, user);
+        Comment comment = new Comment(1L, user, post, TEXT);
+        Comment comment2 = new Comment(1L, user, post, NEW_TEXT);
+
+        int page = 0;
+        int size = 10;
+
+        List<CommentResponseDto> response = List.of(
+                CommentResponseDto.of(comment),
+                CommentResponseDto.of(comment2)
+        );
+        when(commentService.getComments(any(CommentByPostReqDto.class))).thenReturn(response);
+
+        // when
+        MvcResult result = mockMvc.perform(get("/api/posts/1/comments?&page=" + page +"&size=" + size))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].content").value(TEXT))
+                .andExpect(jsonPath("$[1].content").value(NEW_TEXT))
+                .andReturn();
+        verify(commentService, times(1)).getComments(any(CommentByPostReqDto.class));
+    }
 
     @DisplayName("POST /api/posts/{post_id}/comments 요청을 보내면 DB에 새로운 댓글이 생성된다")
     @Test
@@ -49,12 +83,29 @@ class CommentControllerTest extends ControllerTest {
         when(commentService.addComment(any(CommentCreateReqDto.class))).thenReturn(comment);
 
         // when then
-        mockMvc.perform(post("/api/posts/1/comments")
+        mockMvc.perform(post("/api/posts/{post_id}/comments", 1L)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(reqDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.commentId").value(comment.getId()))
-                .andExpect(jsonPath("$.content").value(comment.getContent()));
+                .andExpect(jsonPath("$.content").value(comment.getContent()))
+                .andDo(document("comments/create",
+                        pathParameters(
+                                parameterWithName("post_id").description("게시글ID")
+                        ),
+                        requestFields(
+                                fieldWithPath("userId").description("유저ID"),
+                                fieldWithPath("postId").description("게시글ID"),
+                                fieldWithPath("content").description("댓글 내용")
+                        ),
+                        responseFields(
+                                fieldWithPath("commentId").description("새로 생성된 댓글ID"),
+                                fieldWithPath("userId").description("작성자ID"),
+                                fieldWithPath("postId").description("게시글ID"),
+                                fieldWithPath("content").description("댓글 내용"),
+                                fieldWithPath("createdAt").description("생성 시간")
+                        )
+                ));
         verify(commentService, times(1)).addComment(any(CommentCreateReqDto.class));
     }
 
@@ -94,35 +145,6 @@ class CommentControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.commentId").value(comment.getId()))
                 .andExpect(jsonPath("$.content").value(comment.getContent()));
         verify(commentService, times(1)).updateComment(any(CommentUpdateReqDto.class), any());
-    }
-
-    @DisplayName("GET /api/comment 요청을 보내면 특정 게시글의 댓글을 페이징해서 반환한다")
-    @Test
-    @WithCustomMockUser
-    void 댓글_조회_API() throws Exception {
-        // given
-        String NEW_TEXT = TEXT + TEXT;
-        User user = new User("user", "email", ROLE.USER);
-        Post post = new Post("title", TEXT, user);
-        Comment comment = new Comment(1L, user, post, TEXT);
-        Comment comment2 = new Comment(1L, user, post, NEW_TEXT);
-
-        int page = 0;
-        int size = 10;
-
-        List<CommentResponseDto> response = List.of(
-                CommentResponseDto.of(comment),
-                CommentResponseDto.of(comment2)
-        );
-        when(commentService.getComments(any(CommentByPostReqDto.class))).thenReturn(response);
-
-        // when
-        MvcResult result = mockMvc.perform(get("/api/posts/1/comments?&page=" + page +"&size=" + size))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].content").value(TEXT))
-                .andExpect(jsonPath("$[1].content").value(NEW_TEXT))
-                .andReturn();
-        verify(commentService, times(1)).getComments(any(CommentByPostReqDto.class));
     }
 
 }

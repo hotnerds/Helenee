@@ -80,10 +80,10 @@ use of HTTP status codes.
 [[resources_users]]
 == Users
 
-[[resources_uers_list]]
+[[resources_users_list]]
 === Getting a list of users
 
-`GET` 요청을 통해 모든 유저의 정보를 가져올 수 있다.
+`GET /api/users` 요청을 통해 모든 유저의 정보를 가져올 수 있다.
 
 operation::users/getAll[snippets='curl-request,http-response']
 
@@ -91,7 +91,7 @@ operation::users/getAll[snippets='curl-request,http-response']
 [[resources_users_list]]
 === Getting a user
 
-`GET/\{user_id\}` 요청을 통해 하나의 유저에 대한 정보를 가져올 수 있다.
+`GET /api/users/\{userid\}` 요청을 통해 하나의 유저에 대한 정보를 가져올 수 있다.
 
 operation::users/getOne[snippets='path-parameters,response-fields,curl-request,http-response']
 
@@ -99,7 +99,7 @@ operation::users/getOne[snippets='path-parameters,response-fields,curl-request,h
 [[resources_users_create]]
 === Creating a user
 
-`POST` 요청을 통해 새로운 유저를 등록할 수 있다.
+`POST /api/users` 요청을 통해 새로운 유저를 등록할 수 있다.
 
 operation::users/create[snippets='request-fields,curl-request,http-response']
 
@@ -107,7 +107,7 @@ operation::users/create[snippets='request-fields,curl-request,http-response']
 [[resources_users_delete]]
 === Deleting a user
 
-`DELETE/\{user-id\}` 요청을 통해 새로운 유저를 등록할 수 있다.
+`DELETE /api/users/\{userid\}` 요청을 통해 새로운 유저를 등록할 수 있다.
 
 operation::users/delete[snippets='path-parameters,curl-request,http-response']
 
@@ -115,6 +115,25 @@ operation::users/delete[snippets='path-parameters,curl-request,http-response']
 [[resources_users_update]]
 === Updating user data
 
-`PATCH/\{user-id\}` 요청을 통해 새로운 유저를 등록할 수 있다.
+`PATCH /api/users/\{userid\}` 요청을 통해 새로운 유저를 등록할 수 있다.
 
 operation::users/update[snippets='path-parameters,request-fields,curl-request,http-response']
+
+
+
+[[resources_comments]]
+== 댓글
+
+[[resources_comments_get]]
+=== 특정 게시글에 대한 댓글 조회
+
+`POST /api/posts/\{postid\}/comments` 요청을 통해 새로운 댓글을 생성할 수 있다.
+
+operation::comments/get[snippets='request-fields,response-fields,curl-request,http-response']
+
+[[resources_comments_create]]
+=== 새로운 댓글 생성
+
+`POST /api/posts/\{postid\}/comments` 요청을 통해 새로운 댓글을 생성할 수 있다.
+
+operation::comments/create[snippets='path-parameters,request-fields,response-fields,curl-request,http-response']
