@@ -2,17 +2,14 @@ package com.hotnerds.post.domain;
 
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
-import com.hotnerds.post.domain.like.Like;
 import com.hotnerds.tag.domain.Tag;
 import com.hotnerds.user.domain.User;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 class PostTest {
 
