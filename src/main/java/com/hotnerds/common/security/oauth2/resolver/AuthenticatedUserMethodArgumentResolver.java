@@ -24,7 +24,7 @@ public class AuthenticatedUserMethodArgumentResolver implements HandlerMethodArg
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(Authenticated.class) &&
-                User.class.isAssignableFrom(parameter.getParameterType());
+                AuthenticatedUser.class.isAssignableFrom(parameter.getParameterType());
     }
 
     @Override
