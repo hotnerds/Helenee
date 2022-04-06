@@ -25,7 +25,7 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
 
         Map<String, Object> attributes = new HashMap<>();
         attributes.put(USER_EMAIL, annotation.getEmail());
-        attributes.put(NAME_ATTRIBUTE_KEY, "1L");
+        attributes.put(NAME_ATTRIBUTE_KEY, annotation.getNameAttributeKey());
 
         DefaultOAuth2User oAuth2User = new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority(ROLE.USER.getKey())), attributes,
                 annotation.getNameAttributeKey());
