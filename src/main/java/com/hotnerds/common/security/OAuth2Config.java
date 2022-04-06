@@ -1,4 +1,4 @@
-package com.hotnerds.common;
+package com.hotnerds.common.security;
 
 import com.hotnerds.common.security.oauth2.provider.CustomOAuth2Provider;
 import com.hotnerds.common.security.oauth2.resolver.AuthenticatedUserMethodArgumentResolver;

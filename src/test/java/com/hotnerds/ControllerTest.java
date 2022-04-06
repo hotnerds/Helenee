@@ -14,6 +14,7 @@ import com.hotnerds.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -28,6 +29,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
+@ComponentScan(basePackages = "com.hotnerds.common.security")
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 public class ControllerTest {
 
@@ -38,45 +40,23 @@ public class ControllerTest {
     @MockBean
     protected UserRepository userRepository;
 
-    @MockBean
-    protected JwtTokenProvider jwtTokenProvider;
-
-    @MockBean
-    AuthenticatedUserMethodArgumentResolver resolver;
-
-    @MockBean
-    CustomOAuth2UserService customOAuth2UserService;
-
-    @MockBean
-    OAuth2SuccessHandler oAuth2SuccessHandler;
-
-    @MockBean
-    OAuth2AuthenticationEntryPoint oAuth2AuthenticationEntryPoint;
 
     protected MockMvc mockMvc;
 
     protected ObjectMapper objectMapper;
 
-    @BeforeEach
-    protected void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) throws Exception {
-        JwtAuthenticationFilter jwtAuthenticationFilter = (JwtAuthenticationFilter) webApplicationContext.getBean("jwtAuthenticationFilter");
+        @BeforeEach
+        protected void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) throws Exception {
+            JwtAuthenticationFilter jwtAuthenticationFilter = (JwtAuthenticationFilter) webApplicationContext.getBean("jwtAuthenticationFilter");
 
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .addFilter(new CharacterEncodingFilter("UTF-8", true))
-                .addFilter(jwtAuthenticationFilter)
-                .apply(springSecurity())
-                .apply(documentationConfiguration(restDocumentation))
-                .alwaysDo(print())
-                .build();
+            mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                    .addFilter(new CharacterEncodingFilter("UTF-8", true))
+                    .addFilter(jwtAuthenticationFilter)
+                    .apply(springSecurity())
+                    .apply(documentationConfiguration(restDocumentation))
+                    .alwaysDo(print())
+                    .build();
 
-        objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-
-        User user = User.builder()
-                .email(USER_EMAIL)
-                .username("garamkim")
-                .build();
-
-        when(resolver.supportsParameter(any())).thenReturn(true);
-        when(resolver.resolveArgument(any(), any(), any(), any())).thenReturn(AuthenticatedUser.of(user));
+            objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     }
 }
