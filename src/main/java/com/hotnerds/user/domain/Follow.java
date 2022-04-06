@@ -3,6 +3,7 @@ package com.hotnerds.user.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -39,10 +40,6 @@ public class Follow {
 
     @Override
     public int hashCode() {
-        final int PRIME = 31;
-        int hashCode = 1;
-        hashCode = PRIME * hashCode + getFollower().hashCode();
-        hashCode = PRIME * hashCode + getFollowed().hashCode();
-        return hashCode;
+        return Objects.hash(this.follower, this.followed);
     }
 }
