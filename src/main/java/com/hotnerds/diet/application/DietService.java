@@ -5,9 +5,10 @@ import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
-import com.hotnerds.diet.domain.dto.DietRequestByDateDto;
-import com.hotnerds.diet.domain.dto.DietSaveFoodRequestDto;
 import com.hotnerds.diet.domain.dto.DietReadRequestDto;
+import com.hotnerds.diet.domain.dto.DietRequestByDateDto;
+import com.hotnerds.diet.domain.dto.DietResponseDto;
+import com.hotnerds.diet.domain.dto.DietSaveFoodRequestDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
 import com.hotnerds.food.application.FoodService;
 import com.hotnerds.user.domain.User;
@@ -30,12 +31,14 @@ public class DietService {
 
     private final DietRepository dietRepository;
 
-    public Diet findByMealDateAndMealTimeAndUser(DietReadRequestDto requestDto, Long userId) {
+    public DietResponseDto find(DietReadRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        return dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(), requestDto.getMealTime(), user)
-                .orElseThrow(() -> new BusinessException(ErrorCode.DIET_NOT_FOUND_EXCEPTION));
+        return DietResponseDto.of(
+                dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(), requestDto.getMealTime(), user)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.DIET_NOT_FOUND_EXCEPTION))
+        );
     }
 
     public List<Diet> searchByDate(DietRequestByDateDto requestDto, Long userId) {

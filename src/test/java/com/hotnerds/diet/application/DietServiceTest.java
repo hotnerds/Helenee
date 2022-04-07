@@ -4,9 +4,10 @@ import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
-import com.hotnerds.diet.domain.dto.DietRequestByDateDto;
-import com.hotnerds.diet.domain.dto.DietSaveFoodRequestDto;
 import com.hotnerds.diet.domain.dto.DietReadRequestDto;
+import com.hotnerds.diet.domain.dto.DietRequestByDateDto;
+import com.hotnerds.diet.domain.dto.DietResponseDto;
+import com.hotnerds.diet.domain.dto.DietSaveFoodRequestDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
 import com.hotnerds.food.application.FoodService;
 import com.hotnerds.food.domain.Food;
@@ -86,7 +87,7 @@ class DietServiceTest {
 
         //when then
         assertThatThrownBy(
-                () -> dietService.findByMealDateAndMealTimeAndUser(requestDto, 1L))
+                () -> dietService.find(requestDto, 1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.DIET_NOT_FOUND_EXCEPTION.getMessage());
         verify(userRepository, times(1)).findById(1L);
@@ -108,7 +109,7 @@ class DietServiceTest {
 
         //when then
         assertThatThrownBy(
-                () -> dietService.findByMealDateAndMealTimeAndUser(requestDto, 1L))
+                () -> dietService.find(requestDto, 1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
         verify(userRepository, times(1)).findById(1L);
@@ -136,12 +137,13 @@ class DietServiceTest {
         when(dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
                 requestDto.getMealTime(),
                 user)).thenReturn(Optional.of(expectedDiet));
-      
+
         //when
-        Diet actualDiet = dietService.findByMealDateAndMealTimeAndUser(requestDto, 1L);
+        DietResponseDto actualDiet = dietService.find(requestDto, 1L);
 
         //then
-        assertThat(actualDiet).isEqualTo(expectedDiet);
+        assertThat(actualDiet.getMealDate()).isEqualTo(mealDate);
+        assertThat(actualDiet.getMealTime().getKey()).isEqualTo("BREAKFAST");
         verify(userRepository, times(1)).findById(1L);
         verify(dietRepository, times(1)).findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
                 requestDto.getMealTime(),
@@ -167,7 +169,6 @@ class DietServiceTest {
                 return invocation.getArgument(0);
             }
         });
-
 
 
         //when

@@ -142,7 +142,7 @@ operation::comments/create[snippets='path-parameters,request-fields,response-fie
 
 
 [[resources_comments_delete]]
-== 댓글 삭제
+=== 댓글 삭제
 
 `DELETE /api/posts/:postId/comments/:commentId` 댓글을 삭제할 수 있다.
 
@@ -150,7 +150,7 @@ operation::comments/delete[snippets='path-parameters,curl-request,http-response'
 
 
 [[resources_comments_update]]
-== 댓글 수정
+=== 댓글 수정
 
 `PATCH /api/posts/:postId/comments/:commentId` 요청을 통해 기존 댓글의 내용을 수정할 수 있다.
 
@@ -223,3 +223,13 @@ operation::follow/get_follower_count[snippets='path-parameters,response-fields,c
 `GET /api/users/:userId/followed` 요청을 통해 userId에 해당하는 유저의 모든 팔로우드 수를 조회할 수 있다.
 
 operation::follow/get_follower_count[snippets='path-parameters,response-fields,curl-request,http-response']
+
+[[resources_diets]]
+== 식단
+
+[[resources_diets_find-unit]]
+=== 단건 조회
+
+식단의 날짜와 식사 시간 코드로 식단을 조회한다.
+
+operation::diets/find-unit[snippets='request-parameters,response-fields,curl-request,http-response']

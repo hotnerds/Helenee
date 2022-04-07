@@ -1,13 +1,15 @@
 package com.hotnerds.diet.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hotnerds.diet.domain.MealTime;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
+import org.apache.tomcat.jni.Local;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-@Getter
+@Data
+@NoArgsConstructor
 public class DietReadRequestDto {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
