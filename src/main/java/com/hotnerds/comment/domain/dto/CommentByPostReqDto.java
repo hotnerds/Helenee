@@ -1,14 +1,21 @@
 package com.hotnerds.comment.domain.dto;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 
 @Getter
-@Builder
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentByPostReqDto {
 
-    private final Long postId;
-    private final PageRequest pageable;
+    private Long postId;
+    private PageRequest pageable;
 
+    @Builder
+    public CommentByPostReqDto(Long postId, PageRequest pageable) {
+        this.postId = postId;
+        this.pageable = pageable;
+    }
 }
