@@ -6,7 +6,6 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Builder
 @Getter
 public class CommentResponseDto {
     private Long commentId;
@@ -14,6 +13,15 @@ public class CommentResponseDto {
     private Long postId;
     private String content;
     private LocalDateTime createdAt;
+
+    @Builder
+    public CommentResponseDto(Long commentId, Long userId, Long postId, String content, LocalDateTime createdAt) {
+        this.commentId = commentId;
+        this.userId = userId;
+        this.postId = postId;
+        this.content = content;
+        this.createdAt = createdAt;
+    }
 
     public static CommentResponseDto of(Comment comment) {
         return CommentResponseDto.builder()
