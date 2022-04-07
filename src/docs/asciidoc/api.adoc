@@ -230,6 +230,13 @@ operation::follow/get_follower_count[snippets='path-parameters,response-fields,c
 [[resources_diets_find-unit]]
 === 단건 조회
 
-식단의 날짜와 식사 시간 코드로 식단을 조회한다.
+식단 ID로 식단을 조회한다.
 
-operation::diets/find-unit[snippets='request-parameters,response-fields,curl-request,http-response']
+operation::diets/find-unit[snippets='path-parameters,response-fields,curl-request,http-response']
+
+[[resources_diets_find-by-date]]
+=== 날짜로 식단 조회
+
+식단 날짜로 식단을 조회한다.
+
+operation::diets/find-by-date[snippets='request-parameters,response-fields,curl-request,http-response']

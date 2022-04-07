@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,11 +39,13 @@ public class DietService {
         );
     }
 
-    public List<Diet> searchByDate(DietRequestByDateDto requestDto, Long userId) {
+    public List<DietResponseDto> searchByDate(DietRequestByDateDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
-
-        return dietRepository.findAllByMealDateAndUser(requestDto.getMealDate(), user);
+        List<Diet> diets = dietRepository.findAllByMealDateAndUser(requestDto.getMealDate(), user);
+        return diets.stream()
+                .map(DietResponseDto::of)
+                .collect(Collectors.toList());
     }
 
     @Transactional

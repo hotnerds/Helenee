@@ -239,7 +239,7 @@ class DietServiceTest {
                 .thenReturn(List.of(diet1, diet2));
 
         //when
-        List<Diet> diets = dietService.searchByDate(requestDto, 1L);
+        List<DietResponseDto> diets = dietService.searchByDate(requestDto, 1L);
 
         //then
         assertThat(diets).hasSize(2);
