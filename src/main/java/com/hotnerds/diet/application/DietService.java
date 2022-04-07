@@ -5,7 +5,6 @@ import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
-import com.hotnerds.diet.domain.dto.DietReadRequestDto;
 import com.hotnerds.diet.domain.dto.DietRequestByDateDto;
 import com.hotnerds.diet.domain.dto.DietResponseDto;
 import com.hotnerds.diet.domain.dto.DietSaveFoodRequestDto;
@@ -49,7 +48,7 @@ public class DietService {
     }
 
     @Transactional
-    public void saveFoods(DietSaveFoodRequestDto requestDto, Long userId) {
+    public DietResponseDto saveFoods(DietSaveFoodRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
@@ -59,6 +58,8 @@ public class DietService {
 
         requestDto.getFoods()
                 .forEach(e -> diet.addFood(foodService.findOrCreate(e.getFoodId()), e.getAmount()));
+
+        return DietResponseDto.of(diet);
     }
 
     @Transactional

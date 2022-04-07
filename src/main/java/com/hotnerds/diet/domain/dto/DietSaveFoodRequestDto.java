@@ -1,5 +1,6 @@
 package com.hotnerds.diet.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hotnerds.diet.domain.MealTime;
 import com.hotnerds.food.domain.dto.FoodRequestDto;
 import lombok.Builder;

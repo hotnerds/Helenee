@@ -240,3 +240,8 @@ operation::diets/find-unit[snippets='path-parameters,response-fields,curl-reques
 식단 날짜로 식단을 조회한다.
 
 operation::diets/find-by-date[snippets='request-parameters,response-fields,curl-request,http-response']
+
+[[resources_diets_save-foods]]
+=== 식단에 음식 저장
+
+operation::diets/save-foods[snippets='request-fields,request-body,curl-request,response-fields,response-body']

@@ -5,12 +5,10 @@ import com.hotnerds.common.security.oauth2.service.AuthenticatedUser;
 import com.hotnerds.diet.application.DietService;
 import com.hotnerds.diet.domain.dto.DietRequestByDateDto;
 import com.hotnerds.diet.domain.dto.DietResponseDto;
+import com.hotnerds.diet.domain.dto.DietSaveFoodRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,6 +34,13 @@ public class DietController {
     public ResponseEntity<List<DietResponseDto>> getDietByMealDate(DietRequestByDateDto requestDto, @Authenticated AuthenticatedUser user) {
         return ResponseEntity.ok(
                 dietService.searchByDate(requestDto, user.getId())
+        );
+    }
+
+    @PostMapping
+    public ResponseEntity<DietResponseDto> saveFoods(DietSaveFoodRequestDto requestDto, @Authenticated AuthenticatedUser user) {
+        return ResponseEntity.ok(
+                dietService.saveFoods(requestDto, user.getId())
         );
     }
 }

@@ -4,7 +4,6 @@ import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
-import com.hotnerds.diet.domain.dto.DietReadRequestDto;
 import com.hotnerds.diet.domain.dto.DietRequestByDateDto;
 import com.hotnerds.diet.domain.dto.DietResponseDto;
 import com.hotnerds.diet.domain.dto.DietSaveFoodRequestDto;
@@ -90,11 +89,6 @@ class DietServiceTest {
     @DisplayName("식단 정보를 조회한다.")
     void 식단_정보_조회() {
         //given
-        DietReadRequestDto requestDto = DietReadRequestDto.builder()
-                .mealDate(mealDate)
-                .mealTime(mealTime)
-                .build();
-
         Diet expectedDiet = Diet.builder()
                 .mealDate(mealDate)
                 .mealTime(mealTime)

@@ -5,8 +5,10 @@ import com.hotnerds.WithCustomMockUser;
 import com.hotnerds.diet.application.DietService;
 import com.hotnerds.diet.domain.dto.DietRequestByDateDto;
 import com.hotnerds.diet.domain.dto.DietResponseDto;
+import com.hotnerds.diet.domain.dto.DietSaveFoodRequestDto;
 import com.hotnerds.diet.domain.dto.MealTimeDto;
 import com.hotnerds.food.domain.Nutrient;
+import com.hotnerds.food.domain.dto.FoodRequestDto;
 import com.hotnerds.food.domain.dto.FoodResponseDto;
 import com.hotnerds.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +31,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -196,5 +199,42 @@ class DietControllerTest extends ControllerTest {
                 ));
         verify(dietService, times(1))
                 .searchByDate(any(DietRequestByDateDto.class), any());
+    }
+
+    @Test
+    @DisplayName("음식 저장 API")
+    @WithCustomMockUser
+    void 음식_저장_API() throws Exception {
+        //given
+        DietSaveFoodRequestDto requestDto = DietSaveFoodRequestDto.builder()
+                .mealDate(LocalDate.of(2022, 4, 5))
+                .mealTime(BREAKFAST)
+                .foods(
+                        List.of(new FoodRequestDto(1L, 2L), new FoodRequestDto(2L, 1L))
+                )
+                .build();
+        when(dietService.saveFoods(any(DietSaveFoodRequestDto.class), any())).thenReturn(diet1);
+
+        //when
+        ResultActions result = mockMvc.perform(post(DEFAULT_URL)
+                .content(objectMapper.writeValueAsString(requestDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        //then
+        result.andExpect(status().isOk())
+                .andDo(document("diets/save-foods",
+                        requestFields(
+                                fieldWithPath("mealDate").description("식단 날짜"),
+                                fieldWithPath("mealTime").description("식사 시간 코드"),
+                                fieldWithPath("foods[]").description("저장할 음식 리스트"),
+                                fieldWithPath("foods[].foodId").description("음식 아이디"),
+                                fieldWithPath("foods[].amount").description("음식량")
+                        ),
+                        responseFields(
+                                dietFields
+                        )
+                ));
     }
 }
