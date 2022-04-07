@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -22,14 +23,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = DietController.class)
@@ -89,24 +88,20 @@ class DietControllerTest extends ControllerTest {
                 )
                 .build();
 
-        when(dietService.find(any(DietReadRequestDto.class), any()))
+        when(dietService.find(anyLong()))
                 .thenReturn(responseDto);
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("mealDate", "2022-04-05");
-        params.add("mealTime", "BREAKFAST");
         //when
         ResultActions result = mockMvc.perform(
-                get(DietController.DEFAULT_URL)
-                        .params(params)
+                get(DietController.DEFAULT_URL + "/{dietId}", 1L)
+                        .accept(MediaType.APPLICATION_JSON)
         );
 
         //then
         result.andExpect(status().isOk())
                 .andDo(document("diets/find-unit",
-                        requestParameters(
-                                parameterWithName("mealDate").description("식단 날짜"),
-                                parameterWithName("mealTime").description("식사 시간 코드")
+                        pathParameters(
+                                parameterWithName("dietId").description("식단 ID")
                         ),
                         responseFields(
                                 fieldWithPath("dietId").description("식단 ID"),

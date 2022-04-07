@@ -75,47 +75,15 @@ class DietServiceTest {
     @DisplayName("존재하지 않는 식단을 조회시 예외가 발생한다.")
     void 존재하지않는_식단_조회시_실패() {
         //given
-        DietReadRequestDto requestDto = DietReadRequestDto.builder()
-                .mealDate(mealDate)
-                .mealTime(mealTime)
-                .build();
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
-                requestDto.getMealTime(),
-                user)).thenReturn(Optional.empty());
+        when(dietRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when then
         assertThatThrownBy(
-                () -> dietService.find(requestDto, 1L))
+                () -> dietService.find(1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.DIET_NOT_FOUND_EXCEPTION.getMessage());
-        verify(userRepository, times(1)).findById(1L);
-        verify(dietRepository, times(1)).findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
-                requestDto.getMealTime(),
-                user);
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 유저의 식단을 조회시 예외가 발생한다.")
-    void 존재하지_않는_유저_식단_조회시_실패() {
-        //given
-        DietReadRequestDto requestDto = DietReadRequestDto.builder()
-                .mealDate(mealDate)
-                .mealTime(mealTime)
-                .build();
-
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        //when then
-        assertThatThrownBy(
-                () -> dietService.find(requestDto, 1L))
-                .isInstanceOf(BusinessException.class)
-                .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
-        verify(userRepository, times(1)).findById(1L);
-        verify(dietRepository, times(0)).findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
-                requestDto.getMealTime(),
-                user);
+        verify(dietRepository, times(1)).findById(1L);
     }
 
     @Test
@@ -133,21 +101,15 @@ class DietServiceTest {
                 .user(user)
                 .build();
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
-                requestDto.getMealTime(),
-                user)).thenReturn(Optional.of(expectedDiet));
+        when(dietRepository.findById(anyLong())).thenReturn(Optional.of(expectedDiet));
 
         //when
-        DietResponseDto actualDiet = dietService.find(requestDto, 1L);
+        DietResponseDto actualDiet = dietService.find(1L);
 
         //then
         assertThat(actualDiet.getMealDate()).isEqualTo(mealDate);
         assertThat(actualDiet.getMealTime().getKey()).isEqualTo("BREAKFAST");
-        verify(userRepository, times(1)).findById(1L);
-        verify(dietRepository, times(1)).findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
-                requestDto.getMealTime(),
-                user);
+        verify(dietRepository, times(1)).findById(1L);
     }
 
     @Test

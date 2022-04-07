@@ -31,12 +31,9 @@ public class DietService {
 
     private final DietRepository dietRepository;
 
-    public DietResponseDto find(DietReadRequestDto requestDto, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
-
+    public DietResponseDto find(Long dietId) {
         return DietResponseDto.of(
-                dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(), requestDto.getMealTime(), user)
+                dietRepository.findById(dietId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.DIET_NOT_FOUND_EXCEPTION))
         );
     }

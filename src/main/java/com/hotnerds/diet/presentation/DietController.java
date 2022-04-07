@@ -8,6 +8,7 @@ import com.hotnerds.diet.domain.dto.DietResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,10 +23,10 @@ public class DietController {
 
     private final DietService dietService;
 
-    @GetMapping
-    public ResponseEntity<DietResponseDto> getDiet(DietReadRequestDto requestDto, @Authenticated AuthenticatedUser user) {
+    @GetMapping("/{dietId}")
+    public ResponseEntity<DietResponseDto> getDiet(@PathVariable Long dietId) {
         return ResponseEntity.ok(
-                dietService.find(requestDto, user.getId())
+                dietService.find(dietId)
         );
     }
 }
