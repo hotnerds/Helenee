@@ -12,7 +12,7 @@ import java.util.Objects;
 @Table(name = "follow")
 public class Follow {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
