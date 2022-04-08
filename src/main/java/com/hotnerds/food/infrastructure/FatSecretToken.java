@@ -1,15 +1,10 @@
-package com.hotnerds.fatsecret;
+package com.hotnerds.food.infrastructure;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.springframework.http.client.BufferingClientHttpRequestFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;

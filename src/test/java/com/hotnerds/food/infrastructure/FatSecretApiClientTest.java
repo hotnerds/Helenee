@@ -1,4 +1,4 @@
-package com.hotnerds.fatsecret.application;
+package com.hotnerds.food.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -8,10 +8,11 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withNoContent;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import com.hotnerds.fatsecret.FatSecretToken;
-import com.hotnerds.fatsecret.TestConfig;
-import com.hotnerds.fatsecret.exception.FatSecretResponseErrorException;
-import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
+import com.hotnerds.food.infrastructure.FatSecretApiClient;
+import com.hotnerds.food.infrastructure.FatSecretToken;
+import com.hotnerds.food.infrastructure.TestConfig;
+import com.hotnerds.food.infrastructure.exception.FatSecretResponseErrorException;
+import com.hotnerds.food.infrastructure.exception.FatSecretResponseErrorHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

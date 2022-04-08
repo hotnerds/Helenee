@@ -1,8 +1,7 @@
 package com.hotnerds.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hotnerds.fatsecret.exception.FatSecretResponseError;
-import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
+import com.hotnerds.food.infrastructure.exception.FatSecretResponseErrorHandler;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -11,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class AppConfig {

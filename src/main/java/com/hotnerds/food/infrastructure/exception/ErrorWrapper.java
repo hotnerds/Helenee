@@ -1,6 +1,5 @@
-package com.hotnerds.fatsecret.exception;
+package com.hotnerds.food.infrastructure.exception;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
 @Getter

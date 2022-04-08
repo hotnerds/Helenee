@@ -1,4 +1,4 @@
-package com.hotnerds.fatsecret.exception;
+package com.hotnerds.food.infrastructure.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestClientResponseException;

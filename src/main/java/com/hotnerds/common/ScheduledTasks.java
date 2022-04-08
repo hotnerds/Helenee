@@ -1,6 +1,6 @@
 package com.hotnerds.common;
 
-import com.hotnerds.fatsecret.FatSecretToken;
+import com.hotnerds.food.infrastructure.FatSecretToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

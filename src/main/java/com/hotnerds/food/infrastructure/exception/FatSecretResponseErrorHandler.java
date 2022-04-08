@@ -1,23 +1,13 @@
-package com.hotnerds.fatsecret.exception;
+package com.hotnerds.food.infrastructure.exception;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 
-import javax.swing.text.html.Option;
-import javax.validation.constraints.Null;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
-
-import static java.util.Optional.ofNullable;
 
 public class FatSecretResponseErrorHandler extends DefaultResponseErrorHandler {
 

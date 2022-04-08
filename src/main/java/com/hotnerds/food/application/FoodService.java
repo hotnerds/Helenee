@@ -2,7 +2,7 @@ package com.hotnerds.food.application;
 
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
-import com.hotnerds.fatsecret.application.FatSecretApiClient;
+import com.hotnerds.food.infrastructure.FatSecretApiClient;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.Nutrient;
 import com.hotnerds.food.domain.repository.FoodRepository;
