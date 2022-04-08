@@ -3,11 +3,7 @@ package com.hotnerds.user.presentation;
 import com.hotnerds.common.security.oauth2.annotation.Authenticated;
 import com.hotnerds.common.security.oauth2.service.AuthenticatedUser;
 import com.hotnerds.user.application.UserService;
-import com.hotnerds.user.domain.dto.FollowServiceReqDto;
-import com.hotnerds.user.domain.dto.NewUserReqDto;
-import com.hotnerds.user.domain.dto.UserResponseDto;
-import com.hotnerds.user.domain.dto.UserUpdateReqDto;
-import com.hotnerds.user.domain.Follow;
+import com.hotnerds.user.domain.dto.*;
 import com.hotnerds.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +18,7 @@ import static com.hotnerds.user.presentation.UserController.*;
 @RequiredArgsConstructor
 @RequestMapping(DEFAULT_URL)
 public class UserController {
-    public static final String DEFAULT_URL = "/users";
+    public static final String DEFAULT_URL = "/api/users";
     private final UserService userService;
 
     @GetMapping
@@ -77,28 +73,28 @@ public class UserController {
     }
 
     @GetMapping("/{followedId}/follow/check")
-    public ResponseEntity<Boolean> checkFollow(@PathVariable("followedId") Long followedId, @Authenticated AuthenticatedUser user) {
-        return ResponseEntity.ok(userService.followCheck(new FollowServiceReqDto(user.getId(), followedId)));
+    public ResponseEntity<FollowCheckResponseDto> checkFollow(@PathVariable("followedId") Long followedId, @Authenticated AuthenticatedUser user) {
+        return ResponseEntity.ok(new FollowCheckResponseDto(userService.followCheck(new FollowServiceReqDto(user.getId(), followedId))));
     }
 
     @GetMapping("/{userId}/follower")
-    public ResponseEntity<List<User>> getFollower(@PathVariable("userId") Long id) {
+    public ResponseEntity<List<FollowUserInfoResponseDto>> getFollower(@PathVariable("userId") Long id) {
         return ResponseEntity.ok(userService.getUserFollowers(id));
     }
 
     @GetMapping("/{userId}/followed")
-    public ResponseEntity<List<User>> getFollowed(@PathVariable("userId") Long id) {
+    public ResponseEntity<List<FollowUserInfoResponseDto>> getFollowed(@PathVariable("userId") Long id) {
         return ResponseEntity.ok(userService.getUserFollowings(id));
     }
 
     @GetMapping("/{userId}/follower/count")
-    public ResponseEntity<Integer> getFollowerCounts(@PathVariable("userId") Long id) {
-        return ResponseEntity.ok(userService.getFollowerCounts(id));
+    public ResponseEntity<FollowCountResponse> getFollowerCounts(@PathVariable("userId") Long id) {
+        return ResponseEntity.ok(new FollowCountResponse(userService.getFollowerCounts(id)));
     }
 
     @GetMapping("/{userId}/followed/count")
-    public ResponseEntity<Integer> getFollowedCounts(@PathVariable("userId") Long id) {
-        return ResponseEntity.ok(userService.getFollowCounts(id));
+    public ResponseEntity<FollowCountResponse> getFollowedCounts(@PathVariable("userId") Long id) {
+        return ResponseEntity.ok(new FollowCountResponse(userService.getFollowCounts(id)));
     }
 
 }

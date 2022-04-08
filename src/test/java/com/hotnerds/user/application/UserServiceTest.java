@@ -219,14 +219,14 @@ class UserServiceTest {
         when(mockedUser2.getFollowerList()).thenReturn(mockedList);
         when(mockedList.getFollowers()).thenReturn(Arrays.asList(follow, anotherFollow));
 
-        List<Long> expectedList = Arrays.asList(1L, 3L);
+        List<Long> expectedList = List.of(1L, 3L);
 
         // when
-        List<User> userList = userService.getUserFollowers(2L); // 2 is user id for user2
+        List<FollowUserInfoResponseDto> userList = userService.getUserFollowers(2L); // 2 is user id for user2
 
         // then
-        assertEquals(expectedList.get(0), userList.get(0).getId());
-        assertEquals(expectedList.get(1), userList.get(1).getId());
+        assertEquals(expectedList.get(0), userList.get(0).getUserId());
+        assertEquals(expectedList.get(1), userList.get(1).getUserId());
         verify(userRepository).findById(2L);
     }
 
@@ -264,14 +264,14 @@ class UserServiceTest {
         when(mockedUser2.getFollowedList()).thenReturn(mockedList);
         when(mockedList.getFollowed()).thenReturn(Arrays.asList(follow, anotherFollow));
 
-        List<Long> expectedList = Arrays.asList(1L, 3L);
+        List<Long> expectedList = List.of(1L, 3L);
 
         // when
-        List<User> userList = userService.getUserFollowings(2L); // 2 is user id for user2
+        List<FollowUserInfoResponseDto> userList = userService.getUserFollowings(2L); // 2 is user id for user2
 
         // then
-        assertEquals(expectedList.get(0), userList.get(0).getId());
-        assertEquals(expectedList.get(1), userList.get(1).getId());
+        assertEquals(expectedList.get(0), userList.get(0).getUserId());
+        assertEquals(expectedList.get(1), userList.get(1).getUserId());
         verify(userRepository).findById(2L);
     }
 

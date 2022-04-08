@@ -87,15 +87,15 @@ public class UserService {
         return newFollowRelationship;
     }
 
-    public List<User> getUserFollowers(final Long userId) {
+    public List<FollowUserInfoResponseDto> getUserFollowers(final Long userId) {
         return getUserById(userId).getFollowerList().getFollowers().stream()
-                .map(f -> f.getFollower())
+                .map(f -> FollowUserInfoResponseDto.of(f.getFollower()))
                 .collect(Collectors.toList());
     }
 
-    public List<User> getUserFollowings(final Long userId) {
+    public List<FollowUserInfoResponseDto> getUserFollowings(final Long userId) {
         return getUserById(userId).getFollowedList().getFollowed().stream()
-                .map(f -> f.getFollowed())
+                .map(f -> FollowUserInfoResponseDto.of(f.getFollowed()))
                 .collect(Collectors.toList());
     }
 
