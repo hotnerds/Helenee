@@ -2,6 +2,7 @@ package com.hotnerds.post.domain.repository;
 
 import com.hotnerds.common.JpaConfig;
 import com.hotnerds.post.domain.Post;
+import com.hotnerds.post.domain.dto.PostResponseDto;
 import com.hotnerds.tag.domain.Tag;
 import com.hotnerds.tag.domain.repository.TagRepository;
 import com.hotnerds.user.domain.User;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.annotation.Rollback;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -76,6 +78,23 @@ class PostRepositoryTest {
 
     }
 
+    @Rollback(value = false)
+    @DisplayName("게시글 전체 조회")
+    @Test
+    public void 게시글_전체_조회_성공() {
+        //given
+        tagRepository.save(tag);
+        userRepository.save(user);
+        postRepository.save(post);
+        PageRequest page = PageRequest.of(0, 10);
+
+        //when
+        List<Post> findPosts = postRepository.findAllPosts(page);
+
+        //then
+        assertThat(findPosts).hasSize(1);
+    }
+
     @DisplayName("게시글 제목으로 조회")
     @Test
     public void 게시글_제목으로_조회_성공() {
@@ -83,10 +102,10 @@ class PostRepositoryTest {
         userRepository.save(user);
         tagRepository.save(tag);
         postRepository.save(post);
+        PageRequest page = PageRequest.of(0, 10);
 
         //when
-        List<Post> findPosts = postRepository.findAllByTitle(post.getTitle());
-
+        List<Post> findPosts = postRepository.findAllByTitle(post.getTitle(), page);
 
         //then
         assertThat(findPosts.size()).isEqualTo(1);
