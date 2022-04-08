@@ -1,21 +1,15 @@
 package com.hotnerds.food.infrastructure;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withNoContent;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-
-import com.hotnerds.food.infrastructure.FatSecretApiClient;
-import com.hotnerds.food.infrastructure.FatSecretToken;
-import com.hotnerds.food.infrastructure.TestConfig;
-import com.hotnerds.food.infrastructure.exception.FatSecretResponseErrorException;
-import com.hotnerds.food.infrastructure.exception.FatSecretResponseErrorHandler;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
+import com.hotnerds.food.domain.Food;
+import com.hotnerds.food.infrastructure.fatsecret.FatSecretApiClient;
+import com.hotnerds.food.infrastructure.fatsecret.FatSecretToken;
+import com.hotnerds.food.infrastructure.fatsecret.handler.FatSecretResponseErrorHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -23,15 +17,16 @@ import org.springframework.boot.test.web.client.MockServerRestTemplateCustomizer
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @Import(TestConfig.class)
 @RestClientTest(value = FatSecretApiClient.class)
@@ -69,13 +64,13 @@ class FatSecretApiClientTest {
                 "    }\n" +
                 "}";
         String requestURL = "https://platform.fatsecret.com/rest/server.api?method=food.get.v2&food_id=" + foodId + "&format=json";
-
-        when(fatSecretResponseErrorHandler.hasError(any())).thenThrow(FatSecretResponseErrorException.class);
+        Mockito.when(fatSecretResponseErrorHandler.hasError(any())).thenThrow(new BusinessException(ErrorCode.EXTERNAL_COMMUNICATION_EXCEPTION));
         mockServer.expect(requestTo(requestURL))
                 .andRespond(withSuccess(jsonResponse, MediaType.APPLICATION_JSON));
         //when then
-        assertThrows(FatSecretResponseErrorException.class, () -> fatSecretApiClient.searchFoodById(foodId));
-
+        assertThatThrownBy(() -> fatSecretApiClient.searchFoodById(1L))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.EXTERNAL_COMMUNICATION_EXCEPTION.getMessage());
     }
 
     @Test
@@ -88,22 +83,16 @@ class FatSecretApiClientTest {
 
         mockServer.expect(requestTo(requestURL))
                 .andRespond(withSuccess(jsonResponse, MediaType.APPLICATION_JSON));
-        when(fatSecretResponseErrorHandler.hasError(any(ClientHttpResponse.class))).thenReturn(false);
 
         //when
-        ResponseEntity<Map<String, Object>> foodResponse = fatSecretApiClient.searchFoodById(foodId);
-        Map<String, Object> food = (Map<String, Object>) foodResponse.getBody().get("food");
-        Map<String, Object> servings = (Map<String, Object>) food.get("servings");
-        ArrayList<Map<String, String>> serving = (ArrayList<Map<String, String>>) servings.get("serving");
+        Food actualFood = fatSecretApiClient.searchFoodById(foodId);
 
         //then
-        assertThat(food.get("food_name").toString()).isEqualTo("Toasted White Bread");
-        assertThat(serving.get(0).get("calories")).isEqualTo("132");
-        assertThat(serving.get(0).get("carbohydrate")).isEqualTo("24.48");
-        assertThat(serving.get(0).get("protein")).isEqualTo("4.05");
-        assertThat(serving.get(0).get("fat")).isEqualTo("1.80");
-        verify(fatSecretResponseErrorHandler, times(1)).hasError(any());
-
+        assertThat(actualFood.getFoodName()).isEqualTo("Toasted White Bread");
+        assertThat(actualFood.getNutrient().getCalories()).isEqualTo(132.0);
+        assertThat(actualFood.getNutrient().getCarbs()).isEqualTo(24.48);
+        assertThat(actualFood.getNutrient().getProtein()).isEqualTo(4.05);
+        assertThat(actualFood.getNutrient().getFat()).isEqualTo(1.80);
     }
 
     @Test
@@ -118,54 +107,11 @@ class FatSecretApiClientTest {
 
         mockServer.expect(requestTo(requestURL))
                 .andRespond(withSuccess(jsonResponse, MediaType.APPLICATION_JSON));
-        when(fatSecretResponseErrorHandler.hasError(any(ClientHttpResponse.class))).thenReturn(false);
-        ArrayList<String> expectedFoodNames = new ArrayList<>(Arrays.asList("Chicken Breast", "Grilled Chicken", "Chicken Thigh", "Skinless Chicken Breast", "Chicken Drumstick"));
 
         //when
-        ResponseEntity<Map<String, Object>> foodsResponse = fatSecretApiClient.searchFoods(foodName, pageNumber, maxResults);
-        Map<String, ArrayList<Map<String, String>>> food = (Map<String, ArrayList<Map<String, String>>>) foodsResponse.getBody().get("foods");
-        ArrayList<Map<String, String>> foodList = food.get("food");
-        ArrayList<String> foodNames = new ArrayList<>(foodList.stream()
-                .map(e -> e.get("food_name"))
-                .collect(Collectors.toList()));
+        List<Food> foods = fatSecretApiClient.searchFoods(foodName, pageNumber, maxResults);
 
         //then
-        assertThat(foodNames).isEqualTo(expectedFoodNames);
-        verify(fatSecretResponseErrorHandler, times(1)).hasError(any());
-
+        assertThat(foods).hasSize(5);
     }
-
-
-    @Test
-    @DisplayName("searchFoodById에서 올바른 access token과 함께 request 요청을 보낸다.")
-    void searchFoodById가_올바른_토큰을_전송한다 () {
-        //given
-        String requestURL = "https://platform.fatsecret.com/rest/server.api?method=food.get.v2&food_id=38821&format=json";
-        mockServer.expect(requestTo(requestURL))
-                .andExpect(header("Authorization", "Bearer valid token"))
-                .andRespond(withNoContent());
-        when(fatSecretToken.getToken()).thenReturn("valid token");
-
-        //when then
-        assertDoesNotThrow(() -> fatSecretApiClient.searchFoodById(38821L));
-
-    }
-
-    @Test
-    @DisplayName("searchFoods에서 올바른 access token과 함께 request 요청을 보낸다.")
-    void searchFoods가_올바른_토큰을_전송한다 () {
-        //given
-        String requestURL = "https://platform.fatsecret.com/rest/server.api?method=foods.search&search_expression=Chicken&page_number=0&max_results=5&format=json";
-        mockServer.expect(requestTo(requestURL))
-                .andExpect(header("Authorization", "Bearer valid token"))
-                .andRespond(withNoContent());
-        when(fatSecretToken.getToken()).thenReturn("valid token");
-
-        //when then
-        assertDoesNotThrow(() -> fatSecretApiClient.searchFoods("Chicken", 0, 5));
-
-    }
-
-
-
 }

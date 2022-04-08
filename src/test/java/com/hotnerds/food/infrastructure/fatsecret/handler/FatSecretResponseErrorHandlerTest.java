@@ -1,6 +1,8 @@
-package com.hotnerds.food.infrastructure.exception;
+package com.hotnerds.food.infrastructure.fatsecret.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +11,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class FatSecretResponseErrorHandlerTest {
 
@@ -49,6 +51,8 @@ class FatSecretResponseErrorHandlerTest {
         byte[] responseBody = "{ \"error\": { }}\n".getBytes(StandardCharsets.UTF_8);
 
         //when then
-        assertThrows(FatSecretResponseErrorException.class, () -> fatSecretResponseErrorHandler.handleError(responseBody));
+        assertThatThrownBy(() -> fatSecretResponseErrorHandler.handleError(responseBody))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.EXTERNAL_COMMUNICATION_EXCEPTION.getMessage());
     }
 }

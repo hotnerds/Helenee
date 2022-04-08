@@ -1,4 +1,4 @@
-package com.hotnerds.food.infrastructure;
+package com.hotnerds.food.infrastructure.fatsecret;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

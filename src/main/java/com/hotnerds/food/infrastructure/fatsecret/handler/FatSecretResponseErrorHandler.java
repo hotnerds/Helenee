@@ -1,6 +1,8 @@
-package com.hotnerds.food.infrastructure.exception;
+package com.hotnerds.food.infrastructure.fatsecret.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;
@@ -27,7 +29,7 @@ public class FatSecretResponseErrorHandler extends DefaultResponseErrorHandler {
         Optional<HttpStatus> optionalStatusCode = Optional.ofNullable(HttpStatus.resolve(response.getRawStatusCode()))
                 .filter(HttpStatus::is2xxSuccessful);
 
-        if(optionalStatusCode.isPresent()) {
+        if (optionalStatusCode.isPresent()) {
             handleError(getResponseBody(response));
         } else {
             super.handleError(response);
@@ -40,9 +42,6 @@ public class FatSecretResponseErrorHandler extends DefaultResponseErrorHandler {
     }
 
     protected void handleError(byte[] responseBody) throws IOException {
-        FatSecretResponseError error = objectMapper.readValue(responseBody, ErrorWrapper.class)
-                .getError();
-
-        throw new FatSecretResponseErrorException(error.getMessage());
+        throw new BusinessException(ErrorCode.EXTERNAL_COMMUNICATION_EXCEPTION);
     }
 }

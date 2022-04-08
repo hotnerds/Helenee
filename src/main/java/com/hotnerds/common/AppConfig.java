@@ -1,7 +1,7 @@
 package com.hotnerds.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hotnerds.food.infrastructure.exception.FatSecretResponseErrorHandler;
+import com.hotnerds.food.infrastructure.fatsecret.handler.FatSecretResponseErrorHandler;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.web.client.RestTemplateBuilder;
