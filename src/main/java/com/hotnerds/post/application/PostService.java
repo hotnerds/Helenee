@@ -10,13 +10,11 @@ import com.hotnerds.tag.domain.Tag;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
@@ -34,16 +32,23 @@ public class PostService {
         postRepository.save(createPost(requestDto));
     }
 
-    public List<PostResponseDto> searchByTitle(String title) {
-        List<Post> findPosts = postRepository.findAllByTitle(title);
+    public List<PostResponseDto> searchAll(Pageable pageable) {
+        return postRepository.findAllPosts(pageable)
+                .stream()
+                .map(PostResponseDto::of)
+                .collect(toList());
+    }
 
-        return findPosts.stream()
+    public List<PostResponseDto> searchByTitle(PostByTitleRequestDto requestDto) {
+
+        return postRepository.findAllByTitle(requestDto.getTitle(), requestDto.getPageable()).stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }
 
     public List<PostResponseDto> searchByWriter(PostByUserRequestDto requestDto) {
-        User user = userRepository.findByUsername(requestDto.getUsername()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+        User user = userRepository.findByUsername(requestDto.getUsername())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         return postRepository.findAllByUser(user, requestDto.getPageable()).stream()
                 .map(PostResponseDto::of)
