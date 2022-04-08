@@ -8,6 +8,7 @@ import com.hotnerds.food.infrastructure.FatSecretApiClient;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.Nutrient;
 import com.hotnerds.food.domain.repository.FoodRepository;
+import com.hotnerds.food.infrastructure.FoodApiClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +29,7 @@ import static org.mockito.Mockito.*;
 class FoodServiceTest {
 
     @Mock
-    FatSecretApiClient apiClient;
+    FoodApiClient apiClient;
 
     @Mock
     FoodRepository foodRepository;

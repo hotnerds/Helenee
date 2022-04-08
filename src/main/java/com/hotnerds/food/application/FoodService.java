@@ -6,6 +6,7 @@ import com.hotnerds.food.infrastructure.FatSecretApiClient;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.Nutrient;
 import com.hotnerds.food.domain.repository.FoodRepository;
+import com.hotnerds.food.infrastructure.FoodApiClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ import java.util.Map;
 @Transactional(readOnly = true)
 public class FoodService {
 
-    FatSecretApiClient apiClient;
+    FoodApiClient apiClient;
     FoodRepository foodRepository;
 
     @Transactional

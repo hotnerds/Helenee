@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
-public class FatSecretApiClient {
+public class FatSecretApiClient implements FoodApiClient {
 
     @Value("${fat-secret.api-url}")
     private String API_URI_PREFIX;
