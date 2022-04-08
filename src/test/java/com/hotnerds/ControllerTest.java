@@ -44,28 +44,28 @@ public class ControllerTest {
     @MockBean
     protected UserRepository userRepository;
 
-    protected User user;
+    protected User authUser;
 
     protected MockMvc mockMvc;
 
     protected ObjectMapper objectMapper;
 
-        @BeforeEach
-        protected void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) throws Exception {
-            JwtAuthenticationFilter jwtAuthenticationFilter = (JwtAuthenticationFilter) webApplicationContext.getBean("jwtAuthenticationFilter");
+    @BeforeEach
+    protected void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) throws Exception {
+        JwtAuthenticationFilter jwtAuthenticationFilter = (JwtAuthenticationFilter) webApplicationContext.getBean("jwtAuthenticationFilter");
 
-            mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                    .addFilter(new CharacterEncodingFilter("UTF-8", true))
-                    .addFilter(jwtAuthenticationFilter)
-                    .apply(springSecurity())
-                    .apply(documentationConfiguration(restDocumentation))
-                    .alwaysDo(print())
-                    .build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .addFilter(new CharacterEncodingFilter("UTF-8", true))
+                .addFilter(jwtAuthenticationFilter)
+                .apply(springSecurity())
+                .apply(documentationConfiguration(restDocumentation))
+                .alwaysDo(print())
+                .build();
 
-            objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-            user = new User("garamkim", "kgr4163@naver.com", ROLE.USER, AuthProvider.KAKAO);
+        authUser = new User("garamkim", "kgr4163@naver.com", ROLE.USER, AuthProvider.KAKAO);
 
-            when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(authUser));
     }
 }
