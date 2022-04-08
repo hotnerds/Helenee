@@ -21,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -169,18 +170,36 @@ public class PostServiceTest {
         verify(tagService, times(requestDto.getTagNames().size())).findOrCreateTag(anyString());
     }
 
+    @DisplayName("전체 게시글 조회")
+    @Test
+    void 전체_게시글_조회() {
+        //given
+        when(postRepository.findAllPosts(any())).thenReturn(List.of(post));
+        Pageable page = PageRequest.of(0, 10);
+        //when
+        List<PostResponseDto> posts = postService.searchAll(page);
+
+        //then
+        assertThat(posts.size()).isEqualTo(1);
+        verify(postRepository, times(1)).findAllPosts(any());
+    }
+
     @DisplayName("게시글 제목으로 조회")
     @Test
     void 게시글_제목으로_조회() {
         //given
-        when(postRepository.findAllByTitle(anyString())).thenReturn(List.of(post));
+        when(postRepository.findAllByTitle(any(), any())).thenReturn(List.of(post));
+        PostByTitleRequestDto requestDto = PostByTitleRequestDto.builder()
+                .title(post.getTitle())
+                .pageable(PageRequest.of(0, 10))
+                .build();
         //when
-        List<PostResponseDto> findPosts = postService.searchByTitle(post.getTitle());
+        List<PostResponseDto> findPosts = postService.searchByTitle(requestDto);
 
         //then
         assertThat(findPosts.size()).isEqualTo(1);
 
-        verify(postRepository, times(1)).findAllByTitle(post.getTitle());
+        verify(postRepository, times(1)).findAllByTitle(any(), any());
     }
 
     @DisplayName("유효하지 않은 사용자 게시물 조회 실패")
