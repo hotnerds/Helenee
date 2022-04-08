@@ -58,13 +58,14 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public boolean isFollowExist(final User user1, final User user2) {
-        return user1.isFollowerOf(user2) && user2.isFollowedBy(user1);
+    public boolean isFollowExist(final User follower, final User followed) {
+        return follower.isFollowerOf(followed) && followed.isFollowedBy(follower);
     }
 
-    public boolean isMutualFollowExist(final User user1, final User user2) {
-        return (user1.isFollowerOf(user2) && user2.isFollowedBy(user1))
-                && (user1.isFollowedBy(user2) && user2.isFollowerOf(user1));
+    public boolean followCheck(final FollowServiceReqDto reqDto) {
+        User follower = getUserById(reqDto.getFollowerId());
+        User followed = getUserById(reqDto.getFollowedId());
+        return isFollowExist(follower, followed);
     }
 
     @Transactional
@@ -86,29 +87,15 @@ public class UserService {
         return newFollowRelationship;
     }
 
-    public Follow getOneFollow(final FollowServiceReqDto followServiceReqDto) {
-        User followerUser = getUserById(followServiceReqDto.getFollowerId());
-        User followedUser = getUserById(followServiceReqDto.getFollowedId());
-
-        if (!isFollowExist(followerUser, followedUser)) {
-            throw new BusinessException(ErrorCode.FOLLOW_NOT_FOUND_EXCEPTION);
-        }
-
-        return followerUser.getFollowedList().getFollowed().stream()
-                .filter(f -> f.getFollowed().equals(followedUser))
-                .findAny()
-                .get();
-    }
-
-    public List<Long> getUserFollowers(final Long userId) {
+    public List<User> getUserFollowers(final Long userId) {
         return getUserById(userId).getFollowerList().getFollowers().stream()
-                .map(f -> f.getFollower().getId())
+                .map(f -> f.getFollower())
                 .collect(Collectors.toList());
     }
 
-    public List<Long> getUserFollowings(final Long userId) {
+    public List<User> getUserFollowings(final Long userId) {
         return getUserById(userId).getFollowedList().getFollowed().stream()
-                .map(f -> f.getFollowed().getId())
+                .map(f -> f.getFollowed())
                 .collect(Collectors.toList());
     }
 
