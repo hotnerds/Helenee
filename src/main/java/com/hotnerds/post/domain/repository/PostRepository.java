@@ -11,7 +11,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
-    List<Post> findAllByTitle(String title);
+    @Query("select distinct p from Post p " +
+            "join fetch p.writer " +
+            "order by p.createdAt desc")
+    List<Post> findAllPosts(Pageable pageable);
+
+    List<Post> findAllByTitle(String title, Pageable pageable);
 
     @Query("select p from Post p where p.createdAt <= :after")
     List<Post> findAllPostsAfter(@Param("after") LocalDateTime after);
