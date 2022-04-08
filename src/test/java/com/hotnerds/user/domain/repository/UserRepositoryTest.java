@@ -1,13 +1,14 @@
 package com.hotnerds.user.domain.repository;
 
 import com.hotnerds.user.domain.User;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class UserRepositoryTest {
@@ -27,10 +28,10 @@ class UserRepositoryTest {
         User userSaved = userRepository.save(userReq);
 
         // then
-        Assertions.assertThat(userReq).isSameAs(userSaved);
-        Assertions.assertThat(userReq.getUsername()).isEqualTo(userSaved.getUsername());
-        Assertions.assertThat(userSaved).isNotNull();
-        Assertions.assertThat(userRepository.count()).isEqualTo(1);
+        assertThat(userReq).isSameAs(userSaved);
+        assertThat(userReq.getUsername()).isEqualTo(userSaved.getUsername());
+        assertThat(userSaved).isNotNull();
+        assertThat(userRepository.count()).isEqualTo(1);
     }
 
     @Test
@@ -49,9 +50,9 @@ class UserRepositoryTest {
         Optional<User> userWrongUsername = userRepository.findByUsername("Wrong Username"); // fail case condition
 
         // then
-        Assertions.assertThat(userRepository.count()).isEqualTo(1);
-        Assertions.assertThat(userFound).isSameAs(userFound);
-        Assertions.assertThat(userWrongUsername.isEmpty()).isEqualTo(true); // fail condition
+        assertThat(userRepository.count()).isEqualTo(1);
+        assertThat(userFound).isSameAs(userFound);
+        assertThat(userWrongUsername.isEmpty()).isEqualTo(true); // fail condition
     }
 
     @Test
@@ -70,9 +71,9 @@ class UserRepositoryTest {
         Optional<User> userWrongEmail = userRepository.findByUsername("Wrong Email"); // fail case condition
 
         // then
-        Assertions.assertThat(userRepository.count()).isEqualTo(1);
-        Assertions.assertThat(userFound).isSameAs(userFound);
-        Assertions.assertThat(userWrongEmail.isEmpty()).isEqualTo(true); // fail condition
+        assertThat(userRepository.count()).isEqualTo(1);
+        assertThat(userFound).isSameAs(userFound);
+        assertThat(userWrongEmail.isEmpty()).isEqualTo(true); // fail condition
     }
 
     @Test
@@ -95,10 +96,11 @@ class UserRepositoryTest {
         Optional<User> userFoundWrongUsernameAndEmail = userRepository.findByUsernameOrEmail("Wrong Key", "Wrong Key");
 
         // then
-        Assertions.assertThat(userRepository.count()).isEqualTo(1);
-        Assertions.assertThat(userFoundOnlyCorrectUsername).isEqualTo(user);
-        Assertions.assertThat(userFoundOnlyCorrectEmail).isEqualTo(user);
-        Assertions.assertThat(userFoundCorrectUsernameAndEmail).isEqualTo(user);
-        Assertions.assertThat(userFoundWrongUsernameAndEmail.isEmpty()).isTrue();
+        assertThat(userRepository.count()).isEqualTo(1);
+        assertThat(userFoundOnlyCorrectUsername).isEqualTo(user);
+        assertThat(userFoundOnlyCorrectEmail).isEqualTo(user);
+        assertThat(userFoundCorrectUsernameAndEmail).isEqualTo(user);
+        assertThat(userFoundWrongUsernameAndEmail.isEmpty()).isTrue();
     }
+
 }
