@@ -71,4 +71,9 @@ public class PostController {
     public ResponseEntity<LikeResponseDto> likePosts(@NotNull @PathVariable("id") Long postId, @Authenticated AuthenticatedUser authUser) {
         return ResponseEntity.ok(postService.like(postId, authUser));
     }
+
+    @DeleteMapping("/{id}/likes")
+    public ResponseEntity<LikeResponseDto> unlikePosts(@NotNull @PathVariable("id") Long postId, @Authenticated AuthenticatedUser authUser) {
+        return ResponseEntity.ok(postService.unlike(postId, authUser));
+    }
 }
