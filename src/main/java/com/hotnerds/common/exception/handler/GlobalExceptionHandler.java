@@ -5,6 +5,7 @@ import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.common.exception.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -46,6 +47,13 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException e) {
         ErrorResponse response = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR_EXCEPTION);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(BindException.class)
+    protected ResponseEntity<ErrorResponse> handleBindException(BindException e) {
+        BindingResult bindingResult = e.getBindingResult();
+        ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE_EXCEPTION, bindingResult);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
