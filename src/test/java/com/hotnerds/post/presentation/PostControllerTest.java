@@ -3,6 +3,7 @@ package com.hotnerds.post.presentation;
 import com.hotnerds.ControllerTest;
 import com.hotnerds.WithCustomMockUser;
 import com.hotnerds.post.application.PostService;
+import com.hotnerds.post.domain.dto.PostRequestDto;
 import com.hotnerds.post.domain.dto.PostResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = {PostController.class})
@@ -45,6 +47,26 @@ class PostControllerTest extends ControllerTest {
         params = new LinkedMultiValueMap<>();
         params.put("page", List.of("0"));
         params.put("size", List.of("10"));
+    }
+
+    @WithCustomMockUser
+    @DisplayName("사용자는 게시물을 작성할 수 있다.")
+    @Test
+    void 게시물_작성_요청() throws Exception {
+        //given
+        PostRequestDto requestDto = PostRequestDto.builder()
+                .title("title")
+                .content("content")
+                .tagNames(List.of("tag"))
+                .build();
+        when(postService.write(any(), any())).thenReturn(1L);
+
+        //when then
+        mockMvc.perform(post("/api/posts")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                        .andExpect(status().isCreated());
     }
 
     @WithCustomMockUser
