@@ -30,7 +30,7 @@ public class FatSecretApiClient implements FoodApiClient {
     private static final String FORMAT = "format";
     private static final String JSON_FORMAT = "json";
     @Value("${fat-secret.api-url}")
-    private String API_URI_PREFIX;
+    private String apiUriPrefix;
     private final RestTemplate restTemplate;
 
     private final FatSecretToken fatSecretToken;
@@ -47,7 +47,7 @@ public class FatSecretApiClient implements FoodApiClient {
         final String FOOD_ID = "food_id";
 
         URI url = UriComponentsBuilder
-                .fromHttpUrl(API_URI_PREFIX)
+                .fromHttpUrl(apiUriPrefix)
                 .queryParam(METHOD, FOOD_GET_METHOD)
                 .queryParam(FOOD_ID, foodId.toString())
                 .queryParam(FORMAT, JSON_FORMAT)
@@ -81,7 +81,7 @@ public class FatSecretApiClient implements FoodApiClient {
         final String MAX_RESULTS = "max_results";
 
         URI url = UriComponentsBuilder
-                .fromHttpUrl(API_URI_PREFIX)
+                .fromHttpUrl(apiUriPrefix)
                 .queryParam(METHOD, FOODS_SEARCH_METHOD)
                 .queryParam(SEARCH_EXPRESSION, foodName)
                 .queryParam(PAGE_NUMBER, pageNumber)

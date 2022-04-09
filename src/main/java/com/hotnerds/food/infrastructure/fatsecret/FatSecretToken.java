@@ -33,11 +33,11 @@ public class FatSecretToken {
     private static final String BASIC_SCOPE = "basic";
     private static final String ACCESS_TOKEN = "access_token";
     @Value("${fat-secret.token-request-url}")
-    private String API_URI_PREFIX;
+    private String apiUriPrefix;
     @Value("${fat-secret.id}")
-    private String ID;
+    private String fatSecretId;
     @Value("${fat-secret.secret}")
-    private String SECRET;
+    private String secretKey;
     private final RestTemplate restTemplate;
     private String accessToken;
 
@@ -65,12 +65,12 @@ public class FatSecretToken {
 
     public ResponseEntity<Map<String, Object>> requestAccessToken() throws RestClientResponseException {
         URI url = UriComponentsBuilder
-                .fromHttpUrl(API_URI_PREFIX)
+                .fromHttpUrl(apiUriPrefix)
                 .build()
                 .toUri();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(ID, SECRET);
+        headers.setBasicAuth(fatSecretId, secretKey);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add(GRANT_TYPE, CLIENT_CREDENTIALS);
