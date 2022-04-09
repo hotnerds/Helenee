@@ -2,6 +2,7 @@ package com.hotnerds.post.application;
 
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
+import com.hotnerds.common.security.oauth2.service.AuthenticatedUser;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.post.domain.dto.*;
 import com.hotnerds.post.domain.repository.PostRepository;
@@ -28,8 +29,8 @@ public class PostService {
     private final TagService tagService;
 
     @Transactional
-    public Long write(PostRequestDto requestDto) {
-        return postRepository.save(createPost(requestDto)).getId();
+    public Long write(PostRequestDto requestDto, AuthenticatedUser authUser) {
+        return postRepository.save(createPost(requestDto, authUser)).getId();
     }
 
     public List<PostResponseDto> searchAll(Pageable pageable) {
@@ -64,8 +65,8 @@ public class PostService {
                 .collect(toList());
     }
 
-    private Post createPost(PostRequestDto postRequestDto) {
-        User user = userRepository.findByUsername(postRequestDto.getUsername())
+    private Post createPost(PostRequestDto postRequestDto, AuthenticatedUser authUser) {
+        User user = userRepository.findByUsername(authUser.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         Post post = new Post(

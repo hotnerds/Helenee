@@ -2,6 +2,7 @@ package com.hotnerds.post.application;
 
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
+import com.hotnerds.common.security.oauth2.service.AuthenticatedUser;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.post.domain.dto.*;
 import com.hotnerds.post.domain.like.Like;
@@ -46,11 +47,12 @@ public class PostServiceTest {
     @Mock
     TagService tagService;
 
-
     @InjectMocks
     PostService postService;
 
     User user;
+
+    AuthenticatedUser authUser;
 
     Post post;
 
@@ -67,6 +69,8 @@ public class PostServiceTest {
                 .email("email")
                 .build();
 
+        authUser = AuthenticatedUser.of(user);
+
         post = new Post(1L,"title", "content", user);
 
         tag = new Tag("tagName");
@@ -79,7 +83,6 @@ public class PostServiceTest {
         PostRequestDto requestDto = PostRequestDto.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
-                .username(user.getUsername())
                 .tagNames(List.of(tag.getName()))
                 .build();
 
@@ -88,13 +91,13 @@ public class PostServiceTest {
         when(tagService.findOrCreateTag(anyString())).thenReturn(tag);
 
         //when
-        Long postId = postService.write(requestDto);
+        Long postId = postService.write(requestDto, authUser);
 
         //then
         assertThat(postId).isNotNull();
-        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
-        verify(postRepository, times(1)).save(any(Post.class));
-        verify(tagService, times(requestDto.getTagNames().size())).findOrCreateTag(anyString());
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).save(any());
+        verify(tagService, times(requestDto.getTagNames().size())).findOrCreateTag(any());
     }
 
     @DisplayName("유효하지 않은 사용자는 게시물을 등록할 수 없다.")
@@ -104,19 +107,18 @@ public class PostServiceTest {
         PostRequestDto requestDto = PostRequestDto.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
-                .username(user.getUsername())
                 .tagNames(List.of(tag.getName()))
                 .build();
 
         when(userRepository.findByUsername(anyString())).thenThrow(new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         //when then
-        assertThatThrownBy(() -> postService.write(requestDto))
+        assertThatThrownBy(() -> postService.write(requestDto, authUser))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
                 .isEqualTo(ErrorCode.USER_NOT_FOUND_EXCEPTION);
-        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
+        verify(userRepository, times(1)).findByUsername(any());
     }
 
 
@@ -128,7 +130,6 @@ public class PostServiceTest {
         PostRequestDto requestDto = PostRequestDto.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
-                .username(user.getUsername())
                 .tagNames(List.of(tagName))
                 .build();
 
@@ -136,14 +137,14 @@ public class PostServiceTest {
         when(tagService.findOrCreateTag(anyString())).thenThrow(new BusinessException(ErrorCode.TAG_NAME_NOT_VALID_EXCEPTION));
 
         //when then
-        assertThatThrownBy(() -> postService.write(requestDto))
+        assertThatThrownBy(() -> postService.write(requestDto, authUser))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
                 .isEqualTo(ErrorCode.TAG_NAME_NOT_VALID_EXCEPTION);
 
-        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
-        verify(tagService, times(1)).findOrCreateTag(anyString());
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(tagService, times(1)).findOrCreateTag(any());
     }
 
     @DisplayName("중복된 태그를 가진 게시물은 생성할 수 없다.")
@@ -153,7 +154,6 @@ public class PostServiceTest {
         PostRequestDto requestDto = PostRequestDto.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
-                .username(user.getUsername())
                 .tagNames(Arrays.asList(tag.getName(), tag.getName()))
                 .build();
 
@@ -161,14 +161,14 @@ public class PostServiceTest {
         when(tagService.findOrCreateTag(anyString())).thenReturn(tag);
 
         //when then
-        assertThatThrownBy(() -> postService.write(requestDto))
+        assertThatThrownBy(() -> postService.write(requestDto, authUser))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
                 .isEqualTo(ErrorCode.DUPLICATED_TAG_EXCEPTION);
 
-        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
-        verify(tagService, times(requestDto.getTagNames().size())).findOrCreateTag(anyString());
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(tagService, times(requestDto.getTagNames().size())).findOrCreateTag(any());
     }
 
     @DisplayName("전체 게시글 조회")
