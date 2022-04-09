@@ -322,6 +322,22 @@ public class PostServiceTest {
         verify(postRepository, times(1)).findById(any());
     }
 
+    @DisplayName("게시글 작성자와 삭제 요청한 유저가 다르면 삭제 할 수 없다.")
+    @Test
+    void 게시글_작성자와_요청한_유저가_다르면_삭제_실패() {
+        User otherUser = new User("otherUser", "aaa@aaa");
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(otherUser));
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+
+        //when then
+        assertThatThrownBy(() -> postService.delete(1L, authUser))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.POST_WRITER_NOT_MATCH_EXCEPTION.getMessage());
+
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).findById(any());
+    }
+
     @DisplayName("게시글 삭제 성공")
     @Test
     void 게시글_삭제_성공() {
