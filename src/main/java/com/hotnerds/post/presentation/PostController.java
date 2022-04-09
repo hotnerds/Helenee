@@ -31,6 +31,11 @@ public class PostController {
         return ResponseEntity.ok(postService.searchAll(pageable));
     }
 
+    @GetMapping(params = {"title"})
+    public ResponseEntity<List<PostResponseDto>> searchPostsByTitle(PostByTitleRequestDto requestDto) {
+        return ResponseEntity.ok(postService.searchByTitle(requestDto));
+    }
+
 
 
 }
