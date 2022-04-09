@@ -36,6 +36,10 @@ public class PostController {
         return ResponseEntity.ok(postService.searchByTitle(requestDto));
     }
 
+    @GetMapping(params = {"writer"})
+    public ResponseEntity<List<PostResponseDto>> searchPostsByWriter(PostByWriterRequestDto requestDto) {
+        return ResponseEntity.ok(postService.searchByWriter(requestDto));
+    }
 
 
 }
