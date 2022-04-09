@@ -59,7 +59,7 @@ public class FatSecretToken {
                     .get(ACCESS_TOKEN)
                     .toString();
         } catch (RestClientResponseException e) {
-            e.printStackTrace();
+            throw new BusinessException(ErrorCode.EXTERNAL_COMMUNICATION_EXCEPTION);
         }
     }
 
