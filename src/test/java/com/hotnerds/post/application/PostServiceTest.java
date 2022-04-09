@@ -370,9 +370,11 @@ public class PostServiceTest {
 
         //when then
         assertThatThrownBy(
-                () -> postService.like(user.getUsername(), post.getId()))
+                () -> postService.like(post.getId(), authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.POST_NOT_FOUND_EXCEPTION.getMessage());
+
+        verify(postRepository, times(1)).findById(any());
     }
 
     @DisplayName("존재하지 않는 사용자가 게시글에 좋아요를 요청하면 실패한다.")
@@ -383,9 +385,12 @@ public class PostServiceTest {
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
         //when then
         assertThatThrownBy(
-                () -> postService.like(user.getUsername(), post.getId()))
+                () -> postService.like(post.getId(), authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
+
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).findById(any());
     }
 
     @DisplayName("게시글 좋아요 요청이 중복되면 예외를 발생시킨다.")
@@ -403,9 +408,12 @@ public class PostServiceTest {
 
         //when then
         assertThatThrownBy(
-                () -> postService.like(user.getUsername(), post.getId()))
+                () -> postService.like(post.getId(), authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.DUPLICATED_LIKE_EXCEPTION.getMessage());
+
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).findById(any());
     }
 
     @DisplayName("사용자가 게시물에 좋아요를 누를 수 있다.")
@@ -416,7 +424,7 @@ public class PostServiceTest {
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
         //when
-        LikeResponseDto responseDto = postService.like(user.getUsername(), post.getId());
+        LikeResponseDto responseDto = postService.like(post.getId(), authUser);
 
         //then
         assertAll(
@@ -437,9 +445,12 @@ public class PostServiceTest {
 
         //when then
         assertThatThrownBy(
-                () -> postService.unlike(user.getUsername(), post.getId()))
+                () -> postService.unlike(post.getId(), authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.LIKE_NOT_FOUND_EXCEPTION.getMessage());
+
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).findById(any());
     }
 
     @DisplayName("좋아요 취소 성공")
@@ -453,7 +464,7 @@ public class PostServiceTest {
 
 
         //when
-        LikeResponseDto responseDto = postService.unlike(user.getUsername(), post.getId());
+        LikeResponseDto responseDto = postService.unlike(post.getId(), authUser);
 
         //then
         assertAll(

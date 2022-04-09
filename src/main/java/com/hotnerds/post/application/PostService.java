@@ -11,8 +11,6 @@ import com.hotnerds.tag.domain.Tag;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -117,10 +115,10 @@ public class PostService {
     }
 
     @Transactional
-    public LikeResponseDto like(String username, Long postId) {
+    public LikeResponseDto like(Long postId, AuthenticatedUser authUser) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(authUser.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         post.like(user);
@@ -133,10 +131,10 @@ public class PostService {
     }
 
     @Transactional
-    public LikeResponseDto unlike(String username, Long postId) {
+    public LikeResponseDto unlike(Long postId, AuthenticatedUser authUser) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(authUser.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         post.unlike(user);
