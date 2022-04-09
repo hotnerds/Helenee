@@ -34,16 +34,15 @@ public class PostService {
         return postRepository.save(createPost(requestDto, authUser)).getId();
     }
 
-    public List<PostResponseDto> searchAll(Pageable pageable) {
-        return postRepository.findAllPosts(pageable)
+    public List<PostResponseDto> searchAll(PageInfo pageInfo) {
+        return postRepository.findAllPosts(pageInfo.toPageable())
                 .stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }
 
     public List<PostResponseDto> searchByTitle(PostByTitleRequestDto requestDto) {
-        Pageable pageable = PageRequest.of(requestDto.getPage(), requestDto.getPageSize());
-        return postRepository.findAllByTitle(requestDto.getTitle(), pageable).stream()
+        return postRepository.findAllByTitle(requestDto.getTitle(),requestDto.getPageInfo().toPageable()).stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }
@@ -52,9 +51,7 @@ public class PostService {
         User user = userRepository.findByUsername(requestDto.getWriter())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        Pageable pageable = PageRequest.of(requestDto.getPage(), requestDto.getPageSize());
-
-        return postRepository.findAllByWriter(user, pageable).stream()
+        return postRepository.findAllByWriter(user, requestDto.getPageInfo().toPageable()).stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }
@@ -63,9 +60,7 @@ public class PostService {
         requestDto.getTagNames()
                 .forEach(Tag::validateTagName);
 
-        Pageable pageable = PageRequest.of(requestDto.getPage(), requestDto.getPageSize());
-
-        return postRepository.findAllByTagNames(requestDto.getTagNames(), pageable).stream()
+        return postRepository.findAllByTagNames(requestDto.getTagNames(), requestDto.getPageInfo().toPageable()).stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }

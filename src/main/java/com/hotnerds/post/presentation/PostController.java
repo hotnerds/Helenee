@@ -36,8 +36,8 @@ public class PostController {
     }
 
     @GetMapping(params = {"page", "size"})
-    public ResponseEntity<List<PostResponseDto>> searchAllPosts(Pageable pageable) {
-        return ResponseEntity.ok(postService.searchAll(pageable));
+    public ResponseEntity<List<PostResponseDto>> searchAllPosts(@Valid PageInfo pageInfo) {
+        return ResponseEntity.ok(postService.searchAll(pageInfo));
     }
 
     @GetMapping(params = {"page", "size", "title"})

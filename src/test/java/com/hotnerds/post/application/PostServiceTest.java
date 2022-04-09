@@ -176,9 +176,12 @@ public class PostServiceTest {
     void 전체_게시글_조회() {
         //given
         when(postRepository.findAllPosts(any())).thenReturn(List.of(post));
-        Pageable page = PageRequest.of(0, 10);
+        PageInfo pageInfo = PageInfo.builder()
+                .page(0)
+                .size(10)
+                .build();
         //when
-        List<PostResponseDto> posts = postService.searchAll(page);
+        List<PostResponseDto> posts = postService.searchAll(pageInfo);
 
         //then
         assertThat(posts.size()).isEqualTo(1);

@@ -17,17 +17,14 @@ public class PostByWriterRequestDto {
     @NotBlank
     private final String writer;
 
-    @Min(0)
-    private int page;
-
-    @JsonProperty("size")
-    @Min(1)
-    private int pageSize;
+    private PageInfo pageInfo;
 
     @Builder
     public PostByWriterRequestDto(String writer, int page, int size) {
         this.writer = writer;
-        this.page = page;
-        this.pageSize = size;
+        this.pageInfo = PageInfo.builder()
+                .page(page)
+                .size(size)
+                .build();
     }
 }
