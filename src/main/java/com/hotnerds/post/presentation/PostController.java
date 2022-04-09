@@ -26,17 +26,17 @@ public class PostController {
 
     private final PostService postService;
 
-    @GetMapping
-    public ResponseEntity<List<PostResponseDto>> searchAllPosts(@PageableDefault(size = 5) Pageable pageable) {
+    @GetMapping(params = {"page", "size"})
+    public ResponseEntity<List<PostResponseDto>> searchAllPosts(Pageable pageable) {
         return ResponseEntity.ok(postService.searchAll(pageable));
     }
 
-    @GetMapping(params = {"title"})
+    @GetMapping(params = {"page", "size", "title"})
     public ResponseEntity<List<PostResponseDto>> searchPostsByTitle(PostByTitleRequestDto requestDto) {
         return ResponseEntity.ok(postService.searchByTitle(requestDto));
     }
 
-    @GetMapping(params = {"writer"})
+    @GetMapping(params = {"page", "size","writer"})
     public ResponseEntity<List<PostResponseDto>> searchPostsByWriter(PostByWriterRequestDto requestDto) {
         return ResponseEntity.ok(postService.searchByWriter(requestDto));
     }
