@@ -56,7 +56,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePosts(@Valid @PathVariable("id") Long postId, @Authenticated AuthenticatedUser authUser) {
+    public ResponseEntity<Void> deletePosts(@NotNull @PathVariable("id") Long postId, @Authenticated AuthenticatedUser authUser) {
         postService.delete(postId, authUser);
         return ResponseEntity.noContent().build();
     }
@@ -67,5 +67,8 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
-
+    @PostMapping("/{id}/likes")
+    public ResponseEntity<LikeResponseDto> likePosts(@NotNull @PathVariable("id") Long postId, @Authenticated AuthenticatedUser authUser) {
+        return ResponseEntity.ok(postService.like(postId, authUser));
+    }
 }
