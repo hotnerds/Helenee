@@ -226,7 +226,7 @@ public class PostServiceTest {
     void 작성자_이름으로_게시물_조회() {
         //given
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
-        when(postRepository.findAllByUser(any(User.class), any(PageRequest.class))).thenReturn(List.of(post, post));
+        when(postRepository.findAllByWriter(any(User.class), any(PageRequest.class))).thenReturn(List.of(post, post));
 
         PostByWriterRequestDto requestDto = PostByWriterRequestDto.builder()
                 .writer(user.getUsername())
@@ -249,7 +249,7 @@ public class PostServiceTest {
                 .isEqualTo(expectedResult);
 
         verify(userRepository, times(1)).findByUsername(user.getUsername());
-        verify(postRepository, times(1)).findAllByUser(user, requestDto.getPageable());
+        verify(postRepository, times(1)).findAllByWriter(user, requestDto.getPageable());
     }
 
     @DisplayName("특정 태그가 붙어 있는 게시글 조회할 수 있다.")
@@ -295,19 +295,14 @@ public class PostServiceTest {
     @Test
     void 유효하지않은사용자_게시글_삭제_실패() {
         //given
-        PostDeleteRequestDto requestDto = PostDeleteRequestDto.builder()
-                .postId(1L)
-                .username("garam")
-                .build();
-
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
 
         //when then
-        assertThatThrownBy(() -> postService.delete(requestDto))
+        assertThatThrownBy(() -> postService.delete(1L, authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
 
-        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
+        verify(userRepository, times(1)).findByUsername(any());
 
     }
 
@@ -315,42 +310,32 @@ public class PostServiceTest {
     @Test
     void 존재하지않은_게시글_삭제_실패() {
         //given
-        PostDeleteRequestDto requestDto = PostDeleteRequestDto.builder()
-                .postId(1L)
-                .username("garam")
-                .build();
-
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when then
-        assertThatThrownBy(() -> postService.delete(requestDto))
+        assertThatThrownBy(() -> postService.delete(1L, authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.POST_NOT_FOUND_EXCEPTION.getMessage());
 
-        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
-        verify(postRepository, times(1)).findById(requestDto.getPostId());
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).findById(any());
     }
 
     @DisplayName("게시글 삭제 성공")
     @Test
     void 게시글_삭제_성공() {
         //given
-        PostDeleteRequestDto requestDto = PostDeleteRequestDto.builder()
-                .postId(1L)
-                .username("garam")
-                .build();
-
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
         //when
-        postService.delete(requestDto);
+        postService.delete(1L, authUser);
 
         //then
-        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
-        verify(postRepository, times(1)).findById(requestDto.getPostId());
-        verify(postRepository, times(1)).deleteById(requestDto.getPostId());
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).findById(any());
+        verify(postRepository, times(1)).deleteById(any());
     }
 
     @DisplayName("존재하지 않는 게시글에 좋아요를 누르면 실패 한다.")

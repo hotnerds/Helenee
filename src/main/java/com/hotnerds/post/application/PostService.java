@@ -51,7 +51,7 @@ public class PostService {
         User user = userRepository.findByUsername(requestDto.getWriter())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        return postRepository.findAllByUser(user, requestDto.getPageable()).stream()
+        return postRepository.findAllByWriter(user, requestDto.getPageable()).stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }
@@ -82,15 +82,18 @@ public class PostService {
     }
 
     @Transactional
-    public void delete(PostDeleteRequestDto requestDto) {
-
-        userRepository.findByUsername(requestDto.getUsername())
+    public void delete(Long postId, AuthenticatedUser authUser) {
+        User user = userRepository.findByUsername(authUser.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        postRepository.findById(requestDto.getPostId())
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
 
-        postRepository.deleteById(requestDto.getPostId());
+        if(!post.isWriter(user)) {
+            throw new BusinessException(ErrorCode.POST_WRITER_NOT_MATCH_EXCEPTION);
+        }
+
+        postRepository.deleteById(postId);
     }
 
     @Transactional

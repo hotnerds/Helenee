@@ -2,7 +2,6 @@ package com.hotnerds.post.domain.repository;
 
 import com.hotnerds.common.JpaConfig;
 import com.hotnerds.post.domain.Post;
-import com.hotnerds.post.domain.dto.PostResponseDto;
 import com.hotnerds.tag.domain.Tag;
 import com.hotnerds.tag.domain.repository.TagRepository;
 import com.hotnerds.user.domain.User;
@@ -135,7 +134,7 @@ class PostRepositoryTest {
         tagRepository.save(tag);
         postRepository.save(post);
         //when
-        List<Post> findPosts = postRepository.findAllByUser(user, PageRequest.of(0, 10));
+        List<Post> findPosts = postRepository.findAllByWriter(user, PageRequest.of(0, 10));
 
         //then
         assertThat(findPosts.size()).isEqualTo(1);
