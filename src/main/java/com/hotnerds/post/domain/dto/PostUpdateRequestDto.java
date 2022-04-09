@@ -17,7 +17,6 @@ public class PostUpdateRequestDto {
     @NotBlank
     private String content;
 
-    @NotEmpty
     private List<@NotBlank String> tagNames;
 
     @Builder

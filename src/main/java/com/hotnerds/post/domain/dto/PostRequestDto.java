@@ -15,7 +15,6 @@ public class PostRequestDto {
     @NotBlank
     private String content;
 
-    @NotEmpty
     private List<@NotBlank String> tagNames;
 
     @Builder

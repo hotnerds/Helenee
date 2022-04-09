@@ -10,7 +10,6 @@ import java.util.List;
 
 @Getter
 public class PostByTagRequestDto {
-    @NotEmpty
     private List<@NotBlank String> tagNames;
 
     PageInfo pageInfo;
