@@ -17,9 +17,9 @@ import org.springframework.util.MultiValueMap;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -115,7 +115,7 @@ class PostControllerTest extends ControllerTest {
     @WithCustomMockUser
     @DisplayName("게시글에 붙은 tag 이름들로 게시글 조회할 수 있다.")
     @Test
-    void 태그_이름들로_게시글_조회() throws Exception{
+    void 태그_이름들로_게시글_조회() throws Exception {
         //given
         when(postService.searchByTagNames(any())).thenReturn(postResponse);
         params.put("tagNames", List.of("tag"));
@@ -126,4 +126,17 @@ class PostControllerTest extends ControllerTest {
                         .params(params))
                         .andExpect(status().isOk());
     }
+
+    @WithCustomMockUser
+    @DisplayName("게시글 작성자는 게시글 삭제 요청할 수 있다.")
+    @Test
+    void 게시글_삭제_요청() throws Exception {
+        //given
+        doNothing().when(postService).delete(any(), any());
+
+        //when
+        mockMvc.perform(delete("/api/posts/{id}", 1L))
+                .andExpect(status().isNoContent());
+    }
+
 }
