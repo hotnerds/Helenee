@@ -1,5 +1,6 @@
 package com.hotnerds.post.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.PageRequest;
@@ -8,11 +9,16 @@ import org.springframework.data.domain.PageRequest;
 public class PostByWriterRequestDto {
 
     private final String writer;
-    private final PageRequest pageable;
+
+    private int page;
+
+    @JsonProperty("size")
+    private int pageSize;
 
     @Builder
-    public PostByWriterRequestDto(String writer, PageRequest pageable) {
+    public PostByWriterRequestDto(String writer, int page, int size) {
         this.writer = writer;
-        this.pageable = pageable;
+        this.page = page;
+        this.pageSize = size;
     }
 }

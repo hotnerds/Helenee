@@ -192,7 +192,8 @@ public class PostServiceTest {
         when(postRepository.findAllByTitle(any(), any())).thenReturn(List.of(post));
         PostByTitleRequestDto requestDto = PostByTitleRequestDto.builder()
                 .title(post.getTitle())
-                .pageable(PageRequest.of(0, 10))
+                .page(0)
+                .size(10)
                 .build();
         //when
         List<PostResponseDto> findPosts = postService.searchByTitle(requestDto);
@@ -210,7 +211,8 @@ public class PostServiceTest {
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
         PostByWriterRequestDto requestDto = PostByWriterRequestDto.builder()
                 .writer(user.getUsername())
-                .pageable(PageRequest.of(0, 10))
+                .page(0)
+                .size(10)
                 .build();
 
         //when then
@@ -230,7 +232,8 @@ public class PostServiceTest {
 
         PostByWriterRequestDto requestDto = PostByWriterRequestDto.builder()
                 .writer(user.getUsername())
-                .pageable(PageRequest.of(0, 10))
+                .page(0)
+                .size(10)
                 .build();
 
         List<PostResponseDto> expectedResult = List.of(
@@ -248,8 +251,8 @@ public class PostServiceTest {
                 .usingRecursiveComparison()
                 .isEqualTo(expectedResult);
 
-        verify(userRepository, times(1)).findByUsername(user.getUsername());
-        verify(postRepository, times(1)).findAllByWriter(user, requestDto.getPageable());
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).findAllByWriter(any(), any());
     }
 
     @DisplayName("특정 태그가 붙어 있는 게시글 조회할 수 있다.")
@@ -259,7 +262,8 @@ public class PostServiceTest {
         post.addTag(tag);
         PostByTagRequestDto requestDto = PostByTagRequestDto.builder()
                 .tagNames(List.of(tag.getName()))
-                .pageable(PageRequest.of(0, 10))
+                .page(0)
+                .size(10)
                 .build();
 
         when(postRepository.findAllByTagNames(any(), any())).thenReturn(List.of(post));
@@ -280,7 +284,8 @@ public class PostServiceTest {
         post.addTag(tag);
         PostByTagRequestDto requestDto = PostByTagRequestDto.builder()
                 .tagNames(List.of("", "     "))
-                .pageable(PageRequest.of(0, 10))
+                .page(0)
+                .size(10)
                 .build();
 
         //when then

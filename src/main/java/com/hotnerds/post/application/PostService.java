@@ -11,6 +11,7 @@ import com.hotnerds.tag.domain.Tag;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,8 +42,8 @@ public class PostService {
     }
 
     public List<PostResponseDto> searchByTitle(PostByTitleRequestDto requestDto) {
-
-        return postRepository.findAllByTitle(requestDto.getTitle(), requestDto.getPageable()).stream()
+        Pageable pageable = PageRequest.of(requestDto.getPage(), requestDto.getPageSize());
+        return postRepository.findAllByTitle(requestDto.getTitle(), pageable).stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }
@@ -51,7 +52,9 @@ public class PostService {
         User user = userRepository.findByUsername(requestDto.getWriter())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        return postRepository.findAllByWriter(user, requestDto.getPageable()).stream()
+        Pageable pageable = PageRequest.of(requestDto.getPage(), requestDto.getPageSize());
+
+        return postRepository.findAllByWriter(user, pageable).stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }
@@ -60,7 +63,9 @@ public class PostService {
         requestDto.getTagNames()
                 .forEach(Tag::validateTagName);
 
-        return postRepository.findAllByTagNames(requestDto.getTagNames(), requestDto.getPageable()).stream()
+        Pageable pageable = PageRequest.of(requestDto.getPage(), requestDto.getPageSize());
+
+        return postRepository.findAllByTagNames(requestDto.getTagNames(), pageable).stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }
