@@ -97,10 +97,10 @@ public class PostService {
     }
 
     @Transactional
-    public void update(PostUpdateRequestDto updateRequestDto) {
+    public void update(PostUpdateRequestDto updateRequestDto, AuthenticatedUser authUser) {
         Post post = postRepository.findById(updateRequestDto.getPostId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
-        User user = userRepository.findByUsername(updateRequestDto.getUsername())
+        User user = userRepository.findByUsername(authUser.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         if(!post.isWriter(user)) {

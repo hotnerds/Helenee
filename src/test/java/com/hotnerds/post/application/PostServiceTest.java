@@ -472,7 +472,6 @@ public class PostServiceTest {
         //given
         PostUpdateRequestDto updateDto = PostUpdateRequestDto.builder()
                 .postId(post.getId())
-                .username(user.getUsername())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tagNames(List.of(tag.getName()))
@@ -483,7 +482,7 @@ public class PostServiceTest {
         when(tagService.findOrCreateTag(anyString())).thenReturn(tag);
 
         //when
-        postService.update(updateDto);
+        postService.update(updateDto, authUser);
 
         //then
         verify(postRepository, times(1)).findById(anyLong());
@@ -501,7 +500,6 @@ public class PostServiceTest {
                 .build();
         PostUpdateRequestDto updateDto = PostUpdateRequestDto.builder()
                 .postId(post.getId())
-                .username(notWriter.getUsername())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tagNames(List.of(tag.getName()))
@@ -511,7 +509,7 @@ public class PostServiceTest {
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(notWriter));
 
         //when then
-        assertThatThrownBy(() -> postService.update(updateDto))
+        assertThatThrownBy(() -> postService.update(updateDto, authUser))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
@@ -527,7 +525,6 @@ public class PostServiceTest {
         //given
         PostUpdateRequestDto updateDto = PostUpdateRequestDto.builder()
                 .postId(post.getId())
-                .username(user.getUsername())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tagNames(List.of(tag.getName()))
@@ -536,7 +533,7 @@ public class PostServiceTest {
         when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when then
-        assertThatThrownBy(() -> postService.update(updateDto))
+        assertThatThrownBy(() -> postService.update(updateDto, authUser))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
@@ -551,7 +548,6 @@ public class PostServiceTest {
         //given
         PostUpdateRequestDto updateDto = PostUpdateRequestDto.builder()
                 .postId(post.getId())
-                .username(user.getUsername())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tagNames(List.of(tag.getName()))
@@ -561,7 +557,7 @@ public class PostServiceTest {
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
 
         //when then
-        assertThatThrownBy(() -> postService.update(updateDto))
+        assertThatThrownBy(() -> postService.update(updateDto, authUser))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
@@ -578,7 +574,6 @@ public class PostServiceTest {
         //given
         PostUpdateRequestDto updateDto = PostUpdateRequestDto.builder()
                 .postId(post.getId())
-                .username(user.getUsername())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tagNames(List.of(tagName))
@@ -589,7 +584,7 @@ public class PostServiceTest {
         when(tagService.findOrCreateTag(anyString())).thenThrow(new BusinessException(ErrorCode.TAG_NAME_NOT_VALID_EXCEPTION));
 
         //when then
-        assertThatThrownBy(() -> postService.update(updateDto))
+        assertThatThrownBy(() -> postService.update(updateDto, authUser))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
