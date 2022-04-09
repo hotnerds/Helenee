@@ -2,6 +2,7 @@ package com.hotnerds.post.presentation;
 
 
 import com.hotnerds.post.application.PostService;
+import com.hotnerds.post.domain.dto.PostByTagRequestDto;
 import com.hotnerds.post.domain.dto.PostByTitleRequestDto;
 import com.hotnerds.post.domain.dto.PostByWriterRequestDto;
 import com.hotnerds.post.domain.dto.PostResponseDto;
@@ -41,5 +42,9 @@ public class PostController {
         return ResponseEntity.ok(postService.searchByWriter(requestDto));
     }
 
+    @GetMapping(params = {"page", "size", "tagNames"})
+    public ResponseEntity<List<PostResponseDto>> searchPostsByTagNames(PostByTagRequestDto requestDto) {
+        return ResponseEntity.ok(postService.searchByTagNames(requestDto));
+    }
 
 }
