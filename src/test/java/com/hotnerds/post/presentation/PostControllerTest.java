@@ -41,6 +41,7 @@ class PostControllerTest extends ControllerTest {
                     .likeCount(1)
                     .tagNames(List.of("tag"))
                     .build());
+
         params = new LinkedMultiValueMap<>();
         params.put("page", List.of("0"));
         params.put("size", List.of("10"));
@@ -89,4 +90,18 @@ class PostControllerTest extends ControllerTest {
                         .andExpect(status().isOk());
     }
 
+    @WithCustomMockUser
+    @DisplayName("게시글에 붙은 tag 이름들로 게시글 조회할 수 있다.")
+    @Test
+    void 태그_이름들로_게시글_조회() throws Exception{
+        //given
+        when(postService.searchByTagNames(any())).thenReturn(postResponse);
+        params.put("tagNames", List.of("tag"));
+
+        //when then
+        mockMvc.perform(get("/api/posts")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .params(params))
+                        .andExpect(status().isOk());
+    }
 }
