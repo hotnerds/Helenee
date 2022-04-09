@@ -106,4 +106,10 @@ class PostTest {
                 .usingRecursiveComparison()
                 .isEqualTo(ErrorCode.TAG_NOT_FOUND_EXCEPTION);
     }
+
+    @DisplayName("게시글 작성자 인지 확인한다.")
+    @Test
+    void 게시글_작성자_확인() {
+        assertThat(post.isWriter(user)).isTrue();
+    }
 }
