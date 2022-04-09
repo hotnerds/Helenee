@@ -1,6 +1,8 @@
 package com.hotnerds.food.infrastructure.fatsecret.dto.searchfoods;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.Nutrient;
 import lombok.AccessLevel;
@@ -47,7 +49,7 @@ public class FoodsWrapper {
             Pattern pattern = Pattern.compile("Calories: \\d+(\\.\\d+)?");
             Matcher matcher = pattern.matcher(foodDescription);
             if (!matcher.find()) {
-                throw new IllegalStateException();
+                throw new BusinessException(ErrorCode.EXTERNAL_COMMUNICATION_EXCEPTION);
             }
             return Double.parseDouble(
                     matcher.group().replace("Calories: ", "")
@@ -58,7 +60,7 @@ public class FoodsWrapper {
             Pattern pattern = Pattern.compile("Carbs: \\d+(\\.\\d+)?");
             Matcher matcher = pattern.matcher(foodDescription);
             if (!matcher.find()) {
-                throw new IllegalStateException();
+                throw new BusinessException(ErrorCode.EXTERNAL_COMMUNICATION_EXCEPTION);
             }
             return Double.parseDouble(
                     matcher.group().replace("Carbs: ", "")
@@ -69,7 +71,7 @@ public class FoodsWrapper {
             Pattern pattern = Pattern.compile("Protein: \\d+(\\.\\d+)?");
             Matcher matcher = pattern.matcher(foodDescription);
             if (!matcher.find()) {
-                throw new IllegalStateException();
+                throw new BusinessException(ErrorCode.EXTERNAL_COMMUNICATION_EXCEPTION);
             }
             return Double.parseDouble(
                     matcher.group().replace("Protein: ", "")
@@ -80,7 +82,7 @@ public class FoodsWrapper {
             Pattern pattern = Pattern.compile("Fat: \\d+(\\.\\d+)?");
             Matcher matcher = pattern.matcher(foodDescription);
             if (!matcher.find()) {
-                throw new IllegalStateException();
+                throw new BusinessException(ErrorCode.EXTERNAL_COMMUNICATION_EXCEPTION);
             }
             return Double.parseDouble(
                     matcher.group().replace("Fat: ", "")
