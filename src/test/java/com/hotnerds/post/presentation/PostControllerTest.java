@@ -3,6 +3,7 @@ package com.hotnerds.post.presentation;
 import com.hotnerds.ControllerTest;
 import com.hotnerds.WithCustomMockUser;
 import com.hotnerds.post.application.PostService;
+import com.hotnerds.post.domain.dto.LikeResponseDto;
 import com.hotnerds.post.domain.dto.PostRequestDto;
 import com.hotnerds.post.domain.dto.PostResponseDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -134,7 +135,7 @@ class PostControllerTest extends ControllerTest {
         //given
         doNothing().when(postService).delete(any(), any());
 
-        //when
+        //when then
         mockMvc.perform(delete("/api/posts/{id}", 1L))
                 .andExpect(status().isNoContent());
     }
@@ -146,10 +147,28 @@ class PostControllerTest extends ControllerTest {
         //given
         doNothing().when(postService).update(any(), any());
 
-        //when
+        //when then
         mockMvc.perform(patch("/api/posts/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
+    }
+
+    @WithCustomMockUser
+    @DisplayName("사용자는 게시글에 좋아요를 누를 수 있다")
+    @Test
+    void 좋아요_요청() throws Exception {
+        //given
+        LikeResponseDto responseDto = LikeResponseDto.builder()
+                .postId(1L)
+                .username("garamkim")
+                .likeCount(1)
+                .build();
+        when(postService.like(any(), any())).thenReturn(responseDto);
+
+        //when then
+        mockMvc.perform(post("/api/posts/{id}/likes", 1L)
+                        .accept(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk());
     }
 
 }
