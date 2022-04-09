@@ -59,4 +59,17 @@ class PostControllerTest extends ControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @WithCustomMockUser
+    @DisplayName("사용자는 게시글을 이름으로 조회할 수 있다.")
+    @Test
+    void 게시글_이름으로_조회() throws Exception{
+        //given
+        when(postService.searchByTitle(any())).thenReturn(postResponse);
+
+        //when
+        mockMvc.perform(get("/api/posts?page=0&size=10&title=title")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
 }
