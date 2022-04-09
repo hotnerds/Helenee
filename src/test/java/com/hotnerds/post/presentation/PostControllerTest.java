@@ -171,4 +171,23 @@ class PostControllerTest extends ControllerTest {
                         .andExpect(status().isOk());
     }
 
+    @WithCustomMockUser
+    @DisplayName("게시글에 좋아요를 누른 사용자는 좋아요를 취소할 수 있다.")
+    @Test
+    void 좋아요_요청_취소() throws Exception {
+        //given
+        LikeResponseDto responseDto = LikeResponseDto.builder()
+                .postId(1L)
+                .username("garamkim")
+                .likeCount(0)
+                .build();
+        when(postService.unlike(any(), any())).thenReturn(responseDto);
+
+        //when then
+        mockMvc.perform(delete("/api/posts/{id}/likes", 1L)
+                        .accept(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk());
+
+    }
+
 }
