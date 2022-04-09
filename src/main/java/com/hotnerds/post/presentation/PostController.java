@@ -7,7 +7,6 @@ import com.hotnerds.post.application.PostService;
 import com.hotnerds.post.domain.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,5 +47,11 @@ public class PostController {
     @GetMapping(params = {"page", "size", "tagNames"})
     public ResponseEntity<List<PostResponseDto>> searchPostsByTagNames(PostByTagRequestDto requestDto) {
         return ResponseEntity.ok(postService.searchByTagNames(requestDto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePosts(@PathVariable("id") Long postId, @Authenticated AuthenticatedUser authUser) {
+        postService.delete(postId, authUser);
+        return ResponseEntity.noContent().build();
     }
 }
