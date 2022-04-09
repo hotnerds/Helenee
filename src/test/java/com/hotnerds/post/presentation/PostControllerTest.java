@@ -139,4 +139,17 @@ class PostControllerTest extends ControllerTest {
                 .andExpect(status().isNoContent());
     }
 
+    @WithCustomMockUser
+    @DisplayName("게시글 작성자는 게시글을 수정할 수 있다.")
+    @Test
+    void 게시글_수정_요청() throws Exception {
+        //given
+        doNothing().when(postService).update(any(), any());
+
+        //when
+        mockMvc.perform(patch("/api/posts/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
 }
