@@ -41,22 +41,22 @@ public class PostController {
     }
 
     @GetMapping(params = {"page", "size", "title"})
-    public ResponseEntity<List<PostResponseDto>> searchPostsByTitle(PostByTitleRequestDto requestDto) {
+    public ResponseEntity<List<PostResponseDto>> searchPostsByTitle(@Valid PostByTitleRequestDto requestDto) {
         return ResponseEntity.ok(postService.searchByTitle(requestDto));
     }
 
     @GetMapping(params = {"page", "size", "writer"})
-    public ResponseEntity<List<PostResponseDto>> searchPostsByWriter(PostByWriterRequestDto requestDto) {
+    public ResponseEntity<List<PostResponseDto>> searchPostsByWriter(@Valid PostByWriterRequestDto requestDto) {
         return ResponseEntity.ok(postService.searchByWriter(requestDto));
     }
 
     @GetMapping(params = {"page", "size", "tagNames"})
-    public ResponseEntity<List<PostResponseDto>> searchPostsByTagNames(PostByTagRequestDto requestDto) {
+    public ResponseEntity<List<PostResponseDto>> searchPostsByTagNames(@Valid PostByTagRequestDto requestDto) {
         return ResponseEntity.ok(postService.searchByTagNames(requestDto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePosts(@PathVariable("id") Long postId, @Authenticated AuthenticatedUser authUser) {
+    public ResponseEntity<Void> deletePosts(@Valid @PathVariable("id") Long postId, @Authenticated AuthenticatedUser authUser) {
         postService.delete(postId, authUser);
         return ResponseEntity.noContent().build();
     }
