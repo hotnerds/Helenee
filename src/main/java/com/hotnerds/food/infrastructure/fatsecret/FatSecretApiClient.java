@@ -1,12 +1,15 @@
 package com.hotnerds.food.infrastructure.fatsecret;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.apiclient.FoodApiClient;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.hotnerds.food.domain.dto.FoodResponseDto;
@@ -74,7 +77,10 @@ public class FatSecretApiClient implements FoodApiClient {
 
         ResponseEntity<FoodWrapper> response = restTemplate.exchange(request, FoodWrapper.class);
 
-        return response.getBody()
+        FoodWrapper responseBody = Optional.ofNullable(response.getBody())
+                .orElseThrow(() -> new BusinessException(ErrorCode.EXTERNAL_COMMUNICATION_EXCEPTION));
+
+        return responseBody
                 .getFood()
                 .toEntity();
     }
@@ -106,7 +112,10 @@ public class FatSecretApiClient implements FoodApiClient {
 
         ResponseEntity<FoodsWrapper> response = restTemplate.exchange(request, FoodsWrapper.class);
 
-        return response.getBody()
+        FoodsWrapper responseBody = Optional.ofNullable(response.getBody())
+                .orElseThrow(() -> new BusinessException(ErrorCode.EXTERNAL_COMMUNICATION_EXCEPTION));
+
+        return responseBody
                 .getFoods()
                 .getFoodList()
                 .stream()
