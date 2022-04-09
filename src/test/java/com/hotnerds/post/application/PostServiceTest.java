@@ -88,9 +88,10 @@ public class PostServiceTest {
         when(tagService.findOrCreateTag(anyString())).thenReturn(tag);
 
         //when
-        postService.write(requestDto);
+        Long postId = postService.write(requestDto);
 
         //then
+        assertThat(postId).isNotNull();
         verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
         verify(postRepository, times(1)).save(any(Post.class));
         verify(tagService, times(requestDto.getTagNames().size())).findOrCreateTag(anyString());
@@ -202,13 +203,13 @@ public class PostServiceTest {
         verify(postRepository, times(1)).findAllByTitle(any(), any());
     }
 
-    @DisplayName("유효하지 않은 사용자 게시물 조회 실패")
+    @DisplayName("존재하지 않은 사용자 게시물 조회 실패")
     @Test
-    void 유효하지않은사용자_게시물_조회_실패() {
+    void 존재하지_않은_사용자_게시물_조회_실패() {
         //given
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
-        PostByUserRequestDto requestDto = PostByUserRequestDto.builder()
-                .username(user.getUsername())
+        PostByWriterRequestDto requestDto = PostByWriterRequestDto.builder()
+                .writer(user.getUsername())
                 .pageable(PageRequest.of(0, 10))
                 .build();
 
@@ -220,15 +221,15 @@ public class PostServiceTest {
         verify(userRepository, times(1)).findByUsername(user.getUsername());
     }
 
-    @DisplayName("사용자가 작성한 게시물 조회")
+    @DisplayName("게시글 작성자 이름으로 게시글 조회.")
     @Test
-    void 사용자가_작성한_게시물_조회() {
+    void 작성자_이름으로_게시물_조회() {
         //given
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findAllByUser(any(User.class), any(PageRequest.class))).thenReturn(List.of(post, post));
 
-        PostByUserRequestDto requestDto = PostByUserRequestDto.builder()
-                .username(user.getUsername())
+        PostByWriterRequestDto requestDto = PostByWriterRequestDto.builder()
+                .writer(user.getUsername())
                 .pageable(PageRequest.of(0, 10))
                 .build();
 
