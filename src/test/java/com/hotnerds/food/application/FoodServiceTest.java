@@ -1,14 +1,12 @@
 package com.hotnerds.food.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hotnerds.common.exception.BusinessException;
-import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.Nutrient;
+import com.hotnerds.food.domain.apiclient.FoodApiClient;
+import com.hotnerds.food.domain.dto.FoodRequestByNameDto;
 import com.hotnerds.food.domain.dto.FoodResponseDto;
 import com.hotnerds.food.domain.repository.FoodRepository;
-import com.hotnerds.food.domain.apiclient.FoodApiClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,13 +15,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.PageRequest;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,7 +48,7 @@ class FoodServiceTest {
 
     @Test
     @DisplayName("해당하는 음식이 없으면 외부 API로 정보를 가져온 후 음식을 생성한다.")
-    void 음식이_없으면_생성() throws JsonProcessingException {
+    void 음식이_없으면_생성() {
         //given
         when(foodRepository.findById(anyLong())).thenReturn(Optional.empty());
         when(foodRepository.save(any(Food.class))).thenAnswer((Answer<Food>) invocation -> invocation.getArgument(0));
@@ -81,5 +78,34 @@ class FoodServiceTest {
         verify(foodRepository, times(1)).findById(1641L);
         verify(apiClient, times(0)).searchFoodById(1641L);
 
+    }
+
+    @Test
+    @DisplayName("음식 이름으로 음식 리스트를 검색한다.")
+    void 음식_리스트_검색() {
+        //given
+        Food food1 = Food.builder()
+                .foodId(1641L)
+                .foodName("Chicken Breast")
+                .nutrient(new Nutrient(164.0, 0.0, 24.82, 6.48))
+                .build();
+        Food food2 = Food.builder()
+                .foodId(1642L)
+                .foodName("Chicken")
+                .nutrient(new Nutrient(164.0, 0.0, 24.82, 6.48))
+                .build();
+        List<Food> foods = List.of(food1, food2);
+        when(apiClient.searchFoods(anyString(), anyInt(), anyInt())).thenReturn(foods);
+        FoodRequestByNameDto request = FoodRequestByNameDto.builder()
+                .foodName("Chicken")
+                .pageRequest(PageRequest.of(0, 2))
+                .build();
+
+        //when
+        List<FoodResponseDto> actualFoods = foodService.searchFoods(request);
+
+        //then
+        assertThat(actualFoods).hasSize(2);
+        verify(apiClient, times(1)).searchFoods("Chicken", 0, 2);
     }
 }
