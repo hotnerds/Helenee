@@ -9,14 +9,12 @@ import java.util.List;
 public class PostRequestDto {
     private String title;
     private String content;
-    private String username;
     private List<String> tagNames;
 
     @Builder
-    public PostRequestDto(String title, String content, String username, List<String> tagNames) {
+    public PostRequestDto(String title, String content, List<String> tagNames) {
         this.title = title;
         this.content = content;
-        this.username = username;
         this.tagNames = tagNames;
     }
 }
