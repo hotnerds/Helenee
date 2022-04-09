@@ -5,14 +5,14 @@ import lombok.Getter;
 import org.springframework.data.domain.PageRequest;
 
 @Getter
-public class PostByUserRequestDto {
+public class PostByWriterRequestDto {
 
-    private final String username;
+    private final String writer;
     private final PageRequest pageable;
 
     @Builder
-    public PostByUserRequestDto(String username, PageRequest pageable) {
-        this.username = username;
+    public PostByWriterRequestDto(String writer, PageRequest pageable) {
+        this.writer = writer;
         this.pageable = pageable;
     }
 }
