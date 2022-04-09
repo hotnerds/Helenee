@@ -3,7 +3,6 @@ package com.hotnerds.food.infrastructure.fatsecret.dto.getfood;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.Nutrient;
-import com.hotnerds.food.domain.dto.FoodResponseDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

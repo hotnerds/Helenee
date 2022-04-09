@@ -27,18 +27,18 @@ public class FatSecretToken {
 
     private static final ParameterizedTypeReference<Map<String, Object>> PARAMETERIZED_RESPONSE_TYPE = new ParameterizedTypeReference<>() {
     };
-    private final String GRANT_TYPE = "grant_type";
-    private final String SCOPE = "scope";
-    private final String CLIENT_CREDENTIALS = "client_credentials";
-    private final String BASIC_SCOPE = "basic";
-    private final String ACCESS_TOKEN = "access_token";
-    private final RestTemplate restTemplate;
+    private static final String GRANT_TYPE = "grant_type";
+    private static final String SCOPE = "scope";
+    private static final String CLIENT_CREDENTIALS = "client_credentials";
+    private static final String BASIC_SCOPE = "basic";
+    private static final String ACCESS_TOKEN = "access_token";
     @Value("${fat-secret.token-request-url}")
     private String API_URI_PREFIX;
     @Value("${fat-secret.id}")
     private String ID;
     @Value("${fat-secret.secret}")
     private String SECRET;
+    private final RestTemplate restTemplate;
     private String accessToken;
 
     @Autowired

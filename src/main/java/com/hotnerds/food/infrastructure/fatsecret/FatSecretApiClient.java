@@ -1,51 +1,39 @@
 package com.hotnerds.food.infrastructure.fatsecret;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.apiclient.FoodApiClient;
-
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import com.hotnerds.food.domain.dto.FoodResponseDto;
 import com.hotnerds.food.infrastructure.fatsecret.dto.getfood.FoodWrapper;
 import com.hotnerds.food.infrastructure.fatsecret.dto.searchfoods.FoodsWrapper;
-import com.hotnerds.food.infrastructure.fatsecret.handler.FatSecretResponseErrorHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
-import org.springframework.http.client.BufferingClientHttpRequestFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Component
 public class FatSecretApiClient implements FoodApiClient {
 
+    private static final String METHOD = "method";
+    private static final String FORMAT = "format";
+    private static final String JSON_FORMAT = "json";
     @Value("${fat-secret.api-url}")
     private String API_URI_PREFIX;
-
-    private final String METHOD = "method";
-
-    private final String FORMAT = "format";
-
-    private final String JSON_FORMAT = "json";
-
     private final RestTemplate restTemplate;
 
     private final FatSecretToken fatSecretToken;
-
-    private static final ParameterizedTypeReference<Map<String, Object>> PARAMETERIZED_RESPONSE_TYPE = new ParameterizedTypeReference<>() {
-    };
 
     @Autowired
     public FatSecretApiClient(RestTemplateBuilder restTemplateBuilder, FatSecretToken fatSecretToken) {

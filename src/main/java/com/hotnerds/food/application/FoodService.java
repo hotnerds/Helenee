@@ -1,21 +1,15 @@
 package com.hotnerds.food.application;
 
-import com.hotnerds.common.exception.BusinessException;
-import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.food.domain.Food;
-import com.hotnerds.food.domain.Nutrient;
+import com.hotnerds.food.domain.apiclient.FoodApiClient;
 import com.hotnerds.food.domain.dto.FoodRequestByNameDto;
 import com.hotnerds.food.domain.dto.FoodResponseDto;
 import com.hotnerds.food.domain.repository.FoodRepository;
-import com.hotnerds.food.domain.apiclient.FoodApiClient;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service

@@ -29,7 +29,7 @@ class FatSecretResponseErrorHandlerTest {
         byte[] responseBody = "{ \"error\": { }}\n".getBytes(StandardCharsets.UTF_8);
 
         //when then
-        assertThat(fatSecretResponseErrorHandler.hasError(responseBody)).isEqualTo(true);
+        assertThat(fatSecretResponseErrorHandler.hasError(responseBody)).isTrue();
 
     }
 
@@ -40,13 +40,13 @@ class FatSecretResponseErrorHandlerTest {
         byte[] responseBody = "{ }".getBytes(StandardCharsets.UTF_8);
 
         //when then
-        assertThat(fatSecretResponseErrorHandler.hasError(responseBody)).isEqualTo(false);
+        assertThat(fatSecretResponseErrorHandler.hasError(responseBody)).isFalse();
 
     }
 
     @Test
     @DisplayName("response body에 error 필드가 있으면 예외를 발생시킨다.")
-    void BODY에_ERROR가_있으면_EXCEPTION_발생() throws IOException {
+    void BODY에_ERROR가_있으면_EXCEPTION_발생() {
         //given
         byte[] responseBody = "{ \"error\": { }}\n".getBytes(StandardCharsets.UTF_8);
 

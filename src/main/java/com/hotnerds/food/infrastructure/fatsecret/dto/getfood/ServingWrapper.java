@@ -2,7 +2,6 @@ package com.hotnerds.food.infrastructure.fatsecret.dto.getfood;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
