@@ -28,8 +28,8 @@ public class PostService {
     private final TagService tagService;
 
     @Transactional
-    public void write(PostRequestDto requestDto) {
-        postRepository.save(createPost(requestDto));
+    public Long write(PostRequestDto requestDto) {
+        return postRepository.save(createPost(requestDto)).getId();
     }
 
     public List<PostResponseDto> searchAll(Pageable pageable) {
@@ -46,8 +46,8 @@ public class PostService {
                 .collect(toList());
     }
 
-    public List<PostResponseDto> searchByWriter(PostByUserRequestDto requestDto) {
-        User user = userRepository.findByUsername(requestDto.getUsername())
+    public List<PostResponseDto> searchByWriter(PostByWriterRequestDto requestDto) {
+        User user = userRepository.findByUsername(requestDto.getWriter())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         return postRepository.findAllByUser(user, requestDto.getPageable()).stream()
