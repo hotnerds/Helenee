@@ -1,20 +1,17 @@
 package com.hotnerds.post.presentation;
 
 
+import com.hotnerds.common.security.oauth2.annotation.Authenticated;
+import com.hotnerds.common.security.oauth2.service.AuthenticatedUser;
 import com.hotnerds.post.application.PostService;
-import com.hotnerds.post.domain.dto.PostByTagRequestDto;
-import com.hotnerds.post.domain.dto.PostByTitleRequestDto;
-import com.hotnerds.post.domain.dto.PostByWriterRequestDto;
-import com.hotnerds.post.domain.dto.PostResponseDto;
+import com.hotnerds.post.domain.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 import static com.hotnerds.post.presentation.PostController.*;
@@ -26,6 +23,12 @@ public class PostController {
     public static final String POST_API_URI = "/api/posts";
 
     private final PostService postService;
+
+    @PostMapping
+    public ResponseEntity<Long> createPosts(PostRequestDto requestDto, @Authenticated AuthenticatedUser authUser) {
+        Long postId = postService.write(requestDto, authUser);
+        return ResponseEntity.created(URI.create(POST_API_URI)).build();
+    }
 
     @GetMapping(params = {"page", "size"})
     public ResponseEntity<List<PostResponseDto>> searchAllPosts(Pageable pageable) {
@@ -46,5 +49,4 @@ public class PostController {
     public ResponseEntity<List<PostResponseDto>> searchPostsByTagNames(PostByTagRequestDto requestDto) {
         return ResponseEntity.ok(postService.searchByTagNames(requestDto));
     }
-
 }
