@@ -14,6 +14,7 @@ import java.util.List;
 public class DietSaveFoodRequestDto {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private LocalDate mealDate;
 
     private MealTime mealTime;
