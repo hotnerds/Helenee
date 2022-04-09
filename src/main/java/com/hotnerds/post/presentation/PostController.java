@@ -60,4 +60,12 @@ public class PostController {
         postService.delete(postId, authUser);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> updatePosts(@Valid PostUpdateRequestDto requestDto, @Authenticated AuthenticatedUser authUser) {
+        postService.update(requestDto, authUser);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
