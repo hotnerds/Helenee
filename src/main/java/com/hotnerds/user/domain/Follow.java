@@ -19,12 +19,10 @@ public class Follow {
 
     @ManyToOne
     @JoinColumn(name = "FOLLOWER_USER_ID")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private User follower;
 
     @ManyToOne
     @JoinColumn(name = "FOLLOWED_USER_ID")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private User followed;
 
     @Builder
