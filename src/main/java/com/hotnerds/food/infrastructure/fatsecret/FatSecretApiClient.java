@@ -1,47 +1,39 @@
-package com.hotnerds.fatsecret.application;
+package com.hotnerds.food.infrastructure.fatsecret;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hotnerds.fatsecret.FatSecretToken;
-
-import java.net.URI;
-import java.util.Map;
-
-import com.hotnerds.fatsecret.exception.FatSecretResponseErrorHandler;
-import lombok.Getter;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
+import com.hotnerds.food.domain.Food;
+import com.hotnerds.food.domain.apiclient.FoodApiClient;
+import com.hotnerds.food.infrastructure.fatsecret.dto.getfood.FoodWrapper;
+import com.hotnerds.food.infrastructure.fatsecret.dto.searchfoods.FoodsWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
-import org.springframework.http.client.BufferingClientHttpRequestFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.annotation.Resource;
-import javax.print.attribute.standard.Media;
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
-public class FatSecretApiClient {
+public class FatSecretApiClient implements FoodApiClient {
 
+    private static final String METHOD = "method";
+    private static final String FORMAT = "format";
+    private static final String JSON_FORMAT = "json";
     @Value("${fat-secret.api-url}")
-    private String API_URI_PREFIX;
-
-    private final String METHOD = "method";
-
-    private final String FORMAT = "format";
-
-    private final String JSON_FORMAT = "json";
-
+    private String apiUriPrefix;
     private final RestTemplate restTemplate;
 
     private final FatSecretToken fatSecretToken;
-
-    private static final ParameterizedTypeReference<Map<String, Object>> PARAMETERIZED_RESPONSE_TYPE = new ParameterizedTypeReference<>() {
-    };
 
     @Autowired
     public FatSecretApiClient(RestTemplateBuilder restTemplateBuilder, FatSecretToken fatSecretToken) {
@@ -49,12 +41,13 @@ public class FatSecretApiClient {
         this.restTemplate = restTemplateBuilder.build();
     }
 
-    public ResponseEntity<Map<String, Object>> searchFoodById(final Long foodId) throws RestClientResponseException {
+    @Override
+    public Food searchFoodById(final Long foodId) throws RestClientResponseException {
         final String FOOD_GET_METHOD = "food.get.v2";
         final String FOOD_ID = "food_id";
 
         URI url = UriComponentsBuilder
-                .fromHttpUrl(API_URI_PREFIX)
+                .fromHttpUrl(apiUriPrefix)
                 .queryParam(METHOD, FOOD_GET_METHOD)
                 .queryParam(FOOD_ID, foodId.toString())
                 .queryParam(FORMAT, JSON_FORMAT)
@@ -70,17 +63,25 @@ public class FatSecretApiClient {
                 .headers(headers)
                 .build();
 
-        return restTemplate.exchange(request, PARAMETERIZED_RESPONSE_TYPE);
+        ResponseEntity<FoodWrapper> response = restTemplate.exchange(request, FoodWrapper.class);
+
+        FoodWrapper responseBody = Optional.ofNullable(response.getBody())
+                .orElseThrow(() -> new BusinessException(ErrorCode.EXTERNAL_COMMUNICATION_EXCEPTION));
+
+        return responseBody
+                .getFood()
+                .toEntity();
     }
 
-    public ResponseEntity<Map<String, Object>> searchFoods(final String foodName, final int pageNumber, final int pageSize) throws RestClientResponseException {
+    @Override
+    public List<Food> searchFoods(final String foodName, final int pageNumber, final int pageSize) throws RestClientResponseException {
         final String FOODS_SEARCH_METHOD = "foods.search";
         final String SEARCH_EXPRESSION = "search_expression";
         final String PAGE_NUMBER = "page_number";
         final String MAX_RESULTS = "max_results";
 
         URI url = UriComponentsBuilder
-                .fromHttpUrl(API_URI_PREFIX)
+                .fromHttpUrl(apiUriPrefix)
                 .queryParam(METHOD, FOODS_SEARCH_METHOD)
                 .queryParam(SEARCH_EXPRESSION, foodName)
                 .queryParam(PAGE_NUMBER, pageNumber)
@@ -97,7 +98,16 @@ public class FatSecretApiClient {
                 .headers(headers)
                 .build();
 
-        return restTemplate.exchange(request, PARAMETERIZED_RESPONSE_TYPE);
+        ResponseEntity<FoodsWrapper> response = restTemplate.exchange(request, FoodsWrapper.class);
+
+        FoodsWrapper responseBody = Optional.ofNullable(response.getBody())
+                .orElseThrow(() -> new BusinessException(ErrorCode.EXTERNAL_COMMUNICATION_EXCEPTION));
+
+        return responseBody
+                .getFoods()
+                .getFoodList()
+                .stream()
+                .map(FoodsWrapper.SearchFoodsResponse::toEntity).collect(Collectors.toList());
     }
 
 

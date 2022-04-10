@@ -53,6 +53,7 @@ public enum ErrorCode {
 
     //Food
     FOOD_NOT_FOUND_EXCEPTION(404, "F001", "음식이 존재하지 않습니다."),
+    EXTERNAL_COMMUNICATION_EXCEPTION(500, "F002", "외부 서버와의 통신간 알 수 없는 에러가 발생했습니다."),
 
     // Auth
     AUTHENTICATION_EXCEPTION(400, "AU001", "인증 관련 오류가 발생했습니다."),

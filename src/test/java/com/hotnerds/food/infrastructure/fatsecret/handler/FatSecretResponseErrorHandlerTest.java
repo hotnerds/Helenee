@@ -1,27 +1,17 @@
-package com.hotnerds.fatsecret.exception;
+package com.hotnerds.food.infrastructure.fatsecret.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.mock.http.client.MockClientHttpResponse;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class FatSecretResponseErrorHandlerTest {
 
@@ -39,7 +29,7 @@ class FatSecretResponseErrorHandlerTest {
         byte[] responseBody = "{ \"error\": { }}\n".getBytes(StandardCharsets.UTF_8);
 
         //when then
-        assertThat(fatSecretResponseErrorHandler.hasError(responseBody)).isEqualTo(true);
+        assertThat(fatSecretResponseErrorHandler.hasError(responseBody)).isTrue();
 
     }
 
@@ -50,17 +40,19 @@ class FatSecretResponseErrorHandlerTest {
         byte[] responseBody = "{ }".getBytes(StandardCharsets.UTF_8);
 
         //when then
-        assertThat(fatSecretResponseErrorHandler.hasError(responseBody)).isEqualTo(false);
+        assertThat(fatSecretResponseErrorHandler.hasError(responseBody)).isFalse();
 
     }
 
     @Test
     @DisplayName("response body에 error 필드가 있으면 예외를 발생시킨다.")
-    void BODY에_ERROR가_있으면_EXCEPTION_발생() throws IOException {
+    void BODY에_ERROR가_있으면_EXCEPTION_발생() {
         //given
         byte[] responseBody = "{ \"error\": { }}\n".getBytes(StandardCharsets.UTF_8);
 
         //when then
-        assertThrows(FatSecretResponseErrorException.class, () -> fatSecretResponseErrorHandler.handleError(responseBody));
+        assertThatThrownBy(() -> fatSecretResponseErrorHandler.handleError(responseBody))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.EXTERNAL_COMMUNICATION_EXCEPTION.getMessage());
     }
 }

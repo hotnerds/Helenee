@@ -6,8 +6,8 @@ import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
 import com.hotnerds.diet.domain.dto.DietRequestByDateDto;
+import com.hotnerds.diet.domain.dto.DietResponseDto;
 import com.hotnerds.diet.domain.dto.DietSaveFoodRequestDto;
-import com.hotnerds.diet.domain.dto.DietReadRequestDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
 import com.hotnerds.food.application.FoodService;
 import com.hotnerds.user.domain.User;
@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,23 +31,24 @@ public class DietService {
 
     private final DietRepository dietRepository;
 
-    public Diet findByMealDateAndMealTimeAndUser(DietReadRequestDto requestDto, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
-
-        return dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(), requestDto.getMealTime(), user)
-                .orElseThrow(() -> new BusinessException(ErrorCode.DIET_NOT_FOUND_EXCEPTION));
+    public DietResponseDto find(Long dietId) {
+        return DietResponseDto.of(
+                dietRepository.findById(dietId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.DIET_NOT_FOUND_EXCEPTION))
+        );
     }
 
-    public List<Diet> searchByDate(DietRequestByDateDto requestDto, Long userId) {
+    public List<DietResponseDto> searchByDate(DietRequestByDateDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
-
-        return dietRepository.findAllByMealDateAndUser(requestDto.getMealDate(), user);
+        List<Diet> diets = dietRepository.findAllByMealDateAndUser(requestDto.getMealDate(), user);
+        return diets.stream()
+                .map(DietResponseDto::of)
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public void saveFoods(DietSaveFoodRequestDto requestDto, Long userId) {
+    public Long saveFoods(DietSaveFoodRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
@@ -56,6 +58,8 @@ public class DietService {
 
         requestDto.getFoods()
                 .forEach(e -> diet.addFood(foodService.findOrCreate(e.getFoodId()), e.getAmount()));
+
+        return diet.getDietId();
     }
 
     @Transactional

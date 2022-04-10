@@ -1,63 +1,40 @@
 package com.hotnerds.food.application;
 
-import com.hotnerds.common.exception.BusinessException;
-import com.hotnerds.common.exception.ErrorCode;
-import com.hotnerds.fatsecret.application.FatSecretApiClient;
 import com.hotnerds.food.domain.Food;
-import com.hotnerds.food.domain.Nutrient;
+import com.hotnerds.food.domain.apiclient.FoodApiClient;
+import com.hotnerds.food.domain.dto.FoodRequestByNameDto;
+import com.hotnerds.food.domain.dto.FoodResponseDto;
 import com.hotnerds.food.domain.repository.FoodRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class FoodService {
 
-    FatSecretApiClient apiClient;
+    FoodApiClient apiClient;
     FoodRepository foodRepository;
 
     @Transactional
     public Food findOrCreate(Long foodId) {
         Food food = foodRepository.findById(foodId)
-                .orElseGet(() -> mapApiResponseToFood(
-                        apiClient.searchFoodById(foodId)));
+                .orElseGet(() -> apiClient.searchFoodById(foodId));
 
         return foodRepository.save(food);
     }
 
-    public Food findById(Long foodId) {
-        return foodRepository.findById(foodId).orElseThrow(() -> new BusinessException(ErrorCode.FOOD_NOT_FOUND_EXCEPTION));
-    }
+    public List<FoodResponseDto> searchFoods(FoodRequestByNameDto requestDto) {
+        List<Food> foods = apiClient.searchFoods(requestDto.getFoodName(),
+                requestDto.getPageAble().getPageNumber(),
+                requestDto.getPageAble().getPageSize());
 
-    @SuppressWarnings("unchecked")
-    protected Food mapApiResponseToFood(ResponseEntity<Map<String, Object>> response) {
-        Map<String, Object> food = (Map<String, Object>) response.getBody().get("food");
-        Map<String, Object> servings = (Map<String, Object>) food.get("servings");
-        Map<String, String> serving = ((ArrayList<Map<String, String>>) servings.get("serving")).get(0);
-
-        String foodId = food.get("food_id").toString();
-        String foodName = food.get("food_name").toString();
-        String calories = serving.get("calories");
-        String carbs = serving.get("carbohydrate");
-        String protein = serving.get("protein");
-        String fat = serving.get("fat");
-
-        return Food.builder()
-                .foodId(Long.parseLong(foodId))
-                .foodName(foodName)
-                .nutrient(Nutrient.builder()
-                        .calories(Double.parseDouble(calories))
-                        .carbs(Double.parseDouble(carbs))
-                        .protein(Double.parseDouble(protein))
-                        .fat(Double.parseDouble(fat))
-                        .build())
-                .build();
-
+        return foods.stream()
+                .map(FoodResponseDto::of)
+                .collect(Collectors.toList());
     }
 }

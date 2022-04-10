@@ -5,12 +5,14 @@ import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
 import com.hotnerds.diet.domain.dto.DietRequestByDateDto;
+import com.hotnerds.diet.domain.dto.DietResponseDto;
 import com.hotnerds.diet.domain.dto.DietSaveFoodRequestDto;
-import com.hotnerds.diet.domain.dto.DietReadRequestDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
 import com.hotnerds.food.application.FoodService;
 import com.hotnerds.food.domain.Food;
+import com.hotnerds.food.domain.Nutrient;
 import com.hotnerds.food.domain.dto.FoodRequestDto;
+import com.hotnerds.food.domain.dto.FoodResponseDto;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,7 +64,11 @@ class DietServiceTest {
 
         user = User.builder().build();
 
-        food = Food.builder().build();
+        food = Food.builder()
+                .foodId(1641L)
+                .foodName("Chicken Breast")
+                .nutrient(new Nutrient(164.0, 0.0, 24.82, 6.48))
+                .build();
 
         foodRequestDto = FoodRequestDto.builder()
                 .foodId(1L)
@@ -74,78 +80,36 @@ class DietServiceTest {
     @DisplayName("존재하지 않는 식단을 조회시 예외가 발생한다.")
     void 존재하지않는_식단_조회시_실패() {
         //given
-        DietReadRequestDto requestDto = DietReadRequestDto.builder()
-                .mealDate(mealDate)
-                .mealTime(mealTime)
-                .build();
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
-                requestDto.getMealTime(),
-                user)).thenReturn(Optional.empty());
+        when(dietRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when then
         assertThatThrownBy(
-                () -> dietService.findByMealDateAndMealTimeAndUser(requestDto, 1L))
+                () -> dietService.find(1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.DIET_NOT_FOUND_EXCEPTION.getMessage());
-        verify(userRepository, times(1)).findById(1L);
-        verify(dietRepository, times(1)).findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
-                requestDto.getMealTime(),
-                user);
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 유저의 식단을 조회시 예외가 발생한다.")
-    void 존재하지_않는_유저_식단_조회시_실패() {
-        //given
-        DietReadRequestDto requestDto = DietReadRequestDto.builder()
-                .mealDate(mealDate)
-                .mealTime(mealTime)
-                .build();
-
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        //when then
-        assertThatThrownBy(
-                () -> dietService.findByMealDateAndMealTimeAndUser(requestDto, 1L))
-                .isInstanceOf(BusinessException.class)
-                .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
-        verify(userRepository, times(1)).findById(1L);
-        verify(dietRepository, times(0)).findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
-                requestDto.getMealTime(),
-                user);
+        verify(dietRepository, times(1)).findById(1L);
     }
 
     @Test
     @DisplayName("식단 정보를 조회한다.")
     void 식단_정보_조회() {
         //given
-        DietReadRequestDto requestDto = DietReadRequestDto.builder()
-                .mealDate(mealDate)
-                .mealTime(mealTime)
-                .build();
-
         Diet expectedDiet = Diet.builder()
                 .mealDate(mealDate)
                 .mealTime(mealTime)
                 .user(user)
                 .build();
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(dietRepository.findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
-                requestDto.getMealTime(),
-                user)).thenReturn(Optional.of(expectedDiet));
-      
+        when(dietRepository.findById(anyLong())).thenReturn(Optional.of(expectedDiet));
+
         //when
-        Diet actualDiet = dietService.findByMealDateAndMealTimeAndUser(requestDto, 1L);
+        DietResponseDto actualDiet = dietService.find(1L);
 
         //then
-        assertThat(actualDiet).isEqualTo(expectedDiet);
-        verify(userRepository, times(1)).findById(1L);
-        verify(dietRepository, times(1)).findByMealDateAndMealTimeAndUser(requestDto.getMealDate(),
-                requestDto.getMealTime(),
-                user);
+        assertThat(actualDiet.getMealDate()).isEqualTo(mealDate);
+        assertThat(actualDiet.getMealTime().getKey()).isEqualTo("BREAKFAST");
+        verify(dietRepository, times(1)).findById(1L);
     }
 
     @Test
@@ -167,7 +131,6 @@ class DietServiceTest {
                 return invocation.getArgument(0);
             }
         });
-
 
 
         //when
@@ -236,7 +199,10 @@ class DietServiceTest {
                 .foods(List.of(foodRequestDto))
                 .build();
 
-        Diet diet = Mockito.spy(Diet.class);
+        Diet diet = Diet.builder()
+                .mealDate(mealDate)
+                .mealTime(mealTime)
+                .build();
 
         when(dietService.findOrCreate(mealDate, mealTime, user)).thenReturn(diet);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
@@ -246,7 +212,6 @@ class DietServiceTest {
         dietService.saveFoods(requestDto, 1L);
 
         //then
-        verify(diet, times(1)).addFood(food, foodRequestDto.getAmount());
         verify(userRepository, times(1)).findById(1L);
 
     }
@@ -276,12 +241,11 @@ class DietServiceTest {
                 .thenReturn(List.of(diet1, diet2));
 
         //when
-        List<Diet> diets = dietService.searchByDate(requestDto, 1L);
+        List<DietResponseDto> diets = dietService.searchByDate(requestDto, 1L);
 
         //then
         assertThat(diets).hasSize(2);
         verify(userRepository, times(1)).findById(1L);
         verify(dietRepository, times(1)).findAllByMealDateAndUser(mealDate, user);
-
     }
 }

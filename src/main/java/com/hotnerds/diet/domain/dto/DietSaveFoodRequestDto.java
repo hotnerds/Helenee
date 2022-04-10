@@ -1,5 +1,6 @@
 package com.hotnerds.diet.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hotnerds.diet.domain.MealTime;
 import com.hotnerds.food.domain.dto.FoodRequestDto;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import java.util.List;
 public class DietSaveFoodRequestDto {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private LocalDate mealDate;
 
     private MealTime mealTime;
