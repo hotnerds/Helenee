@@ -187,13 +187,12 @@ class UserServiceTest {
     void isFollowExist() {
         user1 = spy(user1);
         user2 = spy(user2);
-        User user3 = spy(user1);
-        when(user1.isFollowerOf(user2)).thenReturn(true);
-        when(user2.isFollowedBy(user1)).thenReturn(true);
-        when(user1.isFollowerOf(user3)).thenReturn(false);
+        Follow follow = new Follow(user1, user2);
+
+        user1.getFollowedList().getFollowed().add(follow);
+        user2.getFollowerList().getFollowers().add(follow);
 
         assertThat(userService.isFollowExist(user1, user2)).isTrue();
-        assertThat(userService.isFollowExist(user1, user3)).isFalse();
     }
 
     @DisplayName("followCheck 함수에 대한 기능 테스트")
@@ -201,11 +200,12 @@ class UserServiceTest {
     void followCheck() {
         user1 = spy(user1);
         user2 = spy(user2);
+        Follow follow = new Follow(user1, user2);
+
+        user1.getFollowedList().getFollowed().add(follow);
+        user2.getFollowerList().getFollowers().add(follow);
 
         FollowServiceReqDto reqDto = new FollowServiceReqDto(1L, 2L);
-
-        when(user1.isFollowerOf(user2)).thenReturn(true);
-        when(user2.isFollowedBy(user1)).thenReturn(true);
 
         assertThat(userService.isFollowExist(user1, user2)).isTrue();
     }
