@@ -1,8 +1,11 @@
 package com.hotnerds.user.domain;
 
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -11,15 +14,17 @@ import javax.persistence.*;
 @Table(name = "follow")
 public class Follow {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "FOLLOWER_USER_ID")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User follower;
 
     @ManyToOne
     @JoinColumn(name = "FOLLOWED_USER_ID")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User followed;
 
     @Builder
@@ -39,10 +44,6 @@ public class Follow {
 
     @Override
     public int hashCode() {
-        final int PRIME = 31;
-        int hashCode = 1;
-        hashCode = PRIME * hashCode + getFollower().hashCode();
-        hashCode = PRIME * hashCode + getFollowed().hashCode();
-        return hashCode;
+        return Objects.hash(this.follower, this.followed);
     }
 }

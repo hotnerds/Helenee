@@ -87,6 +87,20 @@ class UserServiceTest {
                 .build();
     }
 
+    @DisplayName("생성하려는 유저가 이미 존재하면 에러 발생")
+    @Test
+    void 유저_생성_실패() {
+        NewUserReqDto newUserReqDto = actualNewUserReqDtoList.get(0);
+        User user = newUserReqDto.toEntity();
+        when(userRepository.findByUsernameOrEmail(anyString(), anyString())).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> userService.createNewUser(newUserReqDto))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.USER_DUPLICATED_EXCEPTION);
+        verify(userRepository, times(1)).findByUsernameOrEmail(anyString(), anyString());
+    }
+
     @Test
     void createNewUser() {
         // mocking
@@ -96,9 +110,7 @@ class UserServiceTest {
 
         // when
         userService.createNewUser(newUserReqDto);
-
-        // then
-        // 실제 DB에 저장되야만 Id가 생성되므로 Mock을 사용해서 테스트가 불가능하다
+        verify(userRepository, times(1)).findByUsernameOrEmail(anyString(), anyString());
     }
 
     @Test
@@ -133,8 +145,28 @@ class UserServiceTest {
         assertEquals(user, userFound);
     }
 
+    @DisplayName("존재하지 않는 유저를 삭제하면 예외 발생")
     @Test
-    void deleteUserById() {
+    void 유저_삭제_실패() {
+        NewUserReqDto newUserReqDto = actualNewUserReqDtoList.get(0);
+        assertThatThrownBy(() -> userService.deleteUserById(1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.USER_NOT_FOUND_EXCEPTION);
+        verify(userRepository, times(1)).findById(anyLong());
+    }
+
+    @DisplayName("유저 삭제 성공")
+    @Test
+    void 유저_삭제_성공() {
+        NewUserReqDto newUserReqDto = actualNewUserReqDtoList.get(0);
+        User user = newUserReqDto.toEntity();
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+
+        userService.deleteUserById(1L);
+
+        verify(userRepository, times(1)).findById(anyLong());
+        verify(userRepository, times(1)).deleteById(anyLong());
     }
 
     @Test
@@ -148,6 +180,51 @@ class UserServiceTest {
         userService.updateUser(user.getId(), userUpdateReqDto);
 
         // then
+    }
+
+    @DisplayName("isFollowExist 함수에 대한 기능 테스트")
+    @Test
+    void isFollowExist() {
+        user1 = spy(user1);
+        user2 = spy(user2);
+        User user3 = new User("user3", "email");
+        User user4 = new User("user4", "email");
+        User user5 = new User("user5", "email");
+        Follow follow = new Follow(user1, user2);
+        Follow follow2 = new Follow(user1, user3);
+        Follow follow3 = new Follow(user1, user4);
+
+        // user 1 and 2 correctly have the follow relationship
+        user1.getFollowedList().getFollowed().add(follow);
+        user2.getFollowerList().getFollowers().add(follow);
+
+        // user 1 has the follow relationship follow2, but user3 doesn't
+        user1.getFollowedList().getFollowed().add(follow2);
+
+        // user 4 has the follow relationship follow3, but user1 doesn't
+        user4.getFollowerList().getFollowers().add(follow3);
+
+        //there are no follow relationship between user1 and user5
+
+        assertThat(userService.isFollowExist(user1, user2)).isTrue();
+        assertThat(userService.isFollowExist(user1, user3)).isFalse();
+        assertThat(userService.isFollowExist(user1, user4)).isFalse();
+        assertThat(userService.isFollowExist(user1, user5)).isFalse();
+    }
+
+    @DisplayName("followCheck 함수에 대한 기능 테스트")
+    @Test
+    void followCheck() {
+        Follow follow = new Follow(user1, user2);
+
+        user1.getFollowedList().getFollowed().add(follow);
+        user2.getFollowerList().getFollowers().add(follow);
+
+        FollowServiceReqDto reqDto = new FollowServiceReqDto(1L, 2L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
+
+        assertThat(userService.followCheck(reqDto)).isTrue();
     }
 
     @Test
@@ -186,41 +263,6 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("없는 정보의 팔로우 검색 시도 시 예외발생")
-    public void 없는_팔로우_관계_검색() {
-        // given
-        when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
-        when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
-
-        // when then
-        assertThatThrownBy(() -> userService.getOneFollow(reqDto))
-                .isInstanceOf(BusinessException.class)
-                .hasMessage(ErrorCode.FOLLOW_NOT_FOUND_EXCEPTION.getMessage());
-        verify(userRepository, times(1)).findById(reqDto.getFollowerId());
-        verify(userRepository, times(1)).findById(reqDto.getFollowedId());
-    }
-
-    @Test
-    @DisplayName("팔로우 관계를 팔로워 ID와 피팔로워 ID로 검색 가능")
-    public void 팔로우_관계_검색() {
-        // given
-        user1.getFollowedList().add(follow);
-        user2.getFollowerList().add(follow);
-
-        when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
-        when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
-
-        // when
-        Follow searchResult = userService.getOneFollow(reqDto);
-
-        // then
-        assertEquals(follow.getFollower(), searchResult.getFollower());
-        assertEquals(follow.getFollowed(), searchResult.getFollowed());
-        verify(userRepository, times(1)).findById(reqDto.getFollowerId());
-        verify(userRepository, times(1)).findById(reqDto.getFollowedId());
-    }
-
-    @Test
     @DisplayName("존재하지 않는 id를 가진 유저를 팔로잉하는 모든 유저들의 id를 검색하면 예외발생")
     public void 유저_팔로워_리스트_오류() {
         // when then
@@ -254,14 +296,14 @@ class UserServiceTest {
         when(mockedUser2.getFollowerList()).thenReturn(mockedList);
         when(mockedList.getFollowers()).thenReturn(Arrays.asList(follow, anotherFollow));
 
-        List<Long> expectedList = Arrays.asList(1L, 3L);
+        List<Long> expectedList = List.of(1L, 3L);
 
         // when
-        List<Long> userIdList = userService.getUserFollowers(2L); // 2 is user id for user2
+        List<FollowUserInfoResponseDto> userList = userService.getUserFollowers(2L); // 2 is user id for user2
 
         // then
-        assertEquals(expectedList.get(0), userIdList.get(0));
-        assertEquals(expectedList.get(1), userIdList.get(1));
+        assertEquals(expectedList.get(0), userList.get(0).getUserId());
+        assertEquals(expectedList.get(1), userList.get(1).getUserId());
         verify(userRepository).findById(2L);
     }
 
@@ -299,14 +341,14 @@ class UserServiceTest {
         when(mockedUser2.getFollowedList()).thenReturn(mockedList);
         when(mockedList.getFollowed()).thenReturn(Arrays.asList(follow, anotherFollow));
 
-        List<Long> expectedList = Arrays.asList(1L, 3L);
+        List<Long> expectedList = List.of(1L, 3L);
 
         // when
-        List<Long> userIdList = userService.getUserFollowings(2L); // 2 is user id for user2
+        List<FollowUserInfoResponseDto> userList = userService.getUserFollowings(2L); // 2 is user id for user2
 
         // then
-        assertEquals(expectedList.get(0), userIdList.get(0));
-        assertEquals(expectedList.get(1), userIdList.get(1));
+        assertEquals(expectedList.get(0), userList.get(0).getUserId());
+        assertEquals(expectedList.get(1), userList.get(1).getUserId());
         verify(userRepository).findById(2L);
     }
 
@@ -407,8 +449,8 @@ class UserServiceTest {
         user2.getFollowerList().getFollowers().add(anotherFollow);
 
         // when
-        boolean expectMutualTrue = userService.isMutualFollowExist(user1, user2);
-        boolean expectMutualFalse = userService.isMutualFollowExist(user2, user3); // user 3 follows user 2, but not vice versa
+        boolean expectMutualTrue = userService.isFollowExist(user1, user2) && userService.isFollowExist(user2, user1);
+        boolean expectMutualFalse = userService.isFollowExist(user1, user3) && userService.isFollowExist(user3, user1);
 
         // then
         assertTrue(expectMutualTrue);

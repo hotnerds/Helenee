@@ -155,3 +155,71 @@ operation::comments/delete[snippets='path-parameters,curl-request,http-response'
 `PATCH /api/posts/:postId/comments/:commentId` 요청을 통해 기존 댓글의 내용을 수정할 수 있다.
 
 operation::comments/update[snippets='path-parameters,request-fields,response-fields,curl-request,http-response']
+
+
+
+[[resources_follow]]
+== 팔로우
+
+
+[[resources_follow_terminology]]
+=== 모호한 단어에 대한 정의
+
+- **followed**란 follower가 팔로우하고 있는 유저
+- **팔로우 관계**란 어떤 follower가 followed를 팔로우하고 있는 상황
+
+
+[[resources_follow_get]]
+=== 팔로우 관계 생성
+
+`POST /api/users/:followedId/follow` 요청을 통해 로그인한 유저가 followedId에 해당하는 유저에 대한 팔로우 요청을 보낼 수 있다.
+
+operation::follow/create[snippets='path-parameters,curl-request,http-response']
+
+
+[[resources_follow_delete]]
+=== 팔로우 관계 삭제
+
+`DELETE /api/users/:followedId/follow` 요청을 통해 로그인한 유저가 followedId에 해당하는 유저에 대한 팔로우를 취소할 수 있다.
+
+operation::follow/delete[snippets='path-parameters,curl-request,http-response']
+
+
+[[resources_follow_check]]
+=== 팔로우 관계 확인
+
+`GET /api/users/:followedId/follow/check` 요청을 통해 로그인한 유저가 followedId에 해당하는 유저를 팔로우하고 있는지 확인할 수 있다.
+
+operation::follow/check[snippets='path-parameters,response-fields,curl-request,http-response']
+
+
+[[resources_follow_followers]]
+=== 특정 유저의 모든 팔로워 조회
+
+`GET /api/users/:userId/follower` 요청을 통해 userId에 해당하는 유저의 모든 팔로워를 조회할 수 있다.
+
+operation::follow/get_follower[snippets='path-parameters,response-fields,curl-request,http-response']
+
+
+[[resources_follow_followed]]
+=== 특정 유저의 모든 팔로우드 조회
+
+`GET /api/users/:userId/followed` 요청을 통해 userId에 해당하는 유저의 모든 팔로우드를 조회할 수 있다.
+
+operation::follow/get_followed[snippets='path-parameters,response-fields,curl-request,http-response']
+
+
+[[resources_follow_followers_count]]
+=== 특정 유저의 모든 팔로워 수 조회
+
+`GET /api/users/:userId/follower` 요청을 통해 userId에 해당하는 유저의 모든 팔로워 수를 조회할 수 있다.
+
+operation::follow/get_follower_count[snippets='path-parameters,response-fields,curl-request,http-response']
+
+
+[[resources_follow_followed_count]]
+=== 특정 유저의 모든 팔로우드 수 조회
+
+`GET /api/users/:userId/followed` 요청을 통해 userId에 해당하는 유저의 모든 팔로우드 수를 조회할 수 있다.
+
+operation::follow/get_follower_count[snippets='path-parameters,response-fields,curl-request,http-response']
