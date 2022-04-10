@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 import static com.hotnerds.diet.presentation.DietController.DEFAULT_URL;
@@ -38,9 +39,8 @@ public class DietController {
     }
 
     @PostMapping
-    public ResponseEntity<DietResponseDto> saveFoods(DietSaveFoodRequestDto requestDto, @Authenticated AuthenticatedUser user) {
-        return ResponseEntity.ok(
-                dietService.saveFoods(requestDto, user.getId())
-        );
+    public ResponseEntity<URI> saveFoods(DietSaveFoodRequestDto requestDto, @Authenticated AuthenticatedUser user) {
+        Long dietId = dietService.saveFoods(requestDto, user.getId());
+        return ResponseEntity.created(URI.create(DEFAULT_URL + "/" + dietId)).build();
     }
 }

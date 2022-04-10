@@ -29,11 +29,14 @@ import static com.hotnerds.diet.domain.MealTime.LUNCH;
 import static com.hotnerds.diet.presentation.DietController.DEFAULT_URL;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = DietController.class)
@@ -213,7 +216,7 @@ class DietControllerTest extends ControllerTest {
                         List.of(new FoodRequestDto(1L, 2L), new FoodRequestDto(2L, 1L))
                 )
                 .build();
-        when(dietService.saveFoods(any(DietSaveFoodRequestDto.class), any())).thenReturn(diet1);
+        when(dietService.saveFoods(any(DietSaveFoodRequestDto.class), any())).thenReturn(diet1.getDietId());
 
         //when
         ResultActions result = mockMvc.perform(post(DEFAULT_URL)
@@ -223,7 +226,7 @@ class DietControllerTest extends ControllerTest {
         );
 
         //then
-        result.andExpect(status().isOk())
+        result.andExpect(status().isCreated())
                 .andDo(document("diets/save-foods",
                         requestFields(
                                 fieldWithPath("mealDate").description("식단 날짜"),
@@ -232,8 +235,8 @@ class DietControllerTest extends ControllerTest {
                                 fieldWithPath("foods[].foodId").description("음식 아이디"),
                                 fieldWithPath("foods[].amount").description("음식량")
                         ),
-                        responseFields(
-                                dietFields
+                        responseHeaders(
+                                headerWithName("Location").description("생성한 식단의 URL")
                         )
                 ));
     }

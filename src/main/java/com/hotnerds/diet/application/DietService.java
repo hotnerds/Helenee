@@ -48,7 +48,7 @@ public class DietService {
     }
 
     @Transactional
-    public DietResponseDto saveFoods(DietSaveFoodRequestDto requestDto, Long userId) {
+    public Long saveFoods(DietSaveFoodRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
@@ -59,7 +59,7 @@ public class DietService {
         requestDto.getFoods()
                 .forEach(e -> diet.addFood(foodService.findOrCreate(e.getFoodId()), e.getAmount()));
 
-        return DietResponseDto.of(diet);
+        return diet.getDietId();
     }
 
     @Transactional

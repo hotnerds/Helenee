@@ -138,18 +138,14 @@ operation::comments/delete[snippets='path-parameters,curl-request,http-response'
 
 operation::comments/update[snippets='path-parameters,request-fields,response-fields,curl-request,http-response']
 
-
-
 [[resources_follow]]
 == 팔로우
-
 
 [[resources_follow_terminology]]
 === 모호한 단어에 대한 정의
 
 - **followed**란 follower가 팔로우하고 있는 유저
 - **팔로우 관계**란 어떤 follower가 followed를 팔로우하고 있는 상황
-
 
 [[resources_follow_get]]
 === 팔로우 관계 생성
@@ -158,14 +154,12 @@ operation::comments/update[snippets='path-parameters,request-fields,response-fie
 
 operation::follow/create[snippets='path-parameters,curl-request,http-response']
 
-
 [[resources_follow_delete]]
 === 팔로우 관계 삭제
 
 `DELETE /api/users/:followedId/follow` 요청을 통해 로그인한 유저가 followedId에 해당하는 유저에 대한 팔로우를 취소할 수 있다.
 
 operation::follow/delete[snippets='path-parameters,curl-request,http-response']
-
 
 [[resources_follow_check]]
 === 팔로우 관계 확인
@@ -174,14 +168,12 @@ operation::follow/delete[snippets='path-parameters,curl-request,http-response']
 
 operation::follow/check[snippets='path-parameters,response-fields,curl-request,http-response']
 
-
 [[resources_follow_followers]]
 === 특정 유저의 모든 팔로워 조회
 
 `GET /api/users/:userId/follower` 요청을 통해 userId에 해당하는 유저의 모든 팔로워를 조회할 수 있다.
 
 operation::follow/get_follower[snippets='path-parameters,response-fields,curl-request,http-response']
-
 
 [[resources_follow_followed]]
 === 특정 유저의 모든 팔로우드 조회
@@ -190,14 +182,12 @@ operation::follow/get_follower[snippets='path-parameters,response-fields,curl-re
 
 operation::follow/get_followed[snippets='path-parameters,response-fields,curl-request,http-response']
 
-
 [[resources_follow_followers_count]]
 === 특정 유저의 모든 팔로워 수 조회
 
 `GET /api/users/:userId/follower` 요청을 통해 userId에 해당하는 유저의 모든 팔로워 수를 조회할 수 있다.
 
 operation::follow/get_follower_count[snippets='path-parameters,response-fields,curl-request,http-response']
-
 
 [[resources_follow_followed_count]]
 === 특정 유저의 모든 팔로우드 수 조회
@@ -226,7 +216,7 @@ operation::diets/find-by-date[snippets='request-parameters,response-fields,curl-
 [[resources_diets_save-foods]]
 === 식단에 음식 저장
 
-operation::diets/save-foods[snippets='request-fields,request-body,curl-request,response-fields,response-body']
+operation::diets/save-foods[snippets='request-fields,request-body,curl-request,response-headers']
 
 [[resources_foods]]
 == 음식
