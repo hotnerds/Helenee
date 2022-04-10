@@ -42,7 +42,7 @@ class FollowTest {
         // given
         Follow identicalFollowRelationship = new Follow(1L, follower, followed);
 
-        assertThat(followRelationship.hashCode()).isEqualTo(identicalFollowRelationship.hashCode());
+        assertThat(followRelationship).hasSameHashCodeAs(identicalFollowRelationship);
     }
 
 }
