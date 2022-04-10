@@ -40,6 +40,13 @@ public class PostService {
                 .collect(toList());
     }
 
+    public PostResponseDto searchByPostId(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
+
+        return PostResponseDto.of(post);
+    }
+
     public List<PostResponseDto> searchByTitle(PostByTitleRequestDto requestDto) {
         return postRepository.findAllByTitle(requestDto.getTitle(),requestDto.getPageable()).stream()
                 .map(PostResponseDto::of)
