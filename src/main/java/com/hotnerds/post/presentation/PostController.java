@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.util.List;
@@ -30,9 +29,9 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public ResponseEntity<Long> createPosts(@RequestBody PostRequestDto requestDto, @Authenticated AuthenticatedUser authUser) {
+    public ResponseEntity<Void> createPosts(@RequestBody PostRequestDto requestDto, @Authenticated AuthenticatedUser authUser) {
         Long postId = postService.write(requestDto, authUser);
-        return ResponseEntity.created(URI.create(POST_API_URI)).build();
+        return ResponseEntity.created(URI.create(POST_API_URI + "/" + postId)).build();
     }
 
     @GetMapping
