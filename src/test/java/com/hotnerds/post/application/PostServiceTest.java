@@ -185,6 +185,37 @@ public class PostServiceTest {
         verify(postRepository, times(1)).findAllPosts(any());
     }
 
+    @DisplayName("게시글 Id로 조회 성공")
+    @Test
+    void 게시글_Id로_조회_성공() {
+        //given
+        when(postRepository.findById(any())).thenReturn(Optional.of(post));
+
+        //when
+        PostResponseDto postResponseDto = postService.searchByPostId(post.getId());
+
+        //then
+        assertThat(postResponseDto.getPostId()).isEqualTo(post.getId());
+
+        verify(postRepository, times(1)).findById(any());
+    }
+
+    @DisplayName("해당하는 Id를 가진 게시글이 없으면 예외 발생")
+    @Test
+    void 게시글_Id_없으면_예외_발생() {
+        //given
+        when(postRepository.findById(any())).thenReturn(Optional.empty());
+
+        //when then
+        assertThatThrownBy(() -> postService.searchByPostId(2L))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .usingRecursiveComparison()
+                .isEqualTo(ErrorCode.POST_NOT_FOUND_EXCEPTION);
+
+        verify(postRepository, times(1)).findById(any());
+    }
+
     @DisplayName("게시글 제목으로 조회")
     @Test
     void 게시글_제목으로_조회() {
