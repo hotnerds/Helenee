@@ -30,8 +30,8 @@ public class FoodService {
 
     public List<FoodResponseDto> searchFoods(FoodRequestByNameDto requestDto) {
         List<Food> foods = apiClient.searchFoods(requestDto.getFoodName(),
-                requestDto.getPageRequest().getPageNumber(),
-                requestDto.getPageRequest().getPageSize());
+                requestDto.getPageAble().getPageNumber(),
+                requestDto.getPageAble().getPageSize());
 
         return foods.stream()
                 .map(FoodResponseDto::of)

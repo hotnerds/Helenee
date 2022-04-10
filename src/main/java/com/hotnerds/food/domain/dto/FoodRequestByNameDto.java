@@ -2,18 +2,19 @@ package com.hotnerds.food.domain.dto;
 
 import lombok.*;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-@Getter
+@Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FoodRequestByNameDto {
 
     private String foodName;
 
-    private PageRequest pageRequest;
+    private Pageable pageAble;
 
     @Builder
-    public FoodRequestByNameDto(String foodName, PageRequest pageRequest) {
+    public FoodRequestByNameDto(String foodName, Pageable pageRequest) {
         this.foodName = foodName;
-        this.pageRequest = pageRequest;
+        this.pageAble = pageRequest;
     }
 }

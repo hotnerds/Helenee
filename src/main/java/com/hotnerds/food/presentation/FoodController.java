@@ -4,6 +4,8 @@ import com.hotnerds.food.application.FoodService;
 import com.hotnerds.food.domain.dto.FoodRequestByNameDto;
 import com.hotnerds.food.domain.dto.FoodResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +25,8 @@ public class FoodController {
     private final FoodService foodService;
 
     @GetMapping
-    public ResponseEntity<List<FoodResponseDto>> searchFoods(FoodRequestByNameDto requestDto) {
+    public ResponseEntity<List<FoodResponseDto>> searchFoods(FoodRequestByNameDto requestDto, @PageableDefault Pageable pageable) {
+        requestDto.setPageAble(pageable);
         return ResponseEntity.ok(foodService.searchFoods(requestDto));
     }
 }
