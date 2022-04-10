@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.jetbrains.annotations.Range;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -17,14 +18,15 @@ public class PostByWriterRequestDto {
     @NotBlank
     private final String writer;
 
-    private PageInfo pageInfo;
+    private Pageable pageable;
 
     @Builder
-    public PostByWriterRequestDto(String writer, int page, int size) {
+    public PostByWriterRequestDto(String writer, Pageable pageable) {
         this.writer = writer;
-        this.pageInfo = PageInfo.builder()
-                .page(page)
-                .size(size)
-                .build();
+        this.pageable = pageable;
+    }
+
+    public void setPageable(Pageable pageable) {
+        this.pageable = pageable;
     }
 }

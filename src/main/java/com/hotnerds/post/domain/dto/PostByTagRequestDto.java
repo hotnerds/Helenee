@@ -1,25 +1,22 @@
 package com.hotnerds.post.domain.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @Getter
 public class PostByTagRequestDto {
-    private List<@NotBlank String> tagNames;
+    private List<String> tagNames;
 
-    PageInfo pageInfo;
+    Pageable pageable;
 
     @Builder
-    public PostByTagRequestDto(List<String> tagNames, int page, int size) {
+    public PostByTagRequestDto(List<String> tagNames, Pageable pageable) {
         this.tagNames = tagNames;
-        this.pageInfo = PageInfo.builder()
-                .page(page)
-                .size(size)
-                .build();
+        this.pageable = pageable;
+    }
+
+    public void setPageable(Pageable pageable) {
+        this.pageable = pageable;
     }
 }

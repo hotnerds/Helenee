@@ -3,6 +3,7 @@ package com.hotnerds.post.domain.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.domain.Pageable;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -13,14 +14,15 @@ public class PostByTitleRequestDto {
     @NotBlank
     private String title;
 
-    private PageInfo pageInfo;
+    private Pageable pageable;
 
     @Builder
-    public PostByTitleRequestDto(String title, int page, int size) {
+    public PostByTitleRequestDto(String title, Pageable pageable) {
         this.title = title;
-        this.pageInfo = PageInfo.builder()
-                .page(page)
-                .size(size)
-                .build();
+        this.pageable = pageable;
+    }
+
+    public void setPageable(Pageable pageable) {
+        this.pageable = pageable;
     }
 }

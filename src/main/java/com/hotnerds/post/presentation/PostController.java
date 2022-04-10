@@ -8,12 +8,12 @@ import com.hotnerds.post.domain.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.util.List;
@@ -30,28 +30,34 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public ResponseEntity<Long> createPosts(PostRequestDto requestDto, @Authenticated AuthenticatedUser authUser) {
+    public ResponseEntity<Long> createPosts(@RequestBody PostRequestDto requestDto, @Authenticated AuthenticatedUser authUser) {
         Long postId = postService.write(requestDto, authUser);
         return ResponseEntity.created(URI.create(POST_API_URI)).build();
     }
 
-    @GetMapping(params = {"page", "size"})
-    public ResponseEntity<List<PostResponseDto>> searchAllPosts(@Valid PageInfo pageInfo) {
-        return ResponseEntity.ok(postService.searchAll(pageInfo));
+    @GetMapping
+    public ResponseEntity<List<PostResponseDto>> searchAllPosts(@PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(postService.searchAll(pageable));
     }
 
-    @GetMapping(params = {"page", "size", "title"})
-    public ResponseEntity<List<PostResponseDto>> searchPostsByTitle(@Valid PostByTitleRequestDto requestDto) {
+    @GetMapping(params = {"title"})
+    public ResponseEntity<List<PostResponseDto>> searchPostsByTitle(@Valid PostByTitleRequestDto requestDto,
+                                                                    @PageableDefault Pageable pageable) {
+        requestDto.setPageable(pageable);
         return ResponseEntity.ok(postService.searchByTitle(requestDto));
     }
 
-    @GetMapping(params = {"page", "size", "writer"})
-    public ResponseEntity<List<PostResponseDto>> searchPostsByWriter(@Valid PostByWriterRequestDto requestDto) {
+    @GetMapping(params = {"writer"})
+    public ResponseEntity<List<PostResponseDto>> searchPostsByWriter(@Valid PostByWriterRequestDto requestDto,
+                                                                     @PageableDefault Pageable pageable) {
+        requestDto.setPageable(pageable);
         return ResponseEntity.ok(postService.searchByWriter(requestDto));
     }
 
-    @GetMapping(params = {"page", "size", "tagNames"})
-    public ResponseEntity<List<PostResponseDto>> searchPostsByTagNames(@Valid PostByTagRequestDto requestDto) {
+    @GetMapping(params = {"tagNames"})
+    public ResponseEntity<List<PostResponseDto>> searchPostsByTagNames(@Valid PostByTagRequestDto requestDto,
+                                                                       @PageableDefault Pageable pageable) {
+        requestDto.setPageable(pageable);
         return ResponseEntity.ok(postService.searchByTagNames(requestDto));
     }
 
@@ -62,7 +68,7 @@ public class PostController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> updatePosts(@Valid PostUpdateRequestDto requestDto, @Authenticated AuthenticatedUser authUser) {
+    public ResponseEntity<Void> updatePosts(@Valid @RequestBody PostUpdateRequestDto requestDto, @Authenticated AuthenticatedUser authUser) {
         postService.update(requestDto, authUser);
         return ResponseEntity.noContent().build();
     }

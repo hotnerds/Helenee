@@ -6,6 +6,7 @@ import com.hotnerds.post.application.PostService;
 import com.hotnerds.post.domain.dto.LikeResponseDto;
 import com.hotnerds.post.domain.dto.PostRequestDto;
 import com.hotnerds.post.domain.dto.PostResponseDto;
+import com.hotnerds.post.domain.dto.PostUpdateRequestDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = {PostController.class})
@@ -146,11 +146,18 @@ class PostControllerTest extends ControllerTest {
     void 게시글_수정_요청() throws Exception {
         //given
         doNothing().when(postService).update(any(), any());
+        PostUpdateRequestDto requestDto = PostUpdateRequestDto.builder()
+                .postId(1L)
+                .title("title")
+                .content("content")
+                .tagNames(List.of())
+                .build();
 
         //when then
         mockMvc.perform(patch("/api/posts/{id}", 1L)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                        .andExpect(status().isNoContent());
     }
 
     @WithCustomMockUser

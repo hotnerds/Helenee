@@ -11,6 +11,7 @@ import com.hotnerds.tag.domain.Tag;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,15 +33,15 @@ public class PostService {
         return postRepository.save(createPost(requestDto, authUser)).getId();
     }
 
-    public List<PostResponseDto> searchAll(PageInfo pageInfo) {
-        return postRepository.findAllPosts(pageInfo.toPageable())
+    public List<PostResponseDto> searchAll(Pageable pageable) {
+        return postRepository.findAllPosts(pageable)
                 .stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }
 
     public List<PostResponseDto> searchByTitle(PostByTitleRequestDto requestDto) {
-        return postRepository.findAllByTitle(requestDto.getTitle(),requestDto.getPageInfo().toPageable()).stream()
+        return postRepository.findAllByTitle(requestDto.getTitle(),requestDto.getPageable()).stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }
@@ -49,7 +50,7 @@ public class PostService {
         User user = userRepository.findByUsername(requestDto.getWriter())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        return postRepository.findAllByWriter(user, requestDto.getPageInfo().toPageable()).stream()
+        return postRepository.findAllByWriter(user, requestDto.getPageable()).stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }
@@ -58,7 +59,7 @@ public class PostService {
         requestDto.getTagNames()
                 .forEach(Tag::validateTagName);
 
-        return postRepository.findAllByTagNames(requestDto.getTagNames(), requestDto.getPageInfo().toPageable()).stream()
+        return postRepository.findAllByTagNames(requestDto.getTagNames(), requestDto.getPageable()).stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }
