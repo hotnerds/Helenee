@@ -187,27 +187,44 @@ class UserServiceTest {
     void isFollowExist() {
         user1 = spy(user1);
         user2 = spy(user2);
+        User user3 = new User("user3", "email");
+        User user4 = new User("user4", "email");
+        User user5 = new User("user5", "email");
         Follow follow = new Follow(user1, user2);
+        Follow follow2 = new Follow(user1, user3);
+        Follow follow3 = new Follow(user1, user4);
 
+        // user 1 and 2 correctly have the follow relationship
         user1.getFollowedList().getFollowed().add(follow);
         user2.getFollowerList().getFollowers().add(follow);
 
+        // user 1 has the follow relationship follow2, but user3 doesn't
+        user1.getFollowedList().getFollowed().add(follow2);
+
+        // user 4 has the follow relationship follow3, but user1 doesn't
+        user4.getFollowerList().getFollowers().add(follow3);
+
+        //there are no follow relationship between user1 and user5
+
         assertThat(userService.isFollowExist(user1, user2)).isTrue();
+        assertThat(userService.isFollowExist(user1, user3)).isFalse();
+        assertThat(userService.isFollowExist(user1, user4)).isFalse();
+        assertThat(userService.isFollowExist(user1, user5)).isFalse();
     }
 
     @DisplayName("followCheck 함수에 대한 기능 테스트")
     @Test
     void followCheck() {
-        user1 = spy(user1);
-        user2 = spy(user2);
         Follow follow = new Follow(user1, user2);
 
         user1.getFollowedList().getFollowed().add(follow);
         user2.getFollowerList().getFollowers().add(follow);
 
         FollowServiceReqDto reqDto = new FollowServiceReqDto(1L, 2L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
 
-        assertThat(userService.isFollowExist(user1, user2)).isTrue();
+        assertThat(userService.followCheck(reqDto)).isTrue();
     }
 
     @Test
