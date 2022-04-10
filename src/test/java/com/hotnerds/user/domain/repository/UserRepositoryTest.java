@@ -51,7 +51,6 @@ class UserRepositoryTest {
 
         // then
         assertThat(userRepository.count()).isEqualTo(1);
-        assertThat(userFound).isSameAs(userFound);
         assertThat(userWrongUsername.isEmpty()).isEqualTo(true); // fail condition
     }
 
@@ -72,7 +71,6 @@ class UserRepositoryTest {
 
         // then
         assertThat(userRepository.count()).isEqualTo(1);
-        assertThat(userFound).isSameAs(userFound);
         assertThat(userWrongEmail.isEmpty()).isEqualTo(true); // fail condition
     }
 

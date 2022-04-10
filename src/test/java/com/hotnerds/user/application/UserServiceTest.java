@@ -87,6 +87,20 @@ class UserServiceTest {
                 .build();
     }
 
+    @DisplayName("생성하려는 유저가 이미 존재하면 에러 발생")
+    @Test
+    void 유저_생성_실패() {
+        NewUserReqDto newUserReqDto = actualNewUserReqDtoList.get(0);
+        User user = newUserReqDto.toEntity();
+        when(userRepository.findByUsernameOrEmail(anyString(), anyString())).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> userService.createNewUser(newUserReqDto))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.USER_DUPLICATED_EXCEPTION);
+        verify(userRepository, times(1)).findByUsernameOrEmail(anyString(), anyString());
+    }
+
     @Test
     void createNewUser() {
         // mocking
@@ -96,9 +110,7 @@ class UserServiceTest {
 
         // when
         userService.createNewUser(newUserReqDto);
-
-        // then
-        // 실제 DB에 저장되야만 Id가 생성되므로 Mock을 사용해서 테스트가 불가능하다
+        verify(userRepository, times(1)).findByUsernameOrEmail(anyString(), anyString());
     }
 
     @Test
@@ -133,8 +145,28 @@ class UserServiceTest {
         assertEquals(user, userFound);
     }
 
+    @DisplayName("존재하지 않는 유저를 삭제하면 예외 발생")
     @Test
-    void deleteUserById() {
+    void 유저_삭제_실패() {
+        NewUserReqDto newUserReqDto = actualNewUserReqDtoList.get(0);
+        assertThatThrownBy(() -> userService.deleteUserById(1L))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.USER_NOT_FOUND_EXCEPTION);
+        verify(userRepository, times(1)).findById(anyLong());
+    }
+
+    @DisplayName("유저 삭제 성공")
+    @Test
+    void 유저_삭제_성공() {
+        NewUserReqDto newUserReqDto = actualNewUserReqDtoList.get(0);
+        User user = newUserReqDto.toEntity();
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+
+        userService.deleteUserById(1L);
+
+        verify(userRepository, times(1)).findById(anyLong());
+        verify(userRepository, times(1)).deleteById(anyLong());
     }
 
     @Test
@@ -148,6 +180,34 @@ class UserServiceTest {
         userService.updateUser(user.getId(), userUpdateReqDto);
 
         // then
+    }
+
+    @DisplayName("isFollowExist 함수에 대한 기능 테스트")
+    @Test
+    void isFollowExist() {
+        user1 = spy(user1);
+        user2 = spy(user2);
+        User user3 = spy(user1);
+        when(user1.isFollowerOf(user2)).thenReturn(true);
+        when(user2.isFollowedBy(user1)).thenReturn(true);
+        when(user1.isFollowerOf(user3)).thenReturn(false);
+
+        assertThat(userService.isFollowExist(user1, user2)).isTrue();
+        assertThat(userService.isFollowExist(user1, user3)).isFalse();
+    }
+
+    @DisplayName("followCheck 함수에 대한 기능 테스트")
+    @Test
+    void followCheck() {
+        user1 = spy(user1);
+        user2 = spy(user2);
+
+        FollowServiceReqDto reqDto = new FollowServiceReqDto(1L, 2L);
+
+        when(user1.isFollowerOf(user2)).thenReturn(true);
+        when(user2.isFollowedBy(user1)).thenReturn(true);
+
+        assertThat(userService.isFollowExist(user1, user2)).isTrue();
     }
 
     @Test
