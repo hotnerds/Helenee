@@ -9,6 +9,7 @@ import java.util.List;
 
 @Getter
 public class PostResponseDto {
+    private Long postId;
     private String title;
     private String content;
     private String username;
@@ -18,7 +19,8 @@ public class PostResponseDto {
 
 
     @Builder
-    public PostResponseDto(String title, String content, String username, LocalDateTime createdAt, int likeCount, List<String> tagNames) {
+    public PostResponseDto(Long postId, String title, String content, String username, LocalDateTime createdAt, int likeCount, List<String> tagNames) {
+        this.postId = postId;
         this.title = title;
         this.content = content;
         this.username = username;
@@ -30,6 +32,7 @@ public class PostResponseDto {
     @Builder
     public static PostResponseDto of(Post post) {
         return PostResponseDto.builder()
+                .postId(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .username(post.getWriter().getUsername())
