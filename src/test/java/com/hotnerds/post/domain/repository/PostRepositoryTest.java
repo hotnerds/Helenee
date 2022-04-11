@@ -57,7 +57,7 @@ class PostRepositoryTest {
 
     @DisplayName("게시글 등록 성공")
     @Test
-    public void 게시글_등록_성공() {
+    void 게시글_등록_성공() {
         //when
         Post savedPost = postRepository.save(post);
 
@@ -67,7 +67,7 @@ class PostRepositoryTest {
 
     @DisplayName("게시글 전체 조회")
     @Test
-    public void 게시글_전체_조회_성공() {
+    void 게시글_전체_조회_성공() {
         //given
         postRepository.save(post);
         PageRequest page = PageRequest.of(0, 10);
@@ -81,7 +81,7 @@ class PostRepositoryTest {
 
     @DisplayName("게시글 제목으로 조회")
     @Test
-    public void 게시글_제목으로_조회_성공() {
+    void 게시글_제목으로_조회_성공() {
         //given
         postRepository.save(post);
         PageRequest page = PageRequest.of(0, 10);
@@ -95,7 +95,7 @@ class PostRepositoryTest {
 
     @DisplayName("특정 시간 이후에 생성된 게시글 조회")
     @Test
-    public void 특정시간_이후에_생성된_게시글_조회() {
+    void 특정시간_이후에_생성된_게시글_조회() {
         //given
         postRepository.save(post);
 

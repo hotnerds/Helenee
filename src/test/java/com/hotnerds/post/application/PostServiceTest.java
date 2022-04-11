@@ -181,7 +181,7 @@ public class PostServiceTest {
         List<PostResponseDto> posts = postService.searchAll(pageable);
 
         //then
-        assertThat(posts.size()).isEqualTo(1);
+        assertThat(posts).hasSize(1);
         verify(postRepository, times(1)).findAllPosts(any());
     }
 
