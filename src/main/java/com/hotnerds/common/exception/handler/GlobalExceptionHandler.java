@@ -47,8 +47,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalStateException.class)
     protected ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException e) {
-        log.info("------------------{}-------------", e.getMessage());
-
         ErrorResponse response = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR_EXCEPTION);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
