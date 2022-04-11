@@ -133,7 +133,7 @@ public class PostService {
 
         return LikeResponseDto.builder()
                 .likeCount(post.getLikeCount())
-                .username(user.getUsername())
+                .writer(user.getUsername())
                 .postId(post.getId())
                 .build();
     }
@@ -149,7 +149,7 @@ public class PostService {
 
         return LikeResponseDto.builder()
                 .likeCount(post.getLikeCount())
-                .username(user.getUsername())
+                .writer(user.getUsername())
                 .postId(post.getId())
                 .build();
     }

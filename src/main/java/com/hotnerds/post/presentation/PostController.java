@@ -29,7 +29,7 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public ResponseEntity<Void> createPosts(@RequestBody PostRequestDto requestDto, @Authenticated AuthenticatedUser authUser) {
+    public ResponseEntity<Void> createPost(@RequestBody PostRequestDto requestDto, @Authenticated AuthenticatedUser authUser) {
         Long postId = postService.write(requestDto, authUser);
         return ResponseEntity.created(URI.create(POST_API_URI + "/" + postId)).build();
     }
@@ -61,24 +61,24 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePosts(@NotNull @PathVariable("id") Long postId, @Authenticated AuthenticatedUser authUser) {
+    public ResponseEntity<Void> deletePost(@NotNull @PathVariable("id") Long postId, @Authenticated AuthenticatedUser authUser) {
         postService.delete(postId, authUser);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> updatePosts(@Valid @RequestBody PostUpdateRequestDto requestDto, @Authenticated AuthenticatedUser authUser) {
+    public ResponseEntity<Void> updatePost(@Valid @RequestBody PostUpdateRequestDto requestDto, @Authenticated AuthenticatedUser authUser) {
         postService.update(requestDto, authUser);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/likes")
-    public ResponseEntity<LikeResponseDto> likePosts(@NotNull @PathVariable("id") Long postId, @Authenticated AuthenticatedUser authUser) {
+    public ResponseEntity<LikeResponseDto> likePost(@NotNull @PathVariable("id") Long postId, @Authenticated AuthenticatedUser authUser) {
         return ResponseEntity.ok(postService.like(postId, authUser));
     }
 
     @DeleteMapping("/{id}/likes")
-    public ResponseEntity<LikeResponseDto> unlikePosts(@NotNull @PathVariable("id") Long postId, @Authenticated AuthenticatedUser authUser) {
+    public ResponseEntity<LikeResponseDto> unlikePost(@NotNull @PathVariable("id") Long postId, @Authenticated AuthenticatedUser authUser) {
         return ResponseEntity.ok(postService.unlike(postId, authUser));
     }
 }

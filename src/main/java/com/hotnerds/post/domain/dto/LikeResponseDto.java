@@ -6,13 +6,13 @@ import lombok.Getter;
 @Getter
 public class LikeResponseDto {
     private int likeCount;
-    private String username;
+    private String writer;
     private Long postId;
 
     @Builder
-    public LikeResponseDto(int likeCount, String username, Long postId) {
+    public LikeResponseDto(int likeCount, String writer, Long postId) {
         this.likeCount = likeCount;
-        this.username = username;
+        this.writer = writer;
         this.postId = postId;
     }
 }

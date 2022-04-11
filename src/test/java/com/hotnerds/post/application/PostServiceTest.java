@@ -452,7 +452,7 @@ public class PostServiceTest {
         //then
         assertAll(
                 () -> assertThat(responseDto.getLikeCount()).isEqualTo(1),
-                () -> assertThat(responseDto.getUsername()).isEqualTo(user.getUsername()),
+                () -> assertThat(responseDto.getWriter()).isEqualTo(user.getUsername()),
                 () -> assertThat(responseDto.getPostId()).isEqualTo(post.getId())
         );
         verify(userRepository, times(1)).findByUsername(user.getUsername());
@@ -492,7 +492,7 @@ public class PostServiceTest {
         //then
         assertAll(
                 () -> assertThat(responseDto.getLikeCount()).isEqualTo(0),
-                () -> assertThat(responseDto.getUsername()).isEqualTo(user.getUsername()),
+                () -> assertThat(responseDto.getWriter()).isEqualTo(user.getUsername()),
                 () -> assertThat(responseDto.getPostId()).isEqualTo(post.getId())
         );
 
