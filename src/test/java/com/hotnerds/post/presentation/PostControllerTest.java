@@ -82,7 +82,7 @@ class PostControllerTest extends ControllerTest {
 
         resultActions.andExpect(status().isCreated())
                 .andDo(
-                        document("post-create",
+                        document("posts/post-create",
                             getDocumentRequestPreprocess(),
                             getDocumentResponsePreprocess(),
                             requestHeaders(
@@ -115,7 +115,7 @@ class PostControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andDo(
                         document(
-                                "post-get-all",
+                                "posts/post-get-all",
                                 getDocumentRequestPreprocess(),
                                 getDocumentResponsePreprocess(),
                                 requestHeaders(
@@ -154,7 +154,7 @@ class PostControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andDo(
                         document(
-                                "post-get-by-title",
+                                "posts/post-get-by-title",
                                 getDocumentRequestPreprocess(),
                                 getDocumentResponsePreprocess(),
                                 requestHeaders(
@@ -194,7 +194,7 @@ class PostControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andDo(
                         document(
-                                "post-get-by-writer",
+                                "posts/post-get-by-writer",
                                 getDocumentRequestPreprocess(),
                                 getDocumentResponsePreprocess(),
                                 requestHeaders(
@@ -234,7 +234,7 @@ class PostControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andDo(
                         document(
-                                "post-get-by-tagNames",
+                                "posts/post-get-by-tagNames",
                                 getDocumentRequestPreprocess(),
                                 getDocumentResponsePreprocess(),
                                 requestHeaders(
@@ -270,7 +270,7 @@ class PostControllerTest extends ControllerTest {
         resultActions.andExpect(status().isNoContent())
                 .andDo(
                         document(
-                                "post-delete",
+                                "posts/post-delete",
                                 getDocumentRequestPreprocess(),
                                 getDocumentResponsePreprocess(),
                                 requestHeaders(
@@ -303,7 +303,7 @@ class PostControllerTest extends ControllerTest {
         resultActions.andExpect(status().isNoContent())
                 .andDo(
                         document(
-                                "post-update",
+                                "posts/post-update",
                                 getDocumentRequestPreprocess(),
                                 getDocumentResponsePreprocess(),
                                 requestHeaders(
@@ -340,7 +340,7 @@ class PostControllerTest extends ControllerTest {
         resultActions.andExpect(status().isOk())
                 .andDo(
                         document(
-                                "post-likes",
+                                "posts/post-likes",
                                 getDocumentRequestPreprocess(),
                                 getDocumentResponsePreprocess(),
                                 requestHeaders(
@@ -376,7 +376,7 @@ class PostControllerTest extends ControllerTest {
         resultActions.andExpect(status().isOk())
                 .andDo(
                         document(
-                                "post-unlikes",
+                                "posts/post-unlikes",
                                 getDocumentRequestPreprocess(),
                                 getDocumentResponsePreprocess(),
                                 requestHeaders(
