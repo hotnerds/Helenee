@@ -234,7 +234,7 @@ class PostControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andDo(
                         document(
-                                "post-get-all",
+                                "post-get-by-tagNames",
                                 getDocumentRequestPreprocess(),
                                 getDocumentResponsePreprocess(),
                                 requestHeaders(
