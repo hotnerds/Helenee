@@ -39,22 +39,21 @@ class PostControllerTest extends ControllerTest {
     @MockBean
     PostService postService;
 
-    List<PostResponseDto> postResponse;
+    PostResponseDto postResponse;
 
     MultiValueMap<String, String> params;
 
     @BeforeEach
     void init() {
-        postResponse = List.of(
-            PostResponseDto.builder()
-                    .postId(1L)
-                    .title("title")
-                    .writer("garamkim")
-                    .content("content")
-                    .createdAt(LocalDateTime.now())
-                    .likeCount(1)
-                    .tagNames(List.of("tag"))
-                    .build());
+        postResponse = PostResponseDto.builder()
+                .postId(1L)
+                .title("title")
+                .writer("garamkim")
+                .content("content")
+                .createdAt(LocalDateTime.now())
+                .likeCount(1)
+                .tagNames(List.of("tag"))
+                .build();
 
         params = new LinkedMultiValueMap<>();
         params.put("page", List.of("0"));
@@ -103,7 +102,7 @@ class PostControllerTest extends ControllerTest {
     @Test
     void 전체_게시물_조회_요청() throws Exception{
         //given
-        when(postService.searchAll(any())).thenReturn(postResponse);
+        when(postService.searchAll(any())).thenReturn(List.of(postResponse));
 
         //when then
         ResultActions resultActions = mockMvc.perform(get("/api/posts")
@@ -138,11 +137,47 @@ class PostControllerTest extends ControllerTest {
     }
 
     @WithCustomMockUser
+    @DisplayName("사용자는 게시글을 게시글 ID로 조회할 수 있다.")
+    @Test
+    void 게시글_ID로_조회() throws Exception {
+        //given
+        when(postService.searchByPostId(any())).thenReturn(postResponse);
+
+        //when then
+        ResultActions resultActions = mockMvc.perform(get("/api/posts/{id}", 1L)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(AUTHORIZATION_HEADER, ACCESS_TOKEN));
+
+        resultActions.andExpect(status().isOk())
+                .andDo(
+                        document(
+                                "posts/post-get-by-id",
+                                getDocumentRequestPreprocess(),
+                                getDocumentResponsePreprocess(),
+                                requestHeaders(
+                                        headerWithName(AUTHORIZATION_HEADER).description("유저의 Access Token")
+                                ),
+                                pathParameters(
+                                        parameterWithName("id").description("조회할 게시글 ID")
+                                ),
+                                responseFields(
+                                        fieldWithPath("postId").type(JsonFieldType.NUMBER).description("게시글의 ID"),
+                                        fieldWithPath("title").type(JsonFieldType.STRING).description("게시글의 제목"),
+                                        fieldWithPath("content").type(JsonFieldType.STRING).description("게시글의 본문"),
+                                        fieldWithPath("writer").type(JsonFieldType.STRING).description("게시글 작성자 이름"),
+                                        fieldWithPath("createdAt").type(JsonFieldType.STRING).description("게시글 작성 날짜"),
+                                        fieldWithPath("likeCount").type(JsonFieldType.NUMBER).description("게시글 좋아요 개수"),
+                                        fieldWithPath("tagNames").type(JsonFieldType.ARRAY).description("게시글 태그 목록")
+                                )));
+
+    }
+
+    @WithCustomMockUser
     @DisplayName("사용자는 게시글을 이름으로 조회할 수 있다.")
     @Test
     void 게시글_이름으로_조회() throws Exception{
         //given
-        when(postService.searchByTitle(any())).thenReturn(postResponse);
+        when(postService.searchByTitle(any())).thenReturn(List.of(postResponse));
         params.put("title", List.of("title"));
         //when then
         ResultActions resultActions = mockMvc.perform(get("/api/posts")
@@ -181,7 +216,7 @@ class PostControllerTest extends ControllerTest {
     @Test
     void 게시글_작성자_이름으로_조회() throws Exception {
         //given
-        when(postService.searchByWriter(any())).thenReturn(postResponse);
+        when(postService.searchByWriter(any())).thenReturn(List.of(postResponse));
         params.put("writer", List.of("garamkim"));
 
         //when then
@@ -221,7 +256,7 @@ class PostControllerTest extends ControllerTest {
     @Test
     void 태그_이름들로_게시글_조회() throws Exception {
         //given
-        when(postService.searchByTagNames(any())).thenReturn(postResponse);
+        when(postService.searchByTagNames(any())).thenReturn(List.of(postResponse));
         params.put("tagNames", List.of("tag"));
 
         //when then
