@@ -252,6 +252,12 @@ operation::posts/post-get-by-writer[snippets='http-request,request-headers,reque
 
 operation::posts/post-get-by-tagNames[snippets='http-request,request-headers,request-parameters,http-response,response-fields,curl-request']
 
+[[resources_post_get_by_id]]
+=== 게시글 단건 조회 - ID
+
+operation::posts/post-get-by-id[snippets='http-request,request-headers,path-parameters,http-response,response-fields,curl-request']
+
+
 [[resources_post-create]]
 === 게시글 생성
 
@@ -276,4 +282,3 @@ operation::posts/post-likes[snippets='http-request,path-parameters,request-heade
 === 게시글 좋아요 취소
 
 operation::posts/post-unlikes[snippets='http-request,path-parameters,request-headers,http-response,response-fields,curl-request']
-
