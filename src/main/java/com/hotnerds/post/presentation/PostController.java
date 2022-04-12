@@ -39,6 +39,11 @@ public class PostController {
         return ResponseEntity.ok(postService.searchAll(pageable));
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<PostResponseDto> searchPostById(@NotNull @PathVariable("id") Long postId) {
+        return ResponseEntity.ok(postService.searchByPostId(postId));
+    }
+
     @GetMapping(params = {"title"})
     public ResponseEntity<List<PostResponseDto>> searchPostsByTitle(@Valid PostByTitleRequestDto requestDto,
                                                                     @PageableDefault Pageable pageable) {
