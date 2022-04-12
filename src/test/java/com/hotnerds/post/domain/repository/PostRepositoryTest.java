@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(
         type = FilterType.ASSIGNABLE_TYPE,
@@ -52,41 +51,43 @@ class PostRepositoryTest {
 
         tag = new Tag("tagName");
 
+        userRepository.save(user);
         post.like(user);
-        post.addTag(tag);
     }
 
     @DisplayName("게시글 등록 성공")
     @Test
-    public void 게시글_등록_성공() {
-        //given
-        userRepository.save(user);
-        tagRepository.save(tag);
+    void 게시글_등록_성공() {
         //when
         Post savedPost = postRepository.save(post);
 
         //then
-        assertAll(
-                () -> assertThat(savedPost.getId()).isNotNull(),
-                () -> assertThat(savedPost.getTitle()).isEqualTo(post.getTitle()),
-                () -> assertThat(savedPost.getContent()).isEqualTo(post.getContent()),
-                () -> assertThat(savedPost.getWriter().getId()).isNotNull(),
-                () -> assertThat(savedPost.getLikeCount()).isEqualTo(1),
-                () -> assertThat(savedPost.getTagNames().size()).isEqualTo(1));
+        assertThat(savedPost.getId()).isNotNull();
+    }
 
+    @DisplayName("게시글 전체 조회")
+    @Test
+    void 게시글_전체_조회_성공() {
+        //given
+        postRepository.save(post);
+        PageRequest page = PageRequest.of(0, 10);
+
+        //when
+        List<Post> findPosts = postRepository.findAllPosts(page);
+
+        //then
+        assertThat(findPosts).hasSize(1);
     }
 
     @DisplayName("게시글 제목으로 조회")
     @Test
-    public void 게시글_제목으로_조회_성공() {
+    void 게시글_제목으로_조회_성공() {
         //given
-        userRepository.save(user);
-        tagRepository.save(tag);
         postRepository.save(post);
+        PageRequest page = PageRequest.of(0, 10);
 
         //when
-        List<Post> findPosts = postRepository.findAllByTitle(post.getTitle());
-
+        List<Post> findPosts = postRepository.findAllByTitle(post.getTitle(), page);
 
         //then
         assertThat(findPosts.size()).isEqualTo(1);
@@ -94,10 +95,8 @@ class PostRepositoryTest {
 
     @DisplayName("특정 시간 이후에 생성된 게시글 조회")
     @Test
-    public void 특정시간_이후에_생성된_게시글_조회() {
+    void 특정시간_이후에_생성된_게시글_조회() {
         //given
-        userRepository.save(user);
-        tagRepository.save(tag);
         postRepository.save(post);
 
         //when
@@ -112,11 +111,9 @@ class PostRepositoryTest {
     @Test
     void 사용자가_작성한_게시글_조회() {
         //given
-        userRepository.save(user);
-        tagRepository.save(tag);
         postRepository.save(post);
         //when
-        List<Post> findPosts = postRepository.findAllByUser(user, PageRequest.of(0, 10));
+        List<Post> findPosts = postRepository.findAllByWriter(user, PageRequest.of(0, 10));
 
         //then
         assertThat(findPosts.size()).isEqualTo(1);
@@ -127,7 +124,7 @@ class PostRepositoryTest {
     @Test
     void Post저장시_Tag가_저장안되면_예외_발생() {
         //given
-        userRepository.save(user);
+        post.addTag(tag);
         //when, then
         assertThatThrownBy(() -> postRepository.save(post))
                 .isInstanceOf(InvalidDataAccessApiUsageException.class);
@@ -138,8 +135,8 @@ class PostRepositoryTest {
     @Test
     void 태그_이름으로_게시글_조회() {
         //given
-        userRepository.save(user);
         tagRepository.save(tag);
+        post.addTag(tag);
         postRepository.save(post);
 
         //when

@@ -2,6 +2,7 @@ package com.hotnerds.post.application;
 
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
+import com.hotnerds.common.security.oauth2.service.AuthenticatedUser;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.post.domain.dto.*;
 import com.hotnerds.post.domain.like.Like;
@@ -21,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,11 +47,12 @@ public class PostServiceTest {
     @Mock
     TagService tagService;
 
-
     @InjectMocks
     PostService postService;
 
     User user;
+
+    AuthenticatedUser authUser;
 
     Post post;
 
@@ -66,6 +69,8 @@ public class PostServiceTest {
                 .email("email")
                 .build();
 
+        authUser = AuthenticatedUser.of(user);
+
         post = new Post(1L,"title", "content", user);
 
         tag = new Tag("tagName");
@@ -78,7 +83,6 @@ public class PostServiceTest {
         PostRequestDto requestDto = PostRequestDto.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
-                .username(user.getUsername())
                 .tagNames(List.of(tag.getName()))
                 .build();
 
@@ -87,12 +91,13 @@ public class PostServiceTest {
         when(tagService.findOrCreateTag(anyString())).thenReturn(tag);
 
         //when
-        postService.write(requestDto);
+        Long postId = postService.write(requestDto, authUser);
 
         //then
-        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
-        verify(postRepository, times(1)).save(any(Post.class));
-        verify(tagService, times(requestDto.getTagNames().size())).findOrCreateTag(anyString());
+        assertThat(postId).isNotNull();
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).save(any());
+        verify(tagService, times(requestDto.getTagNames().size())).findOrCreateTag(any());
     }
 
     @DisplayName("유효하지 않은 사용자는 게시물을 등록할 수 없다.")
@@ -102,19 +107,18 @@ public class PostServiceTest {
         PostRequestDto requestDto = PostRequestDto.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
-                .username(user.getUsername())
                 .tagNames(List.of(tag.getName()))
                 .build();
 
         when(userRepository.findByUsername(anyString())).thenThrow(new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         //when then
-        assertThatThrownBy(() -> postService.write(requestDto))
+        assertThatThrownBy(() -> postService.write(requestDto, authUser))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
                 .isEqualTo(ErrorCode.USER_NOT_FOUND_EXCEPTION);
-        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
+        verify(userRepository, times(1)).findByUsername(any());
     }
 
 
@@ -126,7 +130,6 @@ public class PostServiceTest {
         PostRequestDto requestDto = PostRequestDto.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
-                .username(user.getUsername())
                 .tagNames(List.of(tagName))
                 .build();
 
@@ -134,14 +137,14 @@ public class PostServiceTest {
         when(tagService.findOrCreateTag(anyString())).thenThrow(new BusinessException(ErrorCode.TAG_NAME_NOT_VALID_EXCEPTION));
 
         //when then
-        assertThatThrownBy(() -> postService.write(requestDto))
+        assertThatThrownBy(() -> postService.write(requestDto, authUser))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
                 .isEqualTo(ErrorCode.TAG_NAME_NOT_VALID_EXCEPTION);
 
-        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
-        verify(tagService, times(1)).findOrCreateTag(anyString());
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(tagService, times(1)).findOrCreateTag(any());
     }
 
     @DisplayName("중복된 태그를 가진 게시물은 생성할 수 없다.")
@@ -151,7 +154,6 @@ public class PostServiceTest {
         PostRequestDto requestDto = PostRequestDto.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
-                .username(user.getUsername())
                 .tagNames(Arrays.asList(tag.getName(), tag.getName()))
                 .build();
 
@@ -159,37 +161,86 @@ public class PostServiceTest {
         when(tagService.findOrCreateTag(anyString())).thenReturn(tag);
 
         //when then
-        assertThatThrownBy(() -> postService.write(requestDto))
+        assertThatThrownBy(() -> postService.write(requestDto, authUser))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
                 .isEqualTo(ErrorCode.DUPLICATED_TAG_EXCEPTION);
 
-        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
-        verify(tagService, times(requestDto.getTagNames().size())).findOrCreateTag(anyString());
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(tagService, times(requestDto.getTagNames().size())).findOrCreateTag(any());
+    }
+
+    @DisplayName("전체 게시글 조회")
+    @Test
+    void 전체_게시글_조회() {
+        //given
+        when(postRepository.findAllPosts(any())).thenReturn(List.of(post));
+        Pageable pageable = PageRequest.of(0, 10);
+        //when
+        List<PostResponseDto> posts = postService.searchAll(pageable);
+
+        //then
+        assertThat(posts).hasSize(1);
+        verify(postRepository, times(1)).findAllPosts(any());
+    }
+
+    @DisplayName("게시글 Id로 조회 성공")
+    @Test
+    void 게시글_Id로_조회_성공() {
+        //given
+        when(postRepository.findById(any())).thenReturn(Optional.of(post));
+
+        //when
+        PostResponseDto postResponseDto = postService.searchByPostId(post.getId());
+
+        //then
+        assertThat(postResponseDto.getPostId()).isEqualTo(post.getId());
+
+        verify(postRepository, times(1)).findById(any());
+    }
+
+    @DisplayName("해당하는 Id를 가진 게시글이 없으면 예외 발생")
+    @Test
+    void 게시글_Id_없으면_예외_발생() {
+        //given
+        when(postRepository.findById(any())).thenReturn(Optional.empty());
+
+        //when then
+        assertThatThrownBy(() -> postService.searchByPostId(2L))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .usingRecursiveComparison()
+                .isEqualTo(ErrorCode.POST_NOT_FOUND_EXCEPTION);
+
+        verify(postRepository, times(1)).findById(any());
     }
 
     @DisplayName("게시글 제목으로 조회")
     @Test
     void 게시글_제목으로_조회() {
         //given
-        when(postRepository.findAllByTitle(anyString())).thenReturn(List.of(post));
+        when(postRepository.findAllByTitle(any(), any())).thenReturn(List.of(post));
+        PostByTitleRequestDto requestDto = PostByTitleRequestDto.builder()
+                .title(post.getTitle())
+                .pageable(PageRequest.of(0 ,10))
+                .build();
         //when
-        List<PostResponseDto> findPosts = postService.searchByTitle(post.getTitle());
+        List<PostResponseDto> findPosts = postService.searchByTitle(requestDto);
 
         //then
         assertThat(findPosts.size()).isEqualTo(1);
 
-        verify(postRepository, times(1)).findAllByTitle(post.getTitle());
+        verify(postRepository, times(1)).findAllByTitle(any(), any());
     }
 
-    @DisplayName("유효하지 않은 사용자 게시물 조회 실패")
+    @DisplayName("존재하지 않은 사용자 게시물 조회 실패")
     @Test
-    void 유효하지않은사용자_게시물_조회_실패() {
+    void 존재하지_않은_사용자_게시물_조회_실패() {
         //given
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
-        PostByUserRequestDto requestDto = PostByUserRequestDto.builder()
-                .username(user.getUsername())
+        PostByWriterRequestDto requestDto = PostByWriterRequestDto.builder()
+                .writer(user.getUsername())
                 .pageable(PageRequest.of(0, 10))
                 .build();
 
@@ -201,15 +252,15 @@ public class PostServiceTest {
         verify(userRepository, times(1)).findByUsername(user.getUsername());
     }
 
-    @DisplayName("사용자가 작성한 게시물 조회")
+    @DisplayName("게시글 작성자 이름으로 게시글 조회.")
     @Test
-    void 사용자가_작성한_게시물_조회() {
+    void 작성자_이름으로_게시물_조회() {
         //given
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
-        when(postRepository.findAllByUser(any(User.class), any(PageRequest.class))).thenReturn(List.of(post, post));
+        when(postRepository.findAllByWriter(any(User.class), any(PageRequest.class))).thenReturn(List.of(post, post));
 
-        PostByUserRequestDto requestDto = PostByUserRequestDto.builder()
-                .username(user.getUsername())
+        PostByWriterRequestDto requestDto = PostByWriterRequestDto.builder()
+                .writer(user.getUsername())
                 .pageable(PageRequest.of(0, 10))
                 .build();
 
@@ -228,8 +279,8 @@ public class PostServiceTest {
                 .usingRecursiveComparison()
                 .isEqualTo(expectedResult);
 
-        verify(userRepository, times(1)).findByUsername(user.getUsername());
-        verify(postRepository, times(1)).findAllByUser(user, requestDto.getPageable());
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).findAllByWriter(any(), any());
     }
 
     @DisplayName("특정 태그가 붙어 있는 게시글 조회할 수 있다.")
@@ -275,19 +326,14 @@ public class PostServiceTest {
     @Test
     void 유효하지않은사용자_게시글_삭제_실패() {
         //given
-        PostDeleteRequestDto requestDto = PostDeleteRequestDto.builder()
-                .postId(1L)
-                .username("garam")
-                .build();
-
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
 
         //when then
-        assertThatThrownBy(() -> postService.delete(requestDto))
+        assertThatThrownBy(() -> postService.delete(1L, authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
 
-        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
+        verify(userRepository, times(1)).findByUsername(any());
 
     }
 
@@ -295,42 +341,48 @@ public class PostServiceTest {
     @Test
     void 존재하지않은_게시글_삭제_실패() {
         //given
-        PostDeleteRequestDto requestDto = PostDeleteRequestDto.builder()
-                .postId(1L)
-                .username("garam")
-                .build();
-
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when then
-        assertThatThrownBy(() -> postService.delete(requestDto))
+        assertThatThrownBy(() -> postService.delete(1L, authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.POST_NOT_FOUND_EXCEPTION.getMessage());
 
-        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
-        verify(postRepository, times(1)).findById(requestDto.getPostId());
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).findById(any());
+    }
+
+    @DisplayName("게시글 작성자와 삭제 요청한 유저가 다르면 삭제 할 수 없다.")
+    @Test
+    void 게시글_작성자와_요청한_유저가_다르면_삭제_실패() {
+        User otherUser = new User("otherUser", "aaa@aaa");
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(otherUser));
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+
+        //when then
+        assertThatThrownBy(() -> postService.delete(1L, authUser))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.POST_WRITER_NOT_MATCH_EXCEPTION.getMessage());
+
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).findById(any());
     }
 
     @DisplayName("게시글 삭제 성공")
     @Test
     void 게시글_삭제_성공() {
         //given
-        PostDeleteRequestDto requestDto = PostDeleteRequestDto.builder()
-                .postId(1L)
-                .username("garam")
-                .build();
-
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
         //when
-        postService.delete(requestDto);
+        postService.delete(1L, authUser);
 
         //then
-        verify(userRepository, times(1)).findByUsername(requestDto.getUsername());
-        verify(postRepository, times(1)).findById(requestDto.getPostId());
-        verify(postRepository, times(1)).deleteById(requestDto.getPostId());
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).findById(any());
+        verify(postRepository, times(1)).deleteById(any());
     }
 
     @DisplayName("존재하지 않는 게시글에 좋아요를 누르면 실패 한다.")
@@ -341,9 +393,11 @@ public class PostServiceTest {
 
         //when then
         assertThatThrownBy(
-                () -> postService.like(user.getUsername(), post.getId()))
+                () -> postService.like(post.getId(), authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.POST_NOT_FOUND_EXCEPTION.getMessage());
+
+        verify(postRepository, times(1)).findById(any());
     }
 
     @DisplayName("존재하지 않는 사용자가 게시글에 좋아요를 요청하면 실패한다.")
@@ -354,9 +408,12 @@ public class PostServiceTest {
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
         //when then
         assertThatThrownBy(
-                () -> postService.like(user.getUsername(), post.getId()))
+                () -> postService.like(post.getId(), authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
+
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).findById(any());
     }
 
     @DisplayName("게시글 좋아요 요청이 중복되면 예외를 발생시킨다.")
@@ -374,9 +431,12 @@ public class PostServiceTest {
 
         //when then
         assertThatThrownBy(
-                () -> postService.like(user.getUsername(), post.getId()))
+                () -> postService.like(post.getId(), authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.DUPLICATED_LIKE_EXCEPTION.getMessage());
+
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).findById(any());
     }
 
     @DisplayName("사용자가 게시물에 좋아요를 누를 수 있다.")
@@ -387,12 +447,12 @@ public class PostServiceTest {
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
         //when
-        LikeResponseDto responseDto = postService.like(user.getUsername(), post.getId());
+        LikeResponseDto responseDto = postService.like(post.getId(), authUser);
 
         //then
         assertAll(
                 () -> assertThat(responseDto.getLikeCount()).isEqualTo(1),
-                () -> assertThat(responseDto.getUsername()).isEqualTo(user.getUsername()),
+                () -> assertThat(responseDto.getWriter()).isEqualTo(user.getUsername()),
                 () -> assertThat(responseDto.getPostId()).isEqualTo(post.getId())
         );
         verify(userRepository, times(1)).findByUsername(user.getUsername());
@@ -408,9 +468,12 @@ public class PostServiceTest {
 
         //when then
         assertThatThrownBy(
-                () -> postService.unlike(user.getUsername(), post.getId()))
+                () -> postService.unlike(post.getId(), authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.LIKE_NOT_FOUND_EXCEPTION.getMessage());
+
+        verify(userRepository, times(1)).findByUsername(any());
+        verify(postRepository, times(1)).findById(any());
     }
 
     @DisplayName("좋아요 취소 성공")
@@ -424,12 +487,12 @@ public class PostServiceTest {
 
 
         //when
-        LikeResponseDto responseDto = postService.unlike(user.getUsername(), post.getId());
+        LikeResponseDto responseDto = postService.unlike(post.getId(), authUser);
 
         //then
         assertAll(
                 () -> assertThat(responseDto.getLikeCount()).isEqualTo(0),
-                () -> assertThat(responseDto.getUsername()).isEqualTo(user.getUsername()),
+                () -> assertThat(responseDto.getWriter()).isEqualTo(user.getUsername()),
                 () -> assertThat(responseDto.getPostId()).isEqualTo(post.getId())
         );
 
@@ -443,7 +506,6 @@ public class PostServiceTest {
         //given
         PostUpdateRequestDto updateDto = PostUpdateRequestDto.builder()
                 .postId(post.getId())
-                .username(user.getUsername())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tagNames(List.of(tag.getName()))
@@ -454,7 +516,7 @@ public class PostServiceTest {
         when(tagService.findOrCreateTag(anyString())).thenReturn(tag);
 
         //when
-        postService.update(updateDto);
+        postService.update(updateDto, authUser);
 
         //then
         verify(postRepository, times(1)).findById(anyLong());
@@ -472,7 +534,6 @@ public class PostServiceTest {
                 .build();
         PostUpdateRequestDto updateDto = PostUpdateRequestDto.builder()
                 .postId(post.getId())
-                .username(notWriter.getUsername())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tagNames(List.of(tag.getName()))
@@ -482,7 +543,7 @@ public class PostServiceTest {
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(notWriter));
 
         //when then
-        assertThatThrownBy(() -> postService.update(updateDto))
+        assertThatThrownBy(() -> postService.update(updateDto, authUser))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
@@ -498,7 +559,6 @@ public class PostServiceTest {
         //given
         PostUpdateRequestDto updateDto = PostUpdateRequestDto.builder()
                 .postId(post.getId())
-                .username(user.getUsername())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tagNames(List.of(tag.getName()))
@@ -507,7 +567,7 @@ public class PostServiceTest {
         when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when then
-        assertThatThrownBy(() -> postService.update(updateDto))
+        assertThatThrownBy(() -> postService.update(updateDto, authUser))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
@@ -522,7 +582,6 @@ public class PostServiceTest {
         //given
         PostUpdateRequestDto updateDto = PostUpdateRequestDto.builder()
                 .postId(post.getId())
-                .username(user.getUsername())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tagNames(List.of(tag.getName()))
@@ -532,7 +591,7 @@ public class PostServiceTest {
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
 
         //when then
-        assertThatThrownBy(() -> postService.update(updateDto))
+        assertThatThrownBy(() -> postService.update(updateDto, authUser))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
@@ -549,7 +608,6 @@ public class PostServiceTest {
         //given
         PostUpdateRequestDto updateDto = PostUpdateRequestDto.builder()
                 .postId(post.getId())
-                .username(user.getUsername())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tagNames(List.of(tagName))
@@ -560,7 +618,7 @@ public class PostServiceTest {
         when(tagService.findOrCreateTag(anyString())).thenThrow(new BusinessException(ErrorCode.TAG_NAME_NOT_VALID_EXCEPTION));
 
         //when then
-        assertThatThrownBy(() -> postService.update(updateDto))
+        assertThatThrownBy(() -> postService.update(updateDto, authUser))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()

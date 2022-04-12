@@ -2,6 +2,7 @@ package com.hotnerds.post.application;
 
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
+import com.hotnerds.common.security.oauth2.service.AuthenticatedUser;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.post.domain.dto.*;
 import com.hotnerds.post.domain.repository.PostRepository;
@@ -10,13 +11,11 @@ import com.hotnerds.tag.domain.Tag;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
@@ -30,22 +29,35 @@ public class PostService {
     private final TagService tagService;
 
     @Transactional
-    public void write(PostRequestDto requestDto) {
-        postRepository.save(createPost(requestDto));
+    public Long write(PostRequestDto requestDto, AuthenticatedUser authUser) {
+        return postRepository.save(createPost(requestDto, authUser)).getId();
     }
 
-    public List<PostResponseDto> searchByTitle(String title) {
-        List<Post> findPosts = postRepository.findAllByTitle(title);
-
-        return findPosts.stream()
+    public List<PostResponseDto> searchAll(Pageable pageable) {
+        return postRepository.findAllPosts(pageable)
+                .stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }
 
-    public List<PostResponseDto> searchByWriter(PostByUserRequestDto requestDto) {
-        User user = userRepository.findByUsername(requestDto.getUsername()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+    public PostResponseDto searchByPostId(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
 
-        return postRepository.findAllByUser(user, requestDto.getPageable()).stream()
+        return PostResponseDto.of(post);
+    }
+
+    public List<PostResponseDto> searchByTitle(PostByTitleRequestDto requestDto) {
+        return postRepository.findAllByTitle(requestDto.getTitle(),requestDto.getPageable()).stream()
+                .map(PostResponseDto::of)
+                .collect(toList());
+    }
+
+    public List<PostResponseDto> searchByWriter(PostByWriterRequestDto requestDto) {
+        User user = userRepository.findByUsername(requestDto.getWriter())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        return postRepository.findAllByWriter(user, requestDto.getPageable()).stream()
                 .map(PostResponseDto::of)
                 .collect(toList());
     }
@@ -59,8 +71,8 @@ public class PostService {
                 .collect(toList());
     }
 
-    private Post createPost(PostRequestDto postRequestDto) {
-        User user = userRepository.findByUsername(postRequestDto.getUsername())
+    private Post createPost(PostRequestDto postRequestDto, AuthenticatedUser authUser) {
+        User user = userRepository.findByUsername(authUser.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         Post post = new Post(
@@ -76,22 +88,25 @@ public class PostService {
     }
 
     @Transactional
-    public void delete(PostDeleteRequestDto requestDto) {
-
-        userRepository.findByUsername(requestDto.getUsername())
+    public void delete(Long postId, AuthenticatedUser authUser) {
+        User user = userRepository.findByUsername(authUser.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
-        postRepository.findById(requestDto.getPostId())
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
 
-        postRepository.deleteById(requestDto.getPostId());
+        if(!post.isWriter(user)) {
+            throw new BusinessException(ErrorCode.POST_WRITER_NOT_MATCH_EXCEPTION);
+        }
+
+        postRepository.deleteById(postId);
     }
 
     @Transactional
-    public void update(PostUpdateRequestDto updateRequestDto) {
+    public void update(PostUpdateRequestDto updateRequestDto, AuthenticatedUser authUser) {
         Post post = postRepository.findById(updateRequestDto.getPostId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
-        User user = userRepository.findByUsername(updateRequestDto.getUsername())
+        User user = userRepository.findByUsername(authUser.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         if(!post.isWriter(user)) {
@@ -108,33 +123,33 @@ public class PostService {
     }
 
     @Transactional
-    public LikeResponseDto like(String username, Long postId) {
+    public LikeResponseDto like(Long postId, AuthenticatedUser authUser) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(authUser.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         post.like(user);
 
         return LikeResponseDto.builder()
                 .likeCount(post.getLikeCount())
-                .username(user.getUsername())
+                .writer(user.getUsername())
                 .postId(post.getId())
                 .build();
     }
 
     @Transactional
-    public LikeResponseDto unlike(String username, Long postId) {
+    public LikeResponseDto unlike(Long postId, AuthenticatedUser authUser) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND_EXCEPTION));
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(authUser.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
 
         post.unlike(user);
 
         return LikeResponseDto.builder()
                 .likeCount(post.getLikeCount())
-                .username(user.getUsername())
+                .writer(user.getUsername())
                 .postId(post.getId())
                 .build();
     }

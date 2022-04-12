@@ -3,13 +3,8 @@ package com.hotnerds;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.hotnerds.common.security.filter.JwtAuthenticationFilter;
-import com.hotnerds.common.security.handler.OAuth2AuthenticationEntryPoint;
-import com.hotnerds.common.security.handler.OAuth2SuccessHandler;
 import com.hotnerds.common.security.oauth2.provider.JwtTokenProvider;
-import com.hotnerds.common.security.oauth2.resolver.AuthenticatedUserMethodArgumentResolver;
 import com.hotnerds.common.security.oauth2.service.AuthProvider;
-import com.hotnerds.common.security.oauth2.service.AuthenticatedUser;
-import com.hotnerds.common.security.oauth2.service.CustomOAuth2UserService;
 import com.hotnerds.user.domain.ROLE;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
@@ -40,11 +35,15 @@ public class ControllerTest {
     public static final String USER_EMAIL = "kgr4163@naver.com";
     public static final String NAME_ATTRIBUTE_KEY = "id";
     public static final String CLIENT_REGISTRATION_ID = "kakao";
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String ACCESS_TOKEN = "access token";
 
     @MockBean
     protected UserRepository userRepository;
 
     protected User authUser;
+    @MockBean
+    JwtTokenProvider jwtTokenProvider;
 
     protected MockMvc mockMvc;
 
@@ -67,5 +66,7 @@ public class ControllerTest {
         authUser = new User("garamkim", "kgr4163@naver.com", ROLE.USER, AuthProvider.KAKAO);
 
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(authUser));
+        when(jwtTokenProvider.resolveToken(any())).thenReturn(ACCESS_TOKEN);
+        when(jwtTokenProvider.validateToken(any())).thenReturn(false);
     }
 }

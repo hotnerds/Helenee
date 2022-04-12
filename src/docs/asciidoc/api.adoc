@@ -227,3 +227,58 @@ operation::diets/save-foods[snippets='request-fields,request-body,curl-request,r
 음식 이름으로 음식 리스트를 검색한다.
 
 operation::foods/search-foods[snippets='request-parameters,response-fields,curl-request,http-response']
+
+[[resources_post]]
+== 게시글
+
+[[resources_post_get_all]]
+=== 게시글 다건 조회
+
+operation::posts/post-get-all[snippets='http-request,request-headers,request-parameters,http-response,response-fields,curl-request']
+
+[[resources_post_get_by_title]]
+=== 게시글 다건 조회 - 제목
+
+operation::posts/post-get-by-title[snippets='http-request,request-headers,request-parameters,http-response,response-fields,curl-request']
+
+[[resources_post_get_by_writer]]
+=== 게시글 다건 조회 - 작성자
+
+operation::posts/post-get-by-writer[snippets='http-request,request-headers,request-parameters,http-response,response-fields,curl-request']
+
+
+[[resources_post_get_by_tagNames]]
+=== 게시글 다건 조회 - 태그 이름
+
+operation::posts/post-get-by-tagNames[snippets='http-request,request-headers,request-parameters,http-response,response-fields,curl-request']
+
+[[resources_post_get_by_id]]
+=== 게시글 단건 조회 - ID
+
+operation::posts/post-get-by-id[snippets='http-request,request-headers,path-parameters,http-response,response-fields,curl-request']
+
+
+[[resources_post-create]]
+=== 게시글 생성
+
+operation::posts/post-create[snippets='http-request,request-headers,request-fields,http-response,response-headers,curl-request']
+
+[[resources_post-create]]
+=== 게시글 삭제
+
+operation::posts/post-delete[snippets='http-request,path-parameters,request-headers,http-response,curl-request']
+
+[[resources_post_update]]
+=== 게시글 수정
+
+operation::posts/post-update[snippets='http-request,request-headers,request-fields,http-response,curl-request']
+
+[[resources_post_likes]]
+=== 게시글 좋아요
+
+operation::posts/post-likes[snippets='http-request,path-parameters,request-headers,http-response,response-fields,curl-request']
+
+[[resources_post_unlikes]]
+=== 게시글 좋아요 취소
+
+operation::posts/post-unlikes[snippets='http-request,path-parameters,request-headers,http-response,response-fields,curl-request']

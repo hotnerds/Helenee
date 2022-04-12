@@ -3,20 +3,22 @@ package com.hotnerds.post.domain.dto;
 import lombok.Builder;
 import lombok.Getter;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Getter
 public class PostRequestDto {
+    @NotBlank
     private String title;
+    @NotBlank
     private String content;
-    private String username;
-    private List<String> tagNames;
+
+    private List<@NotBlank String> tagNames;
 
     @Builder
-    public PostRequestDto(String title, String content, String username, List<String> tagNames) {
+    public PostRequestDto(String title, String content, List<String> tagNames) {
         this.title = title;
         this.content = content;
-        this.username = username;
         this.tagNames = tagNames;
     }
 }
