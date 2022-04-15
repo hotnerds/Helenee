@@ -26,9 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(value = FoodController.class)
 class FoodControllerTest extends ControllerTest {
 
-    @MockBean
-    FoodService foodService;
-
     @Test
     @WithCustomMockUser
     void 음식_리스트_검색() throws Exception {
