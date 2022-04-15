@@ -59,7 +59,7 @@ public class DietService {
         requestDto.getFoods()
                 .forEach(e -> diet.addFood(foodService.findOrCreate(e.getFoodId()), e.getAmount()));
 
-        return diet.getDietId();
+        return diet.getId();
     }
 
     @Transactional

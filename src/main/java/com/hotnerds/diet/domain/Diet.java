@@ -4,7 +4,6 @@ import com.hotnerds.common.BaseTimeEntity;
 import com.hotnerds.diet.domain.dietFood.DietFoods;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.Nutrient;
-import com.hotnerds.post.domain.like.Like;
 import com.hotnerds.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -28,8 +27,7 @@ import java.util.Objects;
 public class Diet extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "diet_id")
-    private Long dietId;
+    private Long id;
 
     @Column(name = "meal_date", nullable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd")

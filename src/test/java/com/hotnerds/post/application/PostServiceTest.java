@@ -5,8 +5,8 @@ import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.common.security.oauth2.service.AuthenticatedUser;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.post.domain.dto.*;
-import com.hotnerds.post.domain.like.Like;
 import com.hotnerds.post.domain.like.Likes;
+import com.hotnerds.post.domain.like.LikeList;
 import com.hotnerds.post.domain.repository.PostRepository;
 import com.hotnerds.tag.application.TagService;
 import com.hotnerds.tag.domain.Tag;
@@ -56,13 +56,13 @@ public class PostServiceTest {
 
     Post post;
 
-    Likes likes;
+    LikeList likes;
 
     Tag tag;
 
     @BeforeEach
     void init() {
-        likes = new Likes(new ArrayList<>());
+        likes = new LikeList(new ArrayList<>());
 
         user = User.builder()
                 .username("name")
@@ -423,7 +423,7 @@ public class PostServiceTest {
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
-        post.getLikes().add(Like.builder()
+        post.getLikeList().add(Likes.builder()
                 .id(null)
                 .user(user)
                 .post(post)

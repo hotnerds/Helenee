@@ -1,8 +1,8 @@
 package com.hotnerds.post.domain;
 
 import com.hotnerds.common.BaseTimeEntity;
-import com.hotnerds.post.domain.like.Like;
 import com.hotnerds.post.domain.like.Likes;
+import com.hotnerds.post.domain.like.LikeList;
 import com.hotnerds.comment.domain.Comment;
 import com.hotnerds.comment.domain.Comments;
 import com.hotnerds.post.domain.tag.PostTags;
@@ -36,7 +36,7 @@ public class Post extends BaseTimeEntity {
     private Comments comments;
 
     @Embedded
-    Likes likes;
+    LikeList likeList;
 
     @Embedded
     PostTags postTags;
@@ -51,21 +51,21 @@ public class Post extends BaseTimeEntity {
     }
 
     public void like(User user) {
-        Like like = Like.builder()
+        Likes like = Likes.builder()
                 .id(null)
                 .post(this)
                 .user(user)
                 .build();
-        likes.add(like);
+        likeList.add(like);
     }
 
     public void unlike(User user) {
-        Like like = Like.builder()
+        Likes like = Likes.builder()
                 .id(null)
                 .post(this)
                 .user(user)
                 .build();
-        likes.remove(like);
+        likeList.remove(like);
     }
 
     public void addTag(Tag tag) {
@@ -85,7 +85,7 @@ public class Post extends BaseTimeEntity {
     }
 
     public int getLikeCount() {
-        return likes.getCount();
+        return likeList.getCount();
     }
 
     public void addComment(Comment comment) {
@@ -101,22 +101,22 @@ public class Post extends BaseTimeEntity {
     }
 
     public Post(String title, String content, User writer) {
-        this(null, title, content, writer, Comments.empty(), Likes.empty(), PostTags.empty());
+        this(null, title, content, writer, Comments.empty(), LikeList.empty(), PostTags.empty());
     }
 
     public Post(Long id, String title, String content, User writer) {
-        this(id, title, content, writer, Comments.empty(), Likes.empty(), PostTags.empty());
+        this(id, title, content, writer, Comments.empty(), LikeList.empty(), PostTags.empty());
     }
 
     @Generated
     @Builder
-    public Post(Long id, String title, String content, User writer, Comments comments, Likes likes, PostTags postTags) {
+    public Post(Long id, String title, String content, User writer, Comments comments, LikeList likes, PostTags postTags) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.writer = writer;
         this.comments = comments;
-        this.likes = likes;
+        this.likeList = likes;
         this.postTags = postTags;
     }
 }

@@ -11,9 +11,9 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Food {
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "food_id")
-    private Long foodId;
+    private Long id;
 
     @Column(name = "food_name", unique = true)
     private String foodName;
@@ -23,7 +23,7 @@ public class Food {
 
     @Builder
     public Food(Long foodId, String foodName, Nutrient nutrient) {
-        this.foodId = foodId;
+        this.id = foodId;
         this.foodName = foodName;
         this.nutrient = nutrient;
     }

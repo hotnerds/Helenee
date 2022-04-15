@@ -41,7 +41,7 @@ public class DietResponseDto {
                 .collect(Collectors.toList());
 
         return DietResponseDto.builder()
-                .dietId(diet.getDietId())
+                .dietId(diet.getId())
                 .mealDate(diet.getMealDate())
                 .mealTime(MealTimeDto.of(diet.getMealTime()))
                 .totalNutrient(diet.calculateTotalNutrient())
