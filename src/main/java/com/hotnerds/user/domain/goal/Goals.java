@@ -2,8 +2,10 @@ package com.hotnerds.user.domain.goal;
 
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -16,6 +18,7 @@ import java.util.List;
 @Embeddable
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Goals {
     @OneToMany(
             mappedBy = "user",

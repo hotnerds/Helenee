@@ -2,7 +2,9 @@ package com.hotnerds.user.domain;
 
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -10,6 +12,7 @@ import java.util.List;
 
 @Embeddable
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FollowedList {
     @OneToMany(mappedBy = "followed", orphanRemoval = true, cascade = CascadeType.PERSIST)
     private List<Follow> followed = new ArrayList<>();

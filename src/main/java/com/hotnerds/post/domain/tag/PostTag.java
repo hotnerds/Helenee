@@ -2,13 +2,16 @@ package com.hotnerds.post.domain.tag;
 
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.tag.domain.Tag;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Getter
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

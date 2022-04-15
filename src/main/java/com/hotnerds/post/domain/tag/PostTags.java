@@ -4,8 +4,10 @@ import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.tag.domain.Tag;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -20,6 +22,7 @@ import static java.util.stream.Collectors.toList;
 @Getter
 @Embeddable
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostTags {
     @OneToMany(
             mappedBy = "post",

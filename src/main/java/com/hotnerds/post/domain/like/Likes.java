@@ -3,7 +3,9 @@ package com.hotnerds.post.domain.like;
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.user.domain.User;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.CascadeType;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Embeddable
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Likes {
     @OneToMany(
             mappedBy = "post",
