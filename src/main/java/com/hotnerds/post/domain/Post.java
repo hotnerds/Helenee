@@ -1,8 +1,10 @@
 package com.hotnerds.post.domain;
 
 import com.hotnerds.common.BaseTimeEntity;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
+import com.hotnerds.post.domain.like.Like;
 import com.hotnerds.post.domain.like.Likes;
-import com.hotnerds.post.domain.like.LikeList;
 import com.hotnerds.comment.domain.Comment;
 import com.hotnerds.comment.domain.Comments;
 import com.hotnerds.post.domain.tag.PostTags;
@@ -36,7 +38,7 @@ public class Post extends BaseTimeEntity {
     private Comments comments;
 
     @Embedded
-    LikeList likeList;
+    Likes likeList;
 
     @Embedded
     PostTags postTags;
@@ -51,20 +53,22 @@ public class Post extends BaseTimeEntity {
     }
 
     public void like(User user) {
-        Likes like = Likes.builder()
+        Like like = Like.builder()
                 .id(null)
                 .post(this)
                 .user(user)
                 .build();
+
         likeList.add(like);
     }
 
     public void unlike(User user) {
-        Likes like = Likes.builder()
+        Like like = Like.builder()
                 .id(null)
                 .post(this)
                 .user(user)
                 .build();
+
         likeList.remove(like);
     }
 
@@ -101,16 +105,16 @@ public class Post extends BaseTimeEntity {
     }
 
     public Post(String title, String content, User writer) {
-        this(null, title, content, writer, Comments.empty(), LikeList.empty(), PostTags.empty());
+        this(null, title, content, writer, Comments.empty(), Likes.empty(), PostTags.empty());
     }
 
     public Post(Long id, String title, String content, User writer) {
-        this(id, title, content, writer, Comments.empty(), LikeList.empty(), PostTags.empty());
+        this(id, title, content, writer, Comments.empty(), Likes.empty(), PostTags.empty());
     }
 
     @Generated
     @Builder
-    public Post(Long id, String title, String content, User writer, Comments comments, LikeList likes, PostTags postTags) {
+    public Post(Long id, String title, String content, User writer, Comments comments, Likes likes, PostTags postTags) {
         this.id = id;
         this.title = title;
         this.content = content;

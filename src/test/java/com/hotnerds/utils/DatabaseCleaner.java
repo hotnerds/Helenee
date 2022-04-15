@@ -1,15 +1,17 @@
 package com.hotnerds.utils;
 
-import com.google.common.base.CaseFormat;
+import org.hibernate.Session;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class DatabaseCleaner implements InitializingBean {
@@ -17,14 +19,20 @@ public class DatabaseCleaner implements InitializingBean {
     @PersistenceContext
     EntityManager entityManager;
 
-    private List<String> tableNames;
+    private List<String> tableNames = new ArrayList<>();
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        tableNames = entityManager.getMetamodel().getEntities().stream()
-                .filter(entityType -> entityType.getJavaType().getAnnotation(Entity.class) != null)
-                .map(e -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, e.getName()))
-                .collect(Collectors.toList());
+    public void afterPropertiesSet() {
+        entityManager.unwrap(Session.class).doWork(this::extractTableNames);
+    }
+
+    private void extractTableNames(Connection conn) throws SQLException {
+        ResultSet tables = conn.getMetaData()
+                .getTables(conn.getCatalog(), null, "%", new String[]{"TABLE"});
+
+        while(tables.next()) {
+            tableNames.add(tables.getString("table_name"));
+        }
     }
 
     @Transactional

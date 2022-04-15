@@ -36,7 +36,6 @@ class PostTest {
     @Test
     void 중복된_게시글_좋아요_실패() {
         post.like(user);
-
         assertThatThrownBy(() -> post.like(user))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")

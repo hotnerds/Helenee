@@ -1,49 +1,49 @@
 package com.hotnerds.post.domain.like;
 
-import com.hotnerds.post.domain.Post;
-import com.hotnerds.user.domain.User;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import java.util.Objects;
+import javax.persistence.CascadeType;
+import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 
-@Entity
-@Getter
-@Table(name = "LIKES")
+@AllArgsConstructor
+@Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Likes {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @OneToMany(
+            mappedBy = "post",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.PERSIST,
+            orphanRemoval = true
+    )
+    private List<Like> likeList = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
-
-    @Builder
-    public Likes(Long id, User user, Post post) {
-        this.id = id;
-        this.user = user;
-        this.post = post;
+    public int getCount() {
+        return likeList.size();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Likes like = (Likes) o;
-        return Objects.equals(user, like.user) && Objects.equals(post, like.post);
+    public void add(Like like) {
+        if(likeList.contains(like)) {
+            throw new BusinessException(ErrorCode.DUPLICATED_LIKE_EXCEPTION);
+        }
+        likeList.add(like);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(user, post);
+    public void remove(Like like) {
+        if(!likeList.contains(like)) {
+            throw new BusinessException(ErrorCode.LIKE_NOT_FOUND_EXCEPTION);
+        }
+        likeList.remove(like);
+    }
+
+    public static Likes empty() {
+        return new Likes(new ArrayList<>());
     }
 }
