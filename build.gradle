@@ -56,6 +56,8 @@ dependencies {
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
 	implementation 'com.google.guava:guava:11.0.2'
+	//log4j
+	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 
 	implementation 'junit:junit:4.13.1'
 	implementation 'org.jetbrains:annotations:20.1.0'
@@ -68,6 +70,11 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
+	modules {
+		module("org.springframework.boot:spring-boot-starter-logging") {
+			replacedBy("org.springframework.boot:spring-boot-starter-log4j2", "replace logback with log4j2")
+		}
+	}
 
 }
 
