@@ -2,8 +2,10 @@ package com.hotnerds.post.domain.like;
 
 import com.hotnerds.post.domain.Post;
 import com.hotnerds.user.domain.User;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -11,9 +13,10 @@ import java.util.Objects;
 @Entity
 @Getter
 @Table(name = "LIKES")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Like {
-    @GeneratedValue
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -55,6 +55,8 @@ dependencies {
 	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
+	implementation 'com.google.guava:guava:11.0.2'
+
 	implementation 'junit:junit:4.13.1'
 	implementation 'org.jetbrains:annotations:20.1.0'
 

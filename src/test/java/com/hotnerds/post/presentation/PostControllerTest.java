@@ -36,9 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = {PostController.class})
 class PostControllerTest extends ControllerTest {
 
-    @MockBean
-    PostService postService;
-
     PostResponseDto postResponse;
 
     MultiValueMap<String, String> params;

@@ -1,6 +1,8 @@
 package com.hotnerds.post.domain;
 
 import com.hotnerds.common.BaseTimeEntity;
+import com.hotnerds.common.exception.BusinessException;
+import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.post.domain.like.Like;
 import com.hotnerds.post.domain.like.Likes;
 import com.hotnerds.comment.domain.Comment;
@@ -36,7 +38,7 @@ public class Post extends BaseTimeEntity {
     private Comments comments;
 
     @Embedded
-    Likes likes;
+    Likes likeList;
 
     @Embedded
     PostTags postTags;
@@ -56,7 +58,8 @@ public class Post extends BaseTimeEntity {
                 .post(this)
                 .user(user)
                 .build();
-        likes.add(like);
+
+        likeList.add(like);
     }
 
     public void unlike(User user) {
@@ -65,7 +68,8 @@ public class Post extends BaseTimeEntity {
                 .post(this)
                 .user(user)
                 .build();
-        likes.remove(like);
+
+        likeList.remove(like);
     }
 
     public void addTag(Tag tag) {
@@ -85,7 +89,7 @@ public class Post extends BaseTimeEntity {
     }
 
     public int getLikeCount() {
-        return likes.getCount();
+        return likeList.getCount();
     }
 
     public void addComment(Comment comment) {
@@ -116,7 +120,7 @@ public class Post extends BaseTimeEntity {
         this.content = content;
         this.writer = writer;
         this.comments = comments;
-        this.likes = likes;
+        this.likeList = likes;
         this.postTags = postTags;
     }
 }

@@ -2,9 +2,9 @@ package com.hotnerds.post.domain.like;
 
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
-import com.hotnerds.user.domain.User;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -12,10 +12,10 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Embeddable
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Likes {
     @OneToMany(
             mappedBy = "post",
@@ -23,35 +23,24 @@ public class Likes {
             cascade = CascadeType.PERSIST,
             orphanRemoval = true
     )
-    private List<Like> likes = new ArrayList<>();
+    private List<Like> likeList = new ArrayList<>();
 
     public int getCount() {
-        return likes.size();
-    }
-
-    public boolean contains(Like like) {
-        return likes.stream()
-                .anyMatch(like::equals);
+        return likeList.size();
     }
 
     public void add(Like like) {
-        if(likes.contains(like)) {
+        if(likeList.contains(like)) {
             throw new BusinessException(ErrorCode.DUPLICATED_LIKE_EXCEPTION);
         }
-        likes.add(like);
+        likeList.add(like);
     }
 
     public void remove(Like like) {
-        if(!likes.contains(like)) {
+        if(!likeList.contains(like)) {
             throw new BusinessException(ErrorCode.LIKE_NOT_FOUND_EXCEPTION);
         }
-        likes.remove(like);
-    }
-
-    public List<User> getLikesUsers() {
-        return likes.stream()
-                .map(like -> like.getUser())
-                .collect(Collectors.toList());
+        likeList.remove(like);
     }
 
     public static Likes empty() {

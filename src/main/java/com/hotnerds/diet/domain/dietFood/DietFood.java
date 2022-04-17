@@ -21,8 +21,8 @@ import java.util.Objects;
 public class DietFood {
 
     @Id
-    @GeneratedValue
-    private Long dietFoodId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "diet_id")

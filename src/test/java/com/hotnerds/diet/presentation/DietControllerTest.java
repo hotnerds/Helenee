@@ -42,9 +42,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = DietController.class)
 class DietControllerTest extends ControllerTest {
 
-    @MockBean
-    DietService dietService;
-
     LocalDate mealDate = LocalDate.of(2022, 4, 5);
 
     FoodResponseDto food1;

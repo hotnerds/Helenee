@@ -2,7 +2,6 @@ package com.hotnerds.diet.domain.repository;
 
 import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
-import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.repository.FoodRepository;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
@@ -11,14 +10,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.annotation.Rollback;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 class DietRepositoryTest {
@@ -65,7 +62,7 @@ class DietRepositoryTest {
         Diet savedDiet = dietRepository.save(diet);
 
         //then
-        assertThat(savedDiet.getDietId()).isNotNull();
+        assertThat(savedDiet.getId()).isNotNull();
         assertThat(savedDiet.getMealDate()).isEqualTo(mealDate);
         assertThat(savedDiet.getMealTime()).isEqualTo(mealTime);
         assertThat(savedDiet.getUser().getId()).isEqualTo(user.getId());

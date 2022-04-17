@@ -2,9 +2,14 @@ package com.hotnerds;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.hotnerds.comment.application.CommentService;
 import com.hotnerds.common.security.filter.JwtAuthenticationFilter;
 import com.hotnerds.common.security.oauth2.provider.JwtTokenProvider;
 import com.hotnerds.common.security.oauth2.service.AuthProvider;
+import com.hotnerds.diet.application.DietService;
+import com.hotnerds.food.application.FoodService;
+import com.hotnerds.post.application.PostService;
+import com.hotnerds.user.application.UserService;
 import com.hotnerds.user.domain.ROLE;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
@@ -43,11 +48,26 @@ public class ControllerTest {
 
     protected User authUser;
     @MockBean
-    JwtTokenProvider jwtTokenProvider;
+    protected JwtTokenProvider jwtTokenProvider;
 
     protected MockMvc mockMvc;
 
     protected ObjectMapper objectMapper;
+
+    @MockBean
+    protected PostService postService;
+
+    @MockBean
+    protected FoodService foodService;
+
+    @MockBean
+    protected DietService dietService;
+
+    @MockBean
+    protected UserService userService;
+
+    @MockBean
+    protected CommentService commentService;
 
     @BeforeEach
     protected void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) throws Exception {

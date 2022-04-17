@@ -33,9 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = CommentController.class)
 class CommentControllerTest extends ControllerTest {
 
-    @MockBean
-    private CommentService commentService;
-
     final static String TEXT = "An apple a day keeps the doctor away";
     final static String NEW_TEXT = TEXT + TEXT;
     private User user;

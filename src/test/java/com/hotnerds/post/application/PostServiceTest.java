@@ -423,7 +423,7 @@ public class PostServiceTest {
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
-        post.getLikes().add(Like.builder()
+        post.getLikeList().add(Like.builder()
                 .id(null)
                 .user(user)
                 .post(post)
