@@ -59,6 +59,9 @@ dependencies {
 	//log4j
 	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 
+	//logback-access
+	implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
+
 	implementation 'junit:junit:4.13.1'
 	implementation 'org.jetbrains:annotations:20.1.0'
 
