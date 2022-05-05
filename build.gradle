@@ -62,6 +62,9 @@ dependencies {
 	//logback-access
 	implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
 
+	//flyway
+	implementation 'org.flywaydb:flyway-core:8.5.8'
+
 	implementation 'junit:junit:4.13.1'
 	implementation 'org.jetbrains:annotations:20.1.0'
 
