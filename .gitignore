@@ -7,6 +7,9 @@ build/
 application.yml
 api.html
 
+## Log ##
+logs/
+
 ### STS ###
 .apt_generated
 .classpath
