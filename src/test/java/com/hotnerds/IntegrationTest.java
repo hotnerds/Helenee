@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @SpringBootTest
-public class IntegrationTest {
+public abstract class IntegrationTest {
 
     @Autowired
     private DatabaseCleaner databaseCleaner;

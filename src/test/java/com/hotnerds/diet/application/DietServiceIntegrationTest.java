@@ -12,7 +12,6 @@ import com.hotnerds.diet.domain.repository.DietRepository;
 import com.hotnerds.food.application.FoodService;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.Nutrient;
-import com.hotnerds.food.domain.apiclient.FoodApiClient;
 import com.hotnerds.food.domain.dto.FoodRequestDto;
 import com.hotnerds.food.domain.repository.FoodRepository;
 import com.hotnerds.food.infrastructure.fatsecret.FatSecretApiClient;
@@ -27,36 +26,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class DietServiceIntegrationTest extends IntegrationTest {
-
-    @Autowired
-    private DietService dietService;
-
-    @Autowired
-    private DietRepository dietRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private FatSecretApiClient apiClient;
-
-    @Autowired
-    private FoodService foodService;
-
-    @Autowired
-    private FoodRepository foodRepository;
+class DietServiceIntegrationTest extends IntegrationTest {
 
     User user;
     Food food;
     LocalDate mealDate;
     MealTime mealTime;
     FoodRequestDto foodRequestDto;
+    @Autowired
+    private DietService dietService;
+    @Autowired
+    private DietRepository dietRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private FatSecretApiClient apiClient;
+    @Autowired
+    private FoodService foodService;
+    @Autowired
+    private FoodRepository foodRepository;
 
     @BeforeEach
     void setUp() {
