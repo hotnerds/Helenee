@@ -5,6 +5,7 @@ import com.hotnerds.food.domain.apiclient.FoodApiClient;
 import com.hotnerds.food.domain.dto.FoodRequestByNameDto;
 import com.hotnerds.food.domain.dto.FoodResponseDto;
 import com.hotnerds.food.domain.repository.FoodRepository;
+import com.hotnerds.food.infrastructure.fatsecret.FatSecretApiClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,14 +18,13 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class FoodService {
 
-    FoodApiClient apiClient;
-    FoodRepository foodRepository;
+    private final FatSecretApiClient apiClient;
+    private final FoodRepository foodRepository;
 
     @Transactional
     public Food findOrCreate(Long foodId) {
         Food food = foodRepository.findById(foodId)
                 .orElseGet(() -> apiClient.searchFoodById(foodId));
-
         return foodRepository.save(food);
     }
 
