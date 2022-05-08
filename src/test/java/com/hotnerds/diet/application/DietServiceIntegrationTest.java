@@ -7,11 +7,15 @@ import com.hotnerds.diet.domain.Diet;
 import com.hotnerds.diet.domain.MealTime;
 import com.hotnerds.diet.domain.dto.DietRequestByDateDto;
 import com.hotnerds.diet.domain.dto.DietResponseDto;
+import com.hotnerds.diet.domain.dto.DietSaveFoodRequestDto;
 import com.hotnerds.diet.domain.repository.DietRepository;
 import com.hotnerds.food.application.FoodService;
 import com.hotnerds.food.domain.Food;
 import com.hotnerds.food.domain.Nutrient;
+import com.hotnerds.food.domain.apiclient.FoodApiClient;
 import com.hotnerds.food.domain.dto.FoodRequestDto;
+import com.hotnerds.food.domain.repository.FoodRepository;
+import com.hotnerds.food.infrastructure.fatsecret.FatSecretApiClient;
 import com.hotnerds.user.domain.ROLE;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.repository.UserRepository;
@@ -23,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -39,7 +44,13 @@ public class DietServiceIntegrationTest extends IntegrationTest {
     private UserRepository userRepository;
 
     @Autowired
+    private FatSecretApiClient apiClient;
+
+    @Autowired
     private FoodService foodService;
+
+    @Autowired
+    private FoodRepository foodRepository;
 
     User user;
     Food food;
@@ -130,5 +141,53 @@ public class DietServiceIntegrationTest extends IntegrationTest {
 
         //then
         assertThat(diets).hasSize(2);
+    }
+
+    @DisplayName("식단에 음식들을 추가한다.")
+    @Test
+    void 식단에_음식_저장() {
+        //given
+        userRepository.save(user);
+        foodRepository.save(food);
+
+        DietSaveFoodRequestDto requestDto = DietSaveFoodRequestDto.builder()
+                .mealDate(mealDate)
+                .mealTime(mealTime)
+                .foods(List.of(foodRequestDto))
+                .build();
+
+        //when
+        dietService.saveFoods(requestDto, 1L);
+        Diet diet = dietRepository.findByMealDateAndMealTimeAndUser(mealDate, mealTime, user).get();
+
+        //then
+        assertThat(diet.getFoods()).hasSize(1);
+    }
+
+    @DisplayName("기존 식단의 음식들을 변경한다.")
+    @Test
+    void 식단_음식_변경() {
+        //given
+        userRepository.save(user);
+        foodRepository.save(food);
+
+        Diet diet = Diet.builder()
+                .mealDate(mealDate)
+                .mealTime(MealTime.BREAKFAST)
+                .user(user)
+                .build();
+        dietRepository.save(diet);
+
+        DietSaveFoodRequestDto requestDto = DietSaveFoodRequestDto.builder()
+                .mealDate(mealDate)
+                .mealTime(mealTime)
+                .foods(List.of(foodRequestDto))
+                .build();
+
+        //when
+        dietService.saveFoods(requestDto, 1L);
+
+        //then
+        assertThat(diet.getFoods()).hasSize(1);
     }
 }
