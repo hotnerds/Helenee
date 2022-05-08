@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class FoodService {
 
-    private final FatSecretApiClient apiClient;
+    private final FoodApiClient apiClient;
     private final FoodRepository foodRepository;
 
     @Transactional
