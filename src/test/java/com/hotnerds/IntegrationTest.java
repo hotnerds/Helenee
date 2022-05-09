@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 public abstract class IntegrationTest {
 
     @Autowired
-    private DatabaseCleaner databaseCleaner;
+    protected DatabaseCleaner databaseCleaner;
 
     @BeforeEach
     void init() {
