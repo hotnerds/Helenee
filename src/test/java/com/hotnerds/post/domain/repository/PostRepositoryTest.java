@@ -93,20 +93,6 @@ class PostRepositoryTest {
         assertThat(findPosts.size()).isEqualTo(1);
     }
 
-    @DisplayName("특정 시간 이후에 생성된 게시글 조회")
-    @Test
-    void 특정시간_이후에_생성된_게시글_조회() {
-        //given
-        postRepository.save(post);
-
-        //when
-        List<Post> findPosts = postRepository.findAllPostsAfter(LocalDateTime.MIN);
-
-        //then
-        assertThat(findPosts.get(0).getCreatedAt()).isAfter(LocalDateTime.MIN);
-        assertThat(findPosts.size()).isEqualTo(1);
-    }
-
     @DisplayName("사용자가 작성한 게시글 조회")
     @Test
     void 사용자가_작성한_게시글_조회() {

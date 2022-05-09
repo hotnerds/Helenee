@@ -18,9 +18,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findAllByTitle(String title, Pageable pageable);
 
-    @Query("select p from Post p where p.createdAt <= :after")
-    List<Post> findAllPostsAfter(@Param("after") LocalDateTime after);
-
     @Query("select p from Post p where p.writer = :writer order by p.createdAt desc")
     List<Post> findAllByWriter(@Param("writer") User writer, Pageable pageable);
 
