@@ -7,6 +7,7 @@ import com.hotnerds.food.domain.apiclient.FoodApiClient;
 import com.hotnerds.food.domain.dto.FoodRequestByNameDto;
 import com.hotnerds.food.domain.dto.FoodResponseDto;
 import com.hotnerds.food.domain.repository.FoodRepository;
+import com.hotnerds.food.infrastructure.fatsecret.FatSecretApiClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

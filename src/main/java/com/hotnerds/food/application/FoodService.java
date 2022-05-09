@@ -17,14 +17,13 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class FoodService {
 
-    FoodApiClient apiClient;
-    FoodRepository foodRepository;
+    private final FoodApiClient apiClient;
+    private final FoodRepository foodRepository;
 
     @Transactional
     public Food findOrCreate(Long foodId) {
         Food food = foodRepository.findById(foodId)
                 .orElseGet(() -> apiClient.searchFoodById(foodId));
-
         return foodRepository.save(food);
     }
 
