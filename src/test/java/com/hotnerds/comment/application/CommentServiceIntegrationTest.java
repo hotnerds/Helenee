@@ -227,7 +227,7 @@ class CommentServiceIntegrationTest extends IntegrationTest {
         commentService.deleteComment(reqDto, user.getId());
 
         // then
-        assertThat(postRepository.getById(post.getId()).getAllComments()).hasSize(0);
+        assertThat(postRepository.getById(post.getId()).getAllComments()).isEmpty();
     }
 
     @DisplayName("존재하지 않는 댓글에 대한 수정 요청 시 에러 발생")
