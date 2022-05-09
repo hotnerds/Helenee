@@ -224,7 +224,7 @@ class UserServiceIntegrationTest extends IntegrationTest {
 
     @Test
     @DisplayName("팔로워 리스트 조회 - 성공")
-    public void 팔로워_리스트_조회() {
+    void 팔로워_리스트_조회() {
         //given
         User user3 = User.builder()
                 .username("user3")
@@ -318,7 +318,7 @@ class UserServiceIntegrationTest extends IntegrationTest {
 
     @Test
     @DisplayName("팔로워 수 확인 - 성공")
-    public void 유저_팔로워_수_확인() {
+    void 유저_팔로워_수_확인() {
         //given
         userRepository.save(user1);
         userRepository.save(user2);
@@ -337,7 +337,7 @@ class UserServiceIntegrationTest extends IntegrationTest {
 
     @Test
     @DisplayName("팔로잉 수 확인 - 성공")
-    public void 유저_팔로잉_수() {
+    void 유저_팔로잉_수() {
         //given
         userRepository.save(user1);
         userRepository.save(user2);
@@ -416,11 +416,10 @@ class UserServiceIntegrationTest extends IntegrationTest {
     void 존재하지_않은_유저_목표_조회_실패() {
         //given
         user1.addOrChangeGoal(goal);
-
         String username = user1.getUsername();
         LocalDate date = goal.getDate();
         //when then
-        assertThatThrownBy(() -> userService.findGoalByDate(date, user1.getUsername()))
+        assertThatThrownBy(() -> userService.findGoalByDate(date, username))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()
