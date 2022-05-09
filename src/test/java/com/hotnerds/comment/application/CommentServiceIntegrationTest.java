@@ -32,7 +32,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
-public class CommentServiceIntegrationTest extends IntegrationTest {
+class CommentServiceIntegrationTest extends IntegrationTest {
 
     @Autowired
     PostRepository postRepository;
@@ -165,7 +165,7 @@ public class CommentServiceIntegrationTest extends IntegrationTest {
         commentService.addComment(reqDto);
 
         // then
-        assertThat(postRepository.getById(post.getId()).getAllComments().size()).isEqualTo(1);
+        assertThat(postRepository.getById(post.getId()).getAllComments()).hasSize(1);
     }
 
     @DisplayName("존재하지 않는 댓글에 대한 삭제 요청 시 에러를 발생")
@@ -180,7 +180,7 @@ public class CommentServiceIntegrationTest extends IntegrationTest {
         postRepository.save(post);
 
         // when then
-        assertThatThrownBy(() -> commentService.deleteComment(reqDto, user.getId()))
+        assertThatThrownBy(() -> commentService.deleteComment(reqDto, userId))
                 .isInstanceOf(BusinessException.class).hasMessage(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION.getMessage());
     }
 
@@ -227,7 +227,7 @@ public class CommentServiceIntegrationTest extends IntegrationTest {
         commentService.deleteComment(reqDto, user.getId());
 
         // then
-        assertThat(postRepository.getById(post.getId()).getAllComments().size()).isEqualTo(0);
+        assertThat(postRepository.getById(post.getId()).getAllComments()).hasSize(0);
     }
 
     @DisplayName("존재하지 않는 댓글에 대한 수정 요청 시 에러 발생")
@@ -244,7 +244,7 @@ public class CommentServiceIntegrationTest extends IntegrationTest {
         postRepository.save(post);
 
         // when then
-        assertThatThrownBy(() -> commentService.updateComment(reqDto, user.getId()))
+        assertThatThrownBy(() -> commentService.updateComment(reqDto, userId))
                 .isInstanceOf(BusinessException.class).hasMessage(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION.getMessage());
     }
 
@@ -348,7 +348,7 @@ public class CommentServiceIntegrationTest extends IntegrationTest {
         List<CommentResponseDto> responseDtoList = commentService.getComments(reqDto);
 
         // then
-        assertThat(responseDtoList.size()).isEqualTo(2);
+        assertThat(responseDtoList).hasSize(2);
     }
 
 }
