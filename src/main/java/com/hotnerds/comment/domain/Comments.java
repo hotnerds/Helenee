@@ -22,7 +22,7 @@ public class Comments {
             fetch = FetchType.LAZY,
             cascade = CascadeType.REMOVE
     )
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     public Comment add(Comment comment) {
         if (comments.contains(comment)) {
