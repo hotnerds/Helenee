@@ -19,7 +19,7 @@ class SecurityConfigTest {
     @BeforeEach
     public void setup() {
         RestAssured.baseURI = "http://localhost";
-        RestAssured.port = 8080;
+        RestAssured.port = 8083;
     }
 
     @DisplayName("OAuth 로그인을 요청하면 OAuth인증창이 뜬다.")
