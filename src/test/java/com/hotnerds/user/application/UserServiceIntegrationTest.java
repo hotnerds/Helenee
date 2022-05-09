@@ -184,311 +184,185 @@ class UserServiceIntegrationTest extends IntegrationTest {
         assertThat(user.getUsername()).isEqualTo("GARAM");
     }
 
-    @DisplayName("isFollowExist 함수에 대한 기능 테스트")
+    @DisplayName("팔로우 유청 - 성공")
     @Test
-    void isFollowExist() {
-        user1 = spy(user1);
-        user2 = spy(user2);
-        User user3 = new User("user3", "email");
-        User user4 = new User("user4", "email");
-        User user5 = new User("user5", "email");
-        Follow follow = new Follow(user1, user2);
-        Follow follow2 = new Follow(user1, user3);
-        Follow follow3 = new Follow(user1, user4);
+    void 팔로우_요청_성공() {
+        //given
+        userRepository.save(user1);
+        userRepository.save(user2);
+        FollowServiceReqDto requestDto = FollowServiceReqDto.builder()
+                .followerId(user1.getId())
+                .followedId(user2.getId())
+                .build();
 
-        // user 1 and 2 correctly have the follow relationship
-        user1.getFollowedList().getFollowed().add(follow);
-        user2.getFollowerList().getFollowers().add(follow);
+        //when
+        userService.createFollow(requestDto);
 
-        // user 1 has the follow relationship follow2, but user3 doesn't
-        user1.getFollowedList().getFollowed().add(follow2);
-
-        // user 4 has the follow relationship follow3, but user1 doesn't
-        user4.getFollowerList().getFollowers().add(follow3);
-
-        //there are no follow relationship between user1 and user5
-
+        //then
         assertThat(userService.isFollowExist(user1, user2)).isTrue();
-        assertThat(userService.isFollowExist(user1, user3)).isFalse();
-        assertThat(userService.isFollowExist(user1, user4)).isFalse();
-        assertThat(userService.isFollowExist(user1, user5)).isFalse();
     }
 
-    @DisplayName("followCheck 함수에 대한 기능 테스트")
+    @DisplayName("중복 팔로우 요청 - 실패")
     @Test
-    void followCheck() {
-        Follow follow = new Follow(user1, user2);
+    void 중복_팔로우_요청_실패() {
+        //given
+        userRepository.save(user1);
+        userRepository.save(user2);
+        FollowServiceReqDto requestDto = FollowServiceReqDto.builder()
+                .followerId(user1.getId())
+                .followedId(user2.getId())
+                .build();
 
-        user1.getFollowedList().getFollowed().add(follow);
-        user2.getFollowerList().getFollowers().add(follow);
+        //when
+        userService.createFollow(requestDto);
 
-        FollowServiceReqDto reqDto = new FollowServiceReqDto(1L, 2L);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
-        when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
-
-        assertThat(userService.followCheck(reqDto)).isTrue();
-    }
-
-    @Test
-    @DisplayName("새로운 팔로우 관계를 생성할때 같은 관계가 존재하면 예외 발생")
-    void 팔로우_중복_확인() {
-        // given
-        user1.getFollowedList().add(follow);
-        user2.getFollowerList().add(follow);
-
-        when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
-        when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
-
-        // when then
-        assertThatThrownBy(() -> userService.createFollow(reqDto))
+        //then
+        assertThatThrownBy(() -> userService.createFollow(requestDto))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.FOLLOW_DUPLICATED_EXCEPTION.getMessage());
-        verify(userRepository, times(1)).findById(reqDto.getFollowerId());
-        verify(userRepository, times(1)).findById(reqDto.getFollowedId());
     }
 
+    @DisplayName("팔로워 리스트 조회 - 실패")
     @Test
-    @DisplayName("새로운 팔로우 관계를 생성할 수 있다")
-    void 새로운_팔로우_관계_생성() {
-        // given
-        when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
-        when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
+    void 팔로워_리스트_조회_실패() {
+        //given
 
-        // when
-        Follow response = userService.createFollow(reqDto);
-
-        // then
-        assertTrue(follow.getFollower() == response.getFollower() &&
-                follow.getFollowed() == response.getFollowed());
-        verify(userRepository, times(1)).findById(reqDto.getFollowerId());
-        verify(userRepository, times(1)).findById(reqDto.getFollowedId());
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 id를 가진 유저를 팔로잉하는 모든 유저들의 id를 검색하면 예외발생")
-    public void 유저_팔로워_리스트_오류() {
-        // when then
-        assertThatThrownBy(() -> userService.getUserFollowers(999L))
+        //when then
+        assertThatThrownBy(() -> userService.getUserFollowers(1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test
-    @DisplayName("특정 id의 유저를 팔로잉하는 모든 유저들의 id를 검색 가능")
-    public void 유저_팔로워_리스트_검색() {
-        // given
-        User mockedUser1 = mock(User.class);
-        User mockedUser2 = mock(User.class);
-        User mockedUser3 = mock(User.class);
-        FollowerList mockedList = mock(FollowerList.class);
-
-        follow = Follow.builder()
-                .follower(mockedUser1)
-                .followed(mockedUser2)
-                .build();
-
-        Follow anotherFollow = Follow.builder()
-                .follower(mockedUser3)
-                .followed(mockedUser2)
-                .build();
-
-        when(userRepository.findById(2L)).thenReturn(Optional.of(mockedUser2));
-        when(mockedUser1.getId()).thenReturn(1L);
-        when(mockedUser3.getId()).thenReturn(3L);
-        when(mockedUser2.getFollowerList()).thenReturn(mockedList);
-        when(mockedList.getFollowers()).thenReturn(Arrays.asList(follow, anotherFollow));
-
-        List<Long> expectedList = List.of(1L, 3L);
-
-        // when
-        List<FollowUserInfoResponseDto> userList = userService.getUserFollowers(2L); // 2 is user id for user2
-
-        // then
-        assertEquals(expectedList.get(0), userList.get(0).getUserId());
-        assertEquals(expectedList.get(1), userList.get(1).getUserId());
-        verify(userRepository).findById(2L);
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 id를 가진 유저가 팔로잉하는 모든 유저들의 id를 검색하면 예외발생")
-    public void 유저_팔로잉_리스트_오류() {
-        // when then
-        assertThatThrownBy(() -> userService.getUserFollowings(999L))
-                .isInstanceOf(BusinessException.class)
-                .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
-    }
-
-    @Test
-    @DisplayName("특정 id의 유저가 팔로잉하는 유저들의 모든 id를 검색 가능")
-    public void 유저_팔로잉_리스트_검색() {
-        // given
-        User mockedUser1 = mock(User.class);
-        User mockedUser2 = mock(User.class);
-        User mockedUser3 = mock(User.class);
-        FollowedList mockedList = mock(FollowedList.class);
-
-        follow = Follow.builder()
-                .follower(mockedUser2)
-                .followed(mockedUser1)
-                .build();
-
-        Follow anotherFollow = Follow.builder()
-                .follower(mockedUser2)
-                .followed(mockedUser3)
-                .build();
-
-        when(userRepository.findById(2L)).thenReturn(Optional.of(mockedUser2));
-        when(mockedUser1.getId()).thenReturn(1L);
-        when(mockedUser3.getId()).thenReturn(3L);
-        when(mockedUser2.getFollowedList()).thenReturn(mockedList);
-        when(mockedList.getFollowed()).thenReturn(Arrays.asList(follow, anotherFollow));
-
-        List<Long> expectedList = List.of(1L, 3L);
-
-        // when
-        List<FollowUserInfoResponseDto> userList = userService.getUserFollowings(2L); // 2 is user id for user2
-
-        // then
-        assertEquals(expectedList.get(0), userList.get(0).getUserId());
-        assertEquals(expectedList.get(1), userList.get(1).getUserId());
-        verify(userRepository).findById(2L);
-    }
-
-    @Test
-    @DisplayName("특정 id를 가진 유저의 현재 팔로워 수 응답 가능")
-    public void 유저_팔로워_수() {
-        // given
+    @DisplayName("팔로워 리스트 조회 - 성공")
+    public void 팔로워_리스트_조회() {
+        //given
         User user3 = User.builder()
                 .username("user3")
                 .email("user3@gmail.com")
                 .build();
 
-        Follow anotherFollow = Follow.builder()
-                .follower(user3)
-                .followed(user2)
+        userRepository.save(user1);
+        userRepository.save(user2);
+        userRepository.save(user3);
+
+        FollowServiceReqDto requestDto1 = FollowServiceReqDto.builder()
+                .followerId(user2.getId())
+                .followedId(user1.getId())
+                .build();
+        FollowServiceReqDto requestDto2 = FollowServiceReqDto.builder()
+                .followerId(user3.getId())
+                .followedId(user1.getId())
                 .build();
 
-        user1.getFollowedList().getFollowed().add(follow);
-        user2.getFollowerList().getFollowers().add(follow);
-        user3.getFollowedList().getFollowed().add(anotherFollow);
-        user2.getFollowerList().getFollowers().add(anotherFollow);
+        userService.createFollow(requestDto1);
+        userService.createFollow(requestDto2);
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user2));
+        //when
+        List<FollowUserInfoResponseDto> followers = userService.getUserFollowers(user1.getId());
 
-        // when
-        Integer count = userService.getFollowerCounts(2L);
+        //then
+        assertThat(followers).hasSize(2);
+    }
 
-        // then
-        assertEquals(2, count);
-        verify(userRepository).findById(anyLong());
+    @DisplayName("팔로잉 리스트 조회 - 실패")
+    @Test
+    void 팔로잉_리스트_조회_실패() {
+        //given
+
+        //when then
+        assertThatThrownBy(() -> userService.getUserFollowings(1L))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
+    }
+
+    @DisplayName("팔로잉 리스트 조회 성공")
+    @Test
+    void 팔로잉_리스트_조회_성공() {
+        //given
+        User user3 = User.builder()
+                .username("user3")
+                .email("user3@gmail.com")
+                .build();
+
+        userRepository.save(user1);
+        userRepository.save(user2);
+        userRepository.save(user3);
+
+        FollowServiceReqDto requestDto1 = FollowServiceReqDto.builder()
+                .followerId(user1.getId())
+                .followedId(user2.getId())
+                .build();
+        FollowServiceReqDto requestDto2 = FollowServiceReqDto.builder()
+                .followerId(user1.getId())
+                .followedId(user3.getId())
+                .build();
+
+        userService.createFollow(requestDto1);
+        userService.createFollow(requestDto2);
+
+        //when
+        List<FollowUserInfoResponseDto> followings = userService.getUserFollowings(user1.getId());
+
+        //then
+        assertThat(followings).hasSize(2);
+    }
+
+    @DisplayName("팔로우 취소 - 성공")
+    @Test
+    void 팔로우_취소_성공() {
+        //given
+        userRepository.save(user1);
+        userRepository.save(user2);
+        FollowServiceReqDto requestDto = FollowServiceReqDto.builder()
+                .followerId(user1.getId())
+                .followedId(user2.getId())
+                .build();
+        userService.createFollow(requestDto);
+
+        //when
+        userService.deleteFollow(requestDto);
+
+        //then
+        assertThat(userService.isFollowExist(user1, user2)).isFalse();
     }
 
     @Test
-    @DisplayName("특정 id를 가진 유저의 현재 팔로워 수 응답 가능")
+    @DisplayName("팔로워 수 확인 - 성공")
+    public void 유저_팔로워_수_확인() {
+        //given
+        userRepository.save(user1);
+        userRepository.save(user2);
+        FollowServiceReqDto requestDto = FollowServiceReqDto.builder()
+                .followerId(user1.getId())
+                .followedId(user2.getId())
+                .build();
+        userService.createFollow(requestDto);
+
+        // when
+        Integer count = userService.getFollowerCounts(user2.getId());
+
+        // then
+        assertThat(count).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("팔로잉 수 확인 - 성공")
     public void 유저_팔로잉_수() {
-        User user3 = User.builder()
-                .username("user3")
-                .email("user3@gmail.com")
+        //given
+        userRepository.save(user1);
+        userRepository.save(user2);
+        FollowServiceReqDto requestDto = FollowServiceReqDto.builder()
+                .followerId(user1.getId())
+                .followedId(user2.getId())
                 .build();
-
-        Follow anotherFollow = Follow.builder()
-                .follower(user3)
-                .followed(user2)
-                .build();
-
-        user1.getFollowedList().getFollowed().add(follow);
-        user2.getFollowerList().getFollowers().add(follow);
-        user3.getFollowedList().getFollowed().add(anotherFollow);
-        user2.getFollowerList().getFollowers().add(anotherFollow);
-
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user2));
+        userService.createFollow(requestDto);
 
         // when
-        Integer count = userService.getFollowCounts(2L);
+        Integer count = userService.getFollowCounts(user1.getId());
 
         // then
-        assertEquals(0, count);
-        verify(userRepository).findById(anyLong());
-    }
-
-    @Test
-    @DisplayName("어떤 유저가 다른 유저를 팔로우하고 있는지 확인 가능")
-    public void 유저_팔로우_확인() {
-        // given
-        user1.getFollowedList().getFollowed().add(follow);
-        user2.getFollowerList().getFollowers().add(follow);
-
-        // when
-        boolean expectTrue = userService.isFollowExist(user1, user2);
-
-        // then
-        assertTrue(expectTrue);
-    }
-
-    @Test
-    @DisplayName("서로 팔로우 되어있는지 확인하는 기능")
-    public void 유저_뮤추얼_팔로우_확인() {
-        User user3 = User.builder()
-                .username("user3")
-                .email("user3@gmail.com")
-                .build();
-
-        Follow mutualFollow = Follow.builder()
-                .follower(user2)
-                .followed(user1)
-                .build();
-
-        Follow anotherFollow = Follow.builder()
-                .follower(user3)
-                .followed(user2)
-                .build();
-
-        user1.getFollowedList().getFollowed().add(follow);
-        user2.getFollowerList().getFollowers().add(follow);
-        user2.getFollowedList().getFollowed().add(mutualFollow);
-        user1.getFollowerList().getFollowers().add(mutualFollow);
-        user3.getFollowedList().getFollowed().add(anotherFollow);
-        user2.getFollowerList().getFollowers().add(anotherFollow);
-
-        // when
-        boolean expectMutualTrue = userService.isFollowExist(user1, user2) && userService.isFollowExist(user2, user1);
-        boolean expectMutualFalse = userService.isFollowExist(user1, user3) && userService.isFollowExist(user3, user1);
-
-        // then
-        assertTrue(expectMutualTrue);
-        assertFalse(expectMutualFalse);
-    }
-    
-    @Test
-    @DisplayName("팔로우가 되어 있지 않은 유저에 대한 팔로우 관계 취소 요청이 오면 오류 발생")
-    public void 유저_팔로우_취소_오류() {
-        // given
-        when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
-        when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
-
-        // when then
-        assertThatThrownBy(() -> userService.deleteFollow(reqDto))
-                .isInstanceOf(BusinessException.class)
-                .hasMessage(ErrorCode.FOLLOW_NOT_FOUND_EXCEPTION.getMessage());
-    }
-
-    @Test
-    @DisplayName("팔로우 관계 취소 기능이 되어야 한다")
-    public void 유저_팔로우_취소() {
-        // given
-        user1.getFollowedList().add(follow);
-        user2.getFollowerList().add(follow);
-        when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
-        when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
-
-        // when
-        userService.deleteFollow(reqDto);
-
-        // then
-        assertAll(
-                () -> assertEquals(0, user1.getFollowedList().followCounts()),
-                () -> assertEquals(0, user2.getFollowerList().followerCounts())
-        );
+        assertThat(count).isEqualTo(1);
     }
 
     @DisplayName("유저는 목표를 생성할 수 있다.")
