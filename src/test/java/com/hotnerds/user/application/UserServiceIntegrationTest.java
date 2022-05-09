@@ -4,8 +4,6 @@ import com.hotnerds.IntegrationTest;
 import com.hotnerds.common.exception.BusinessException;
 import com.hotnerds.common.exception.ErrorCode;
 import com.hotnerds.user.domain.Follow;
-import com.hotnerds.user.domain.FollowedList;
-import com.hotnerds.user.domain.FollowerList;
 import com.hotnerds.user.domain.User;
 import com.hotnerds.user.domain.dto.*;
 import com.hotnerds.user.domain.goal.Goal;
@@ -13,23 +11,14 @@ import com.hotnerds.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 class UserServiceIntegrationTest extends IntegrationTest {
 
@@ -369,6 +358,7 @@ class UserServiceIntegrationTest extends IntegrationTest {
     @Test
     void 목표_생성_성공() {
         //given
+        userRepository.save(user1);
         GoalRequestDto requestDto = GoalRequestDto.builder()
                 .calories(goal.getCalories())
                 .carbs(goal.getCarbs())
@@ -376,8 +366,6 @@ class UserServiceIntegrationTest extends IntegrationTest {
                 .fat(goal.getFat())
                 .date(goal.getDate())
                 .build();
-
-        when(userRepository.findByUsername(any())).thenReturn(Optional.of(user1));
 
         //when
         userService.createOrChangeGoal(requestDto, user1.getUsername());
@@ -400,7 +388,6 @@ class UserServiceIntegrationTest extends IntegrationTest {
                 .build();
 
         String username = user1.getUsername();
-        when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
 
         //when then
         assertThatThrownBy(() -> userService.createOrChangeGoal(requestDto, username))
@@ -414,9 +401,9 @@ class UserServiceIntegrationTest extends IntegrationTest {
     @Test
     void 특정_날짜_목표_조회_성공() {
         //given
+        userRepository.save(user1);
         user1.addOrChangeGoal(goal);
 
-        when(userRepository.findByUsername(any())).thenReturn(Optional.of(user1));
         //when
         GoalResponseDto response = userService.findGoalByDate(goal.getDate(), user1.getUsername());
 
@@ -429,7 +416,6 @@ class UserServiceIntegrationTest extends IntegrationTest {
     void 존재하지_않은_유저_목표_조회_실패() {
         //given
         user1.addOrChangeGoal(goal);
-        when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
 
         String username = user1.getUsername();
         LocalDate date = goal.getDate();
@@ -445,8 +431,7 @@ class UserServiceIntegrationTest extends IntegrationTest {
     @Test
     void 존재하지_않은_목표_조회_실패() {
         //given
-        when(userRepository.findByUsername(any())).thenReturn(Optional.of(user1));
-
+        userRepository.save(user1);
         String username = user1.getUsername();
         LocalDate date = goal.getDate();
         //when then
