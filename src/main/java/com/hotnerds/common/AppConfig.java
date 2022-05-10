@@ -5,6 +5,8 @@ import com.hotnerds.food.infrastructure.fatsecret.handler.FatSecretResponseError
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -51,6 +53,18 @@ public class AppConfig {
         return new RestTemplateBuilder()
                 .requestFactory(this::bufferingClientHttpRequestFactory)
                 .errorHandler(fatSecretResponseErrorHandler());
+    }
+
+    @Bean
+    public GracefulShutdown gracefulShutdown() {
+        return new GracefulShutdown();
+    }
+
+    @Bean
+    public ConfigurableServletWebServerFactory webServerFactory(final GracefulShutdown gracefulShutdown) {
+        TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
+        factory.addConnectorCustomizers(gracefulShutdown);
+        return factory;
     }
 
 }
