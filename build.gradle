@@ -2,24 +2,16 @@ plugins {
 	id 'org.springframework.boot' version '2.6.3'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
-	id 'jacoco'
-	id "org.sonarqube" version "3.3"
-	id "org.asciidoctor.jvm.convert" version "3.3.2"
 }
 
 group = 'com'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
-ext {
-	snippetsDir = file('build/generated-snippets')
-}
-
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
-	asciidoctorExtensions
 }
 
 repositories {
@@ -35,154 +27,19 @@ dependencies {
 	//gson
 	implementation 'com.google.code.gson:gson:2.8.6'
 
-	//oauth
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-
-	//jwt
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2',
-			// Uncomment the next line if you want to use RSASSA-PSS (PS256, PS384, PS512) algorithms:
-			//'org.bouncycastle:bcprov-jdk15on:1.60',
-			'io.jsonwebtoken:jjwt-jackson:0.11.2' // or 'io.jsonwebtoken:jjwt-gson:0.11.2' for gson
-
 	//modelMapper
 	implementation 'org.modelmapper:modelmapper:2.3.8'
 
-	//rest-assured
-	testImplementation 'io.rest-assured:rest-assured'
-
-	//spring rest docs
-	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
-	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-
-	implementation 'com.google.guava:guava:11.0.2'
-	//log4j
-	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
-
-	//logback-access
-	implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
-
-	//flyway
-	implementation 'org.flywaydb:flyway-core:8.5.8'
-	implementation 'org.flywaydb:flyway-mysql:8.5.8'
-
-	//security actuator
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-
-	//sentry
-	implementation 'io.sentry:sentry-spring-boot-starter:5.7.3'
-	implementation 'io.sentry:sentry-log4j2:5.7.3'
-
-	implementation 'junit:junit:4.13.1'
-	implementation 'org.jetbrains:annotations:20.1.0'
-	compileOnly 'com.jakewharton.nopen:nopen-annotations:1.0.1'
-
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+	runtimeOnly 'mysql:mysql-connector-java'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
-	testCompileOnly 'org.projectlombok:lombok:1.18.20'
 
-	testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
-
-	modules {
-		module("org.springframework.boot:spring-boot-starter-logging") {
-			replacedBy("org.springframework.boot:spring-boot-starter-log4j2", "replace logback with log4j2")
-		}
-	}
-
-}
-
-asciidoctor {
-	configurations "asciidoctorExtensions"
-	inputs.dir snippetsDir
-	dependsOn test
-}
-
-asciidoctor.doFirst {
-	delete file('src/main/resources/static/docs')
-}
-
-test {
-	outputs.dir snippetsDir
-}
-
-bootJar {
-	dependsOn asciidoctor
-	from ("${asciidoctor.outputDir}") {
-		into 'static/docs'
-	}
-}
-
-task copyDocument(type: Copy) {
-	dependsOn asciidoctor
-	from file("build/docs/asciidoc")
-	into file("src/main/resources/static/docs")
-}
-
-jacoco {
-	toolVersion = '0.8.7'
-}
-
-jacocoTestReport {
-	reports {
-		html.enabled true
-		xml.enabled true
-		csv.enabled false
-	}
-
-	finalizedBy 'jacocoTestCoverageVerification'
-}
-
-jacocoTestCoverageVerification {
-
-	violationRules {
-		rule {
-			enabled = true
-
-			element = 'CLASS'
-
-			limit {
-				counter = 'BRANCH'
-				value = 'COVEREDRATIO'
-				minimum = 0.00
-			}
-
-			limit {
-				counter = 'INSTRUCTION'
-				value = 'COVEREDRATIO'
-				minimum = 0.00
-			}
-
-			excludes = [
-					"*.dto.*",
-					"*.HotnerdsApplication",
-					"*.common.*",
-					"*.security.*",
-					"*.exception.*",
-			]
-		}
-	}
-}
-
-sonarqube {
-	properties {
-		property "sonar.projectKey", "hotnerds_Helenee"
-		property "sonar.organization", "hotnerds"
-		property "sonar.host.url", "https://sonarcloud.io"
-	}
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
-
-	finalizedBy 'jacocoTestReport'
-}
-
-build {
-	dependsOn copyDocument
 }

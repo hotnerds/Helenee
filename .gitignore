@@ -4,11 +4,6 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-application.yml
-api.html
-
-## Log ##
-logs/
 
 ### STS ###
 .apt_generated
@@ -31,11 +26,6 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
-#yml
-**/src/main/resources/application.yml
-**/src/main/resources/application-local.yml
-**/src/test/resources/application.yml
-
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
@@ -45,6 +35,3 @@ out/
 
 ### VS Code ###
 .vscode/
-
-### MacOS ###
-.DS_Store
