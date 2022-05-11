@@ -37,7 +37,7 @@ public class Comments {
         comments.remove(comment);
     }
 
-    protected Comment getOneComment(Long commentId) {
+    public Comment getOneComment(Long commentId) {
         return comments.stream()
                 .filter(c -> c.getId().equals(commentId))
                 .findAny()

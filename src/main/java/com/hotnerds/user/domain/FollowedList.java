@@ -39,4 +39,8 @@ public class FollowedList {
         }
         followed.remove(follow);
     }
+
+    public static FollowedList empty() {
+        return new FollowedList();
+    }
 }

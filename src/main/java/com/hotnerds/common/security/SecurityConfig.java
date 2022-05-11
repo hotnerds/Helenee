@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                 .and()
                 .authorizeRequests()
-                    .antMatchers("/", "/oauth/**").permitAll()
+                    .antMatchers("/", "/oauth/**", "/actuator/health").permitAll()
                     .anyRequest().authenticated()
                 .and()
                     .oauth2Login().loginPage("/oauth2/authorization/kakao")
