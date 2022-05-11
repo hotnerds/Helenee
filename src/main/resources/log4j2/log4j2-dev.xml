@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Configuration>
+<Configuration packages="org.apache.logging.log4j.core,io.sentry.log4j2">
     <Properties>
         <Property name="log-info">logs/info/log-info</Property>
         <Property name="log-warn">logs/warn/log-warn</Property>
@@ -90,18 +90,21 @@
             </DefaultRolloverStrategy>
         </RollingFile>
 
+        <Sentry name="SentryAppender" minimumBreadcrumbLevel="DEBUG" minimumEventLevel="WARN" />
     </Appenders>
     <Loggers>
         <Logger name = "com.hotnerds" level="info" additivity="false">
             <AppenderRef ref="InfoFileAppender" />
             <AppenderRef ref="WarnFileAppender" />
             <AppenderRef ref="ErrorFileAppender" />
+            <AppenderRef ref="SentryAppender" />
         </Logger>
 
         <Logger name = "org.springframework" level="info" additivity="false">
             <AppenderRef ref="InfoFileAppender" />
             <AppenderRef ref="WarnFileAppender" />
             <AppenderRef ref="ErrorFileAppender" />
+            <AppenderRef ref="SentryAppender" />
         </Logger>
 
 <!--        <Logger name="org.hibernate.SQL" level="debug" additivity="false">-->
