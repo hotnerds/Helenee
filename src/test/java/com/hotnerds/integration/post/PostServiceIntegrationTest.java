@@ -27,8 +27,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-public class PostServiceIntegrationTest extends IntegrationTest {
+class PostServiceIntegrationTest extends IntegrationTest {
 
     @Autowired
     PostRepository postRepository;
@@ -299,9 +300,10 @@ public class PostServiceIntegrationTest extends IntegrationTest {
         userRepository.save(user);
         userRepository.save(otherUser);
         postRepository.save(post);
+        Long postId = post.getId();
 
         //when then
-        assertThatThrownBy(() -> postService.delete(post.getId(), otherAuthenticatedUser))
+        assertThatThrownBy(() -> postService.delete(postId, otherAuthenticatedUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.POST_WRITER_NOT_MATCH_EXCEPTION.getMessage());
     }
@@ -313,8 +315,10 @@ public class PostServiceIntegrationTest extends IntegrationTest {
         userRepository.save(user);
         postRepository.save(post);
 
-        //when then
-        postService.delete(post.getId(), authUser);
+        Long postId = post.getId();
+
+        //when
+        assertDoesNotThrow(() -> postService.delete(postId, authUser));
     }
 
     @DisplayName("존재하지 않는 게시글에 좋아요를 누르면 실패 한다.")
@@ -333,8 +337,11 @@ public class PostServiceIntegrationTest extends IntegrationTest {
     @DisplayName("존재하지 않는 사용자가 게시글에 좋아요를 요청하면 실패한다.")
     @Test
     void 존재하지않는_사용자_좋아요_실패() {
+        //given
+        Long postId = post.getId();
+        //when then
         assertThatThrownBy(
-                () -> postService.like(post.getId(), authUser))
+                () -> postService.like(postId, authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
     }
@@ -346,11 +353,11 @@ public class PostServiceIntegrationTest extends IntegrationTest {
         userRepository.save(user);
         post.like(user);
         postRepository.save(post);
-
+        Long postId = post.getId();
 
         //when then
         assertThatThrownBy(
-                () -> postService.like(post.getId(), authUser))
+                () -> postService.like(postId, authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.DUPLICATED_LIKE_EXCEPTION.getMessage());
     }
@@ -379,10 +386,11 @@ public class PostServiceIntegrationTest extends IntegrationTest {
         //given
         userRepository.save(user);
         postRepository.save(post);
+        Long postId = post.getId();
 
         //when then
         assertThatThrownBy(
-                () -> postService.unlike(post.getId(), authUser))
+                () -> postService.unlike(postId, authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.LIKE_NOT_FOUND_EXCEPTION.getMessage());
     }
@@ -400,7 +408,7 @@ public class PostServiceIntegrationTest extends IntegrationTest {
 
         //then
         assertAll(
-                () -> assertThat(responseDto.getLikeCount()).isEqualTo(0),
+                () -> assertThat(responseDto.getLikeCount()).isZero(),
                 () -> assertThat(responseDto.getWriter()).isEqualTo(user.getUsername()),
                 () -> assertThat(responseDto.getPostId()).isEqualTo(post.getId())
         );
@@ -422,13 +430,13 @@ public class PostServiceIntegrationTest extends IntegrationTest {
                 .tagNames(List.of(tag.getName()))
                 .build();
 
-        //when
-        postService.update(updateDto, authUser);
+        //when then
+        assertDoesNotThrow(() -> postService.update(updateDto, authUser));
     }
 
     @DisplayName("게시글 작성자가 아닌 사용자는 게시글 수정할 수 없다.")
     @Test
-    public void 작성자가_아닌_사용자_게시글_수정_실패() {
+    void 작성자가_아닌_사용자_게시글_수정_실패() {
         //given
         User otherUser = new User("otherUser", "aaa@aaa", ROLE.USER, AuthProvider.KAKAO);
         AuthenticatedUser otherAuthenticatedUser = AuthenticatedUser.of(otherUser);

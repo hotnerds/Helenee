@@ -33,13 +33,13 @@ class TagServiceTest {
     Tag tag;
 
     @BeforeEach
-    public void init() {
+    void init() {
         tag = new Tag(1L, "name");
     }
 
     @DisplayName("태그가 존재하면 조회한다.")
     @Test
-    public void 태그_조회_성공() {
+    void 태그_조회_성공() {
         //given
         when(tagRepository.findByName(anyString())).thenReturn(Optional.of(tag));
 
@@ -56,7 +56,7 @@ class TagServiceTest {
 
     @DisplayName("태그가 존재하지 않으면 생성한다.")
     @Test
-    public void 태그_존재하지않을시_생성() {
+    void 태그_존재하지않을시_생성() {
         //given
         when(tagRepository.findByName(anyString())).thenReturn(Optional.empty());
         when(tagRepository.save(any())).thenReturn(tag);
@@ -75,7 +75,7 @@ class TagServiceTest {
 
     @DisplayName("생성할 태그의 이름이 잘못되면 예외가 발생한다.")
     @Test
-    public void 태그_이름_잘못되면_예외_발생() {
+    void 태그_이름_잘못되면_예외_발생() {
         //given
         when(tagRepository.findByName(anyString())).thenReturn(Optional.empty());
 

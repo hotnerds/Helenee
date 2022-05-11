@@ -39,7 +39,7 @@ class DietTest {
         diet.addFood(food2, 1L);
 
         //then
-        assertThat(diet.getFoods().size()).isEqualTo(2);
+        assertThat(diet.getFoods()).hasSize(2);
     }
 
     @Test

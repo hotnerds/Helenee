@@ -177,10 +177,9 @@ class UserServiceTest {
         User user = actualNewUserReqDtoList.get(0).toEntity();
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
-        // when
-        userService.updateUser(user.getId(), userUpdateReqDto);
+        // when then
+        assertDoesNotThrow(() -> userService.updateUser(user.getId(), userUpdateReqDto));
 
-        // then
     }
 
     @DisplayName("isFollowExist 함수에 대한 기능 테스트")
@@ -265,7 +264,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("존재하지 않는 id를 가진 유저를 팔로잉하는 모든 유저들의 id를 검색하면 예외발생")
-    public void 유저_팔로워_리스트_오류() {
+    void 유저_팔로워_리스트_오류() {
         // when then
         assertThatThrownBy(() -> userService.getUserFollowers(999L))
                 .isInstanceOf(BusinessException.class)
@@ -274,7 +273,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("특정 id의 유저를 팔로잉하는 모든 유저들의 id를 검색 가능")
-    public void 유저_팔로워_리스트_검색() {
+    void 유저_팔로워_리스트_검색() {
         // given
         User mockedUser1 = mock(User.class);
         User mockedUser2 = mock(User.class);
@@ -310,7 +309,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("존재하지 않는 id를 가진 유저가 팔로잉하는 모든 유저들의 id를 검색하면 예외발생")
-    public void 유저_팔로잉_리스트_오류() {
+    void 유저_팔로잉_리스트_오류() {
         // when then
         assertThatThrownBy(() -> userService.getUserFollowings(999L))
                 .isInstanceOf(BusinessException.class)
@@ -319,7 +318,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("특정 id의 유저가 팔로잉하는 유저들의 모든 id를 검색 가능")
-    public void 유저_팔로잉_리스트_검색() {
+    void 유저_팔로잉_리스트_검색() {
         // given
         User mockedUser1 = mock(User.class);
         User mockedUser2 = mock(User.class);
@@ -355,7 +354,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("특정 id를 가진 유저의 현재 팔로워 수 응답 가능")
-    public void 유저_팔로워_수() {
+    void 유저_팔로워_수() {
         // given
         User user3 = User.builder()
                 .username("user3")
@@ -384,7 +383,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("특정 id를 가진 유저의 현재 팔로워 수 응답 가능")
-    public void 유저_팔로잉_수() {
+    void 유저_팔로잉_수() {
         User user3 = User.builder()
                 .username("user3")
                 .email("user3@gmail.com")
@@ -412,7 +411,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("어떤 유저가 다른 유저를 팔로우하고 있는지 확인 가능")
-    public void 유저_팔로우_확인() {
+    void 유저_팔로우_확인() {
         // given
         user1.getFollowedList().getFollowed().add(follow);
         user2.getFollowerList().getFollowers().add(follow);
@@ -426,7 +425,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("서로 팔로우 되어있는지 확인하는 기능")
-    public void 유저_뮤추얼_팔로우_확인() {
+    void 유저_뮤추얼_팔로우_확인() {
         User user3 = User.builder()
                 .username("user3")
                 .email("user3@gmail.com")
@@ -460,7 +459,7 @@ class UserServiceTest {
     
     @Test
     @DisplayName("팔로우가 되어 있지 않은 유저에 대한 팔로우 관계 취소 요청이 오면 오류 발생")
-    public void 유저_팔로우_취소_오류() {
+    void 유저_팔로우_취소_오류() {
         // given
         when(userRepository.findById(reqDto.getFollowerId())).thenReturn(Optional.of(user1));
         when(userRepository.findById(reqDto.getFollowedId())).thenReturn(Optional.of(user2));
@@ -473,7 +472,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("팔로우 관계 취소 기능이 되어야 한다")
-    public void 유저_팔로우_취소() {
+    void 유저_팔로우_취소() {
         // given
         user1.getFollowedList().add(follow);
         user2.getFollowerList().add(follow);
@@ -559,7 +558,7 @@ class UserServiceTest {
         String username = user1.getUsername();
         LocalDate date = goal.getDate();
         //when then
-        assertThatThrownBy(() -> userService.findGoalByDate(date, user1.getUsername()))
+        assertThatThrownBy(() -> userService.findGoalByDate(date, username))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .usingRecursiveComparison()

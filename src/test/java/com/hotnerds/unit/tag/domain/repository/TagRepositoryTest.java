@@ -21,7 +21,7 @@ class TagRepositoryTest {
 
     @DisplayName("태그를 저장할 수 있다.")
     @Test
-    public void 태그_저장_성공() {
+    void 태그_저장_성공() {
         //given
         Tag tag = new Tag("name");
 
@@ -36,7 +36,7 @@ class TagRepositoryTest {
 
     @DisplayName("태그를 이름으로 조회할 수 있다.")
     @Test
-    public void 태그_이름으로_조회_성공() {
+    void 태그_이름으로_조회_성공() {
         //given
         Tag tag = new Tag("name");
         tagRepository.save(tag);

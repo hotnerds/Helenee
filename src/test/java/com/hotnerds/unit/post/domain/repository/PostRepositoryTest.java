@@ -91,7 +91,7 @@ class PostRepositoryTest {
         List<Post> findPosts = postRepository.findAllByTitle(post.getTitle(), page);
 
         //then
-        assertThat(findPosts.size()).isEqualTo(1);
+        assertThat(findPosts).hasSize(1);
     }
 
     @DisplayName("사용자가 작성한 게시글 조회")
@@ -103,7 +103,7 @@ class PostRepositoryTest {
         List<Post> findPosts = postRepository.findAllByWriter(user, PageRequest.of(0, 10));
 
         //then
-        assertThat(findPosts.size()).isEqualTo(1);
+        assertThat(findPosts).hasSize(1);
         assertThat(findPosts.get(0).getWriter().getUsername()).isEqualTo(user.getUsername());
     }
 
@@ -130,6 +130,6 @@ class PostRepositoryTest {
         List<Post> findPosts = postRepository.findAllByTagNames(List.of(tag.getName()), PageRequest.of(0, 10));
 
         //then
-        assertThat(findPosts.size()).isEqualTo(1);
+        assertThat(findPosts).hasSize(1);
     }
 }

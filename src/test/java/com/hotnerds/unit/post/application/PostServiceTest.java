@@ -37,7 +37,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class PostServiceTest {
+class PostServiceTest {
 
     @Mock
     PostRepository postRepository;
@@ -126,7 +126,7 @@ public class PostServiceTest {
     @DisplayName("유효하지 않은 태그 이름을 갖는 게시물은 생성할 수 없다.")
     @ValueSource(strings = {"", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", " "})
     @ParameterizedTest
-    public void 유효하지않는_태그를_갖는_게시글_생성_실패(String tagName) {
+    void 유효하지않는_태그를_갖는_게시글_생성_실패(String tagName) {
         //given
         PostRequestDto requestDto = PostRequestDto.builder()
                 .title(post.getTitle())
@@ -150,7 +150,7 @@ public class PostServiceTest {
 
     @DisplayName("중복된 태그를 가진 게시물은 생성할 수 없다.")
     @Test
-    public void 중복된_태그를_가진_게시물_생성_실패() {
+    void 중복된_태그를_가진_게시물_생성_실패() {
         //given
         PostRequestDto requestDto = PostRequestDto.builder()
                 .title(post.getTitle())
@@ -230,7 +230,7 @@ public class PostServiceTest {
         List<PostResponseDto> findPosts = postService.searchByTitle(requestDto);
 
         //then
-        assertThat(findPosts.size()).isEqualTo(1);
+        assertThat(findPosts).hasSize(1);
 
         verify(postRepository, times(1)).findAllByTitle(any(), any());
     }
@@ -274,7 +274,7 @@ public class PostServiceTest {
         List<PostResponseDto> findResults = postService.searchByWriter(requestDto);
 
         //then
-        assertThat(findResults.size()).isEqualTo(2);
+        assertThat(findResults).hasSize(2);
 
         assertThat(findResults)
                 .usingRecursiveComparison()
@@ -300,7 +300,7 @@ public class PostServiceTest {
         List<PostResponseDto> findPosts = postService.searchByTagNames(requestDto);
 
         //then
-        assertThat(findPosts.size()).isEqualTo(1);
+        assertThat(findPosts).hasSize(1);
 
         verify(postRepository, times(1)).findAllByTagNames(any(),any());
     }
@@ -391,10 +391,11 @@ public class PostServiceTest {
     void 존재하지않은_게시글_좋아요_실패() {
         //given
         when(userRepository.findByUsername(any())).thenReturn(Optional.of(user));
+        Long postId = post.getId();
 
         //when then
         assertThatThrownBy(
-                () -> postService.like(post.getId(), authUser))
+                () -> postService.like(postId, authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.POST_NOT_FOUND_EXCEPTION.getMessage());
 
@@ -407,9 +408,11 @@ public class PostServiceTest {
     void 존재하지않는_사용자_좋아요_실패() {
         //given
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
+        Long postId = post.getId();
+
         //when then
         assertThatThrownBy(
-                () -> postService.like(post.getId(), authUser))
+                () -> postService.like(postId, authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
 
@@ -422,6 +425,7 @@ public class PostServiceTest {
         //given
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+        Long postId = post.getId();
 
         post.getLikeList().add(Like.builder()
                 .id(null)
@@ -431,7 +435,7 @@ public class PostServiceTest {
 
         //when then
         assertThatThrownBy(
-                () -> postService.like(post.getId(), authUser))
+                () -> postService.like(postId, authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.DUPLICATED_LIKE_EXCEPTION.getMessage());
 
@@ -465,10 +469,11 @@ public class PostServiceTest {
         //given
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+        Long postId = post.getId();
 
         //when then
         assertThatThrownBy(
-                () -> postService.unlike(post.getId(), authUser))
+                () -> postService.unlike(postId, authUser))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.LIKE_NOT_FOUND_EXCEPTION.getMessage());
 
@@ -491,7 +496,7 @@ public class PostServiceTest {
 
         //then
         assertAll(
-                () -> assertThat(responseDto.getLikeCount()).isEqualTo(0),
+                () -> assertThat(responseDto.getLikeCount()).isZero(),
                 () -> assertThat(responseDto.getWriter()).isEqualTo(user.getUsername()),
                 () -> assertThat(responseDto.getPostId()).isEqualTo(post.getId())
         );
@@ -526,7 +531,7 @@ public class PostServiceTest {
 
     @DisplayName("게시글 작성자가 아닌 사용자는 게시글 수정할 수 없다.")
     @Test
-    public void 작성자가_아닌_사용자_게시글_수정_실패() {
+    void 작성자가_아닌_사용자_게시글_수정_실패() {
         //given
         User notWriter = User.builder()
                 .username("garam1234")

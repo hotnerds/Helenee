@@ -52,7 +52,7 @@ class UserRepositoryTest {
 
         // then
         assertThat(userRepository.count()).isEqualTo(1);
-        assertThat(userWrongUsername.isEmpty()).isEqualTo(true); // fail condition
+        assertThat(userWrongUsername).isEmpty(); // fail condition
     }
 
     @Test
@@ -72,7 +72,7 @@ class UserRepositoryTest {
 
         // then
         assertThat(userRepository.count()).isEqualTo(1);
-        assertThat(userWrongEmail.isEmpty()).isTrue(); // fail condition
+        assertThat(userWrongEmail).isEmpty(); // fail condition
     }
 
     @Test

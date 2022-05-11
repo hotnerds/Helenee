@@ -15,7 +15,7 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
 
     private static final int TIMEOUT = 30;
 
-    private volatile Connector connector;
+    private Connector connector;
 
     @Override
     public void customize(Connector connector) {

@@ -54,7 +54,7 @@ class PostTest {
         post.unlike(user);
 
         //then
-        assertThat(post.getLikeCount()).isEqualTo(0);
+        assertThat(post.getLikeCount()).isZero();
     }
 
     @DisplayName("좋아요를 누른 적 없는 유저가 좋아요를 취소할 수 없다.")
@@ -72,7 +72,7 @@ class PostTest {
     void 태그_추가_성공() {
         post.addTag(tag);
 
-        assertThat(post.getPostTags().getPostTags().size()).isEqualTo(1);
+        assertThat(post.getPostTags().getPostTags()).hasSize(1);
     }
 
     @DisplayName("게시글은 중복된 태그를 가질 수 없다.")
@@ -94,7 +94,7 @@ class PostTest {
 
         post.removeTag(tag);
 
-        assertThat(post.getPostTags().getPostTags().size()).isEqualTo(0);
+        assertThat(post.getPostTags().getPostTags()).hasSize(0);
     }
 
     @DisplayName("게시글에 붙어 있지 않은 태그를 지울 수는 없다.")

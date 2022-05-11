@@ -165,7 +165,7 @@ class CommentServiceTest {
         commentService.addComment(reqDto);
 
         // then
-        assertThat(post.getComments().getComments().size()).isEqualTo(1);
+        assertThat(post.getComments().getComments()).hasSize(1);
         verify(userRepository, times(1)).findById(anyLong());
         verify(postRepository, times(1)).findById(anyLong());
         verify(commentRepository, times(1)).save(any());
@@ -179,17 +179,15 @@ class CommentServiceTest {
                 .postId(post.getId()) // id for post
                 .commentId(comment.getId()) // id comment
                 .build();
-        when(user.getId()).thenReturn(1L);
+        Long userId = 2L;
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
-        when(commentRepository.findById(anyLong())).thenReturn(Optional.of(comment));
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(commentRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // when then
-        assertThatThrownBy(() -> commentService.deleteComment(reqDto, user.getId()))
+        assertThatThrownBy(() -> commentService.deleteComment(reqDto, userId))
                 .isInstanceOf(BusinessException.class).hasMessage(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION.getMessage());
         verify(postRepository, times(1)).findById(anyLong());
         verify(commentRepository, times(1)).findById(anyLong());
-        verify(userRepository, times(1)).findById(anyLong());
     }
 
     @DisplayName("댓글 삭제 요청자와 댓글 작성자의 id가 다르면 에러를 발생")
@@ -248,7 +246,7 @@ class CommentServiceTest {
         commentService.deleteComment(reqDto, user.getId());
 
         // then
-        assertThat(post.getComments().getComments().size()).isEqualTo(0);
+        assertThat(post.getComments().getComments()).hasSize(0);
         verify(postRepository, times(1)).findById(anyLong());
         verify(commentRepository, times(1)).findById(anyLong());
         verify(commentRepository, times(1)).deleteById(anyLong());
@@ -265,10 +263,10 @@ class CommentServiceTest {
                 .commentId(comment.getId()) // id comment
                 .content(NEW_TEXT)
                 .build();
-        when(user.getId()).thenReturn(1L);
+        Long userId = 1L;
 
         // when then
-        assertThatThrownBy(() -> commentService.updateComment(reqDto, user.getId()))
+        assertThatThrownBy(() -> commentService.updateComment(reqDto, userId))
                 .isInstanceOf(BusinessException.class).hasMessage(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION.getMessage());
         verify(commentRepository, times(1)).findById(anyLong());
     }
@@ -283,14 +281,14 @@ class CommentServiceTest {
                 .commentId(comment.getId()) // id comment
                 .content(NEW_TEXT)
                 .build();
-        when(user.getId()).thenReturn(1L);
+        Long userId = 2L;
         when(commentRepository.findById(anyLong())).thenReturn(Optional.of(comment));
-
+        when(userRepository.findById(any())).thenReturn(Optional.empty());
         // when then
-        assertThatThrownBy(() -> commentService.updateComment(reqDto, user.getId()))
+        assertThatThrownBy(() -> commentService.updateComment(reqDto, userId))
                 .isInstanceOf(BusinessException.class).hasMessage(ErrorCode.USER_NOT_FOUND_EXCEPTION.getMessage());
-        verify(commentRepository, times(1)).findById(anyLong());
-        verify(userRepository, times(1)).findById(anyLong());
+        verify(commentRepository, times(1)).findById(any());
+        verify(userRepository, times(1)).findById(any());
     }
 
     @DisplayName("댓글 수정 요청자의 타당성이 만족하지 않을 때 에러 발생")
@@ -387,7 +385,7 @@ class CommentServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(responseDtoList.size()).isEqualTo(2),
+                () -> assertThat(responseDtoList).hasSize(2),
                 () -> assertThat(responseDtoList)
                         .usingRecursiveComparison()
                         .isEqualTo(expectedList)

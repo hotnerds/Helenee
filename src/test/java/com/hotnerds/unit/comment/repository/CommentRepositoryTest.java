@@ -69,7 +69,7 @@ class CommentRepositoryTest {
 
     @DisplayName("댓글 등록 성공")
     @Test
-    public void 댓글_등록_성공() {
+    void 댓글_등록_성공() {
         //given
         userRepository.save(user);
         postRepository.save(post);
@@ -87,7 +87,7 @@ class CommentRepositoryTest {
 
     @DisplayName("게시글 ID로 댓글 조회")
     @Test
-    public void 게시글_ID로_댓글_조회() {
+    void 게시글_ID로_댓글_조회() {
         //given
         userRepository.save(user);
         postRepository.save(post);
@@ -107,13 +107,13 @@ class CommentRepositoryTest {
         System.out.println(commentList.get(1).getCreatedAt());
 
         //then
-        assertThat(commentList.size()).isEqualTo(2);
+        assertThat(commentList).hasSize(2);
 
     }
 
     @DisplayName("댓글 삭제 성공")
     @Test
-    public void 댓글_삭제_성공() {
+    void 댓글_삭제_성공() {
         // given
         userRepository.save(user);
         postRepository.save(post);

@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 @ComponentScan(basePackages = "com.hotnerds.common.security")
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-public class ControllerTest {
+public abstract class ControllerTest {
 
     public static final String USER_EMAIL = "kgr4163@naver.com";
     public static final String NAME_ATTRIBUTE_KEY = "id";

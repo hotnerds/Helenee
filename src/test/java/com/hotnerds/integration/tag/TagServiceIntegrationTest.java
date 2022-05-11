@@ -31,13 +31,13 @@ public class TagServiceIntegrationTest extends IntegrationTest {
     Tag tag;
 
     @BeforeEach
-    public void init() {
+    void init() {
         tag = new Tag("name");
     }
 
     @DisplayName("태그가 존재하면 조회한다.")
     @Test
-    public void 태그_조회_성공() {
+    void 태그_조회_성공() {
         //given
         Tag savedTag = tagRepository.save(tag);
 
@@ -52,7 +52,7 @@ public class TagServiceIntegrationTest extends IntegrationTest {
 
     @DisplayName("태그가 존재하지 않으면 생성한다.")
     @Test
-    public void 태그_존재하지않을시_생성() {
+    void 태그_존재하지않을시_생성() {
         //when
         Tag findTag = tagService.findOrCreateTag(tag.getName());
 
@@ -64,7 +64,7 @@ public class TagServiceIntegrationTest extends IntegrationTest {
 
     @DisplayName("생성할 태그의 이름이 잘못되면 예외가 발생한다.")
     @Test
-    public void 태그_이름_잘못되면_예외_발생() {
+    void 태그_이름_잘못되면_예외_발생() {
         //when then
         assertThatThrownBy(() -> tagService.findOrCreateTag(""))
                 .isInstanceOf(BusinessException.class)

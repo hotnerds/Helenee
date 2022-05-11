@@ -47,12 +47,6 @@ class CommentsTest {
                 .isEqualTo(ErrorCode.COMMENT_DUPLICATED_EXCEPTION);
     }
 
-    @DisplayName("Comments에 새로운 댓글 엔티티를 추가할 수 있다")
-    @Test
-    void 댓글_추가_성공() {
-        // Comments 내부의 comments 리스트는 불변 객체이기 때문에 테스트 불가능.
-    }
-
     @DisplayName("Comments에 있는 댓글 중 특정 ID를 가진 댓글을 삭제할 수 있다.")
     @Test
     void 댓글_삭제_실패() {
@@ -61,12 +55,6 @@ class CommentsTest {
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION);
-    }
-
-    @DisplayName("Comments에 있는 댓글 중 특정 ID를 가진 댓글을 삭제할 수 있다.")
-    @Test
-    void 댓글_삭제_성공() {
-        // Comments 내부의 comments 리스트는 불변 객체이기 때문에 테스트 불가능.
     }
 
     @DisplayName("Comments에 있는 댓글 중 특정 ID를 가진 댓글을 조회할 수 있다.")
