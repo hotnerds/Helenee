@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<included>
+    <property name="log-access" value="logs/access/log-access" />
+    <property name="file-pattern" value="%d{yyyy-MM-dd-HH}-%i.log.gz" />
+    <appender name="AccessAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log-access}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log-access}-${file-pattern}</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <charset>utf8</charset>
+            <Pattern>
+                %n%fullRequest%n%n%fullResponse
+            </Pattern>
+        </encoder>
+    </appender>
+</included>

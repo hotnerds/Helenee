@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <springProfile name="prod,dev,local">
+        <include resource="./logback/access-prod.xml" />
+        <appender-ref ref="AccessAppender" />
+    </springProfile>
+
+    <springProfile name="test">
+        <include resource="./logback/access-test.xml" />
+        <appender-ref ref="STDOUT" />
+    </springProfile>
+
+</configuration>

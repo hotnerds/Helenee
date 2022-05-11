@@ -1,0 +1,284 @@
+= Helenee API Guide
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+:operation-curl-request-title: Example request
+:operation-http-response-title: Example response
+
+[[overview]]
+= Overview
+
+[[overview_http_verbs]]
+== HTTP verbs
+
+RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its use of HTTP verbs.
+
+|===
+| Verb | Usage
+
+| `GET`
+| Used to retrieve a resource
+
+| `POST`
+| Used to create a new resource
+
+| `PATCH`
+| Used to update an existing resource, including partial updates
+
+| `DELETE`
+| Used to delete an existing resource
+|===
+
+[[overview_http_status_codes]]
+== HTTP status codes
+
+RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its use of HTTP status codes.
+
+|===
+| Status code | Usage
+
+| `200 OK`
+| The request completed successfully
+
+| `201 Created`
+| A new resource has been created successfully. The resource's URI is available from the response's
+`Location` header
+
+| `204 No Content`
+| An update to an existing resource has been applied successfully
+
+| `400 Bad Request`
+| The request was malformed. The response body will include an error providing further information
+
+| `404 Not Found`
+| The requested resource did not exist
+|===
+
+[[overview_headers]]
+== Headers
+
+[[overview_errors]]
+== Errors
+
+[[overview_hypermedia]]
+== Hypermedia
+
+[[resources]]
+= Resources
+
+[[resources_users]]
+== Users
+
+[[resources_users_list]]
+=== Getting a list of users
+
+`GET /api/users` 요청을 통해 모든 유저의 정보를 가져올 수 있다.
+
+operation::users/getAll[snippets='curl-request,http-response']
+
+[[resources_users_list]]
+=== Getting a user
+
+`GET /api/users/\{userid\}` 요청을 통해 하나의 유저에 대한 정보를 가져올 수 있다.
+
+operation::users/getOne[snippets='path-parameters,request-parameters,response-fields,curl-request,http-response']
+
+[[resources_users_create]]
+=== Creating a user
+
+`POST /api/users` 요청을 통해 새로운 유저를 등록할 수 있다.
+
+operation::users/create[snippets='request-fields,curl-request,http-response']
+
+[[resources_users_delete]]
+=== Deleting a user
+
+`DELETE /api/users/\{userid\}` 요청을 통해 새로운 유저를 등록할 수 있다.
+
+operation::users/delete[snippets='path-parameters,curl-request,http-response']
+
+[[resources_users_update]]
+=== Updating user data
+
+`PATCH /api/users/\{userid\}` 요청을 통해 새로운 유저를 등록할 수 있다.
+
+operation::users/update[snippets='path-parameters,request-fields,curl-request,http-response']
+
+[[resources_comments]]
+== 댓글
+
+[[resources_comments_get]]
+=== 특정 게시글에 대한 댓글 조회
+
+`GET /api/posts/:postId/comments` 요청을 통해 특성 게시글에 대한 댓글을 조회할 수 있다.
+
+operation::comments/get[snippets='path-parameters,request-parameters,response-fields,curl-request,http-response']
+
+[[resources_comments_create]]
+=== 새로운 댓글 생성
+
+`POST /api/posts/:postId/comments` 요청을 통해 새로운 댓글을 생성할 수 있다.
+
+operation::comments/create[snippets='path-parameters,request-fields,response-fields,curl-request,http-response']
+
+[[resources_comments_delete]]
+=== 댓글 삭제
+
+`DELETE /api/posts/:postId/comments/:commentId` 댓글을 삭제할 수 있다.
+
+operation::comments/delete[snippets='path-parameters,curl-request,http-response']
+
+[[resources_comments_update]]
+=== 댓글 수정
+
+`PATCH /api/posts/:postId/comments/:commentId` 요청을 통해 기존 댓글의 내용을 수정할 수 있다.
+
+operation::comments/update[snippets='path-parameters,request-fields,response-fields,curl-request,http-response']
+
+[[resources_follow]]
+== 팔로우
+
+[[resources_follow_terminology]]
+=== 모호한 단어에 대한 정의
+
+- **followed**란 follower가 팔로우하고 있는 유저
+- **팔로우 관계**란 어떤 follower가 followed를 팔로우하고 있는 상황
+
+[[resources_follow_get]]
+=== 팔로우 관계 생성
+
+`POST /api/users/:followedId/follow` 요청을 통해 로그인한 유저가 followedId에 해당하는 유저에 대한 팔로우 요청을 보낼 수 있다.
+
+operation::follow/create[snippets='path-parameters,curl-request,http-response']
+
+[[resources_follow_delete]]
+=== 팔로우 관계 삭제
+
+`DELETE /api/users/:followedId/follow` 요청을 통해 로그인한 유저가 followedId에 해당하는 유저에 대한 팔로우를 취소할 수 있다.
+
+operation::follow/delete[snippets='path-parameters,curl-request,http-response']
+
+[[resources_follow_check]]
+=== 팔로우 관계 확인
+
+`GET /api/users/:followedId/follow/check` 요청을 통해 로그인한 유저가 followedId에 해당하는 유저를 팔로우하고 있는지 확인할 수 있다.
+
+operation::follow/check[snippets='path-parameters,response-fields,curl-request,http-response']
+
+[[resources_follow_followers]]
+=== 특정 유저의 모든 팔로워 조회
+
+`GET /api/users/:userId/follower` 요청을 통해 userId에 해당하는 유저의 모든 팔로워를 조회할 수 있다.
+
+operation::follow/get_follower[snippets='path-parameters,response-fields,curl-request,http-response']
+
+[[resources_follow_followed]]
+=== 특정 유저의 모든 팔로우드 조회
+
+`GET /api/users/:userId/followed` 요청을 통해 userId에 해당하는 유저의 모든 팔로우드를 조회할 수 있다.
+
+operation::follow/get_followed[snippets='path-parameters,response-fields,curl-request,http-response']
+
+[[resources_follow_followers_count]]
+=== 특정 유저의 모든 팔로워 수 조회
+
+`GET /api/users/:userId/follower` 요청을 통해 userId에 해당하는 유저의 모든 팔로워 수를 조회할 수 있다.
+
+operation::follow/get_follower_count[snippets='path-parameters,response-fields,curl-request,http-response']
+
+[[resources_follow_followed_count]]
+=== 특정 유저의 모든 팔로우드 수 조회
+
+`GET /api/users/:userId/followed` 요청을 통해 userId에 해당하는 유저의 모든 팔로우드 수를 조회할 수 있다.
+
+operation::follow/get_follower_count[snippets='path-parameters,response-fields,curl-request,http-response']
+
+[[resources_diets]]
+== 식단
+
+[[resources_diets_find-unit]]
+=== 단건 조회
+
+식단 ID로 식단을 조회한다.
+
+operation::diets/find-unit[snippets='path-parameters,response-fields,curl-request,http-response']
+
+[[resources_diets_find-by-date]]
+=== 날짜로 식단 조회
+
+식단 날짜로 식단을 조회한다.
+
+operation::diets/find-by-date[snippets='request-parameters,response-fields,curl-request,http-response']
+
+[[resources_diets_save-foods]]
+=== 식단에 음식 저장
+
+operation::diets/save-foods[snippets='request-fields,request-body,curl-request,response-headers']
+
+[[resources_foods]]
+== 음식
+
+[[resources_foods_search-foods]]
+=== 음식 리스트 검색
+
+음식 이름으로 음식 리스트를 검색한다.
+
+operation::foods/search-foods[snippets='request-parameters,response-fields,curl-request,http-response']
+
+[[resources_post]]
+== 게시글
+
+[[resources_post_get_all]]
+=== 게시글 다건 조회
+
+operation::posts/post-get-all[snippets='http-request,request-headers,request-parameters,http-response,response-fields,curl-request']
+
+[[resources_post_get_by_title]]
+=== 게시글 다건 조회 - 제목
+
+operation::posts/post-get-by-title[snippets='http-request,request-headers,request-parameters,http-response,response-fields,curl-request']
+
+[[resources_post_get_by_writer]]
+=== 게시글 다건 조회 - 작성자
+
+operation::posts/post-get-by-writer[snippets='http-request,request-headers,request-parameters,http-response,response-fields,curl-request']
+
+
+[[resources_post_get_by_tagNames]]
+=== 게시글 다건 조회 - 태그 이름
+
+operation::posts/post-get-by-tagNames[snippets='http-request,request-headers,request-parameters,http-response,response-fields,curl-request']
+
+[[resources_post_get_by_id]]
+=== 게시글 단건 조회 - ID
+
+operation::posts/post-get-by-id[snippets='http-request,request-headers,path-parameters,http-response,response-fields,curl-request']
+
+
+[[resources_post-create]]
+=== 게시글 생성
+
+operation::posts/post-create[snippets='http-request,request-headers,request-fields,http-response,response-headers,curl-request']
+
+[[resources_post-create]]
+=== 게시글 삭제
+
+operation::posts/post-delete[snippets='http-request,path-parameters,request-headers,http-response,curl-request']
+
+[[resources_post_update]]
+=== 게시글 수정
+
+operation::posts/post-update[snippets='http-request,request-headers,request-fields,http-response,curl-request']
+
+[[resources_post_likes]]
+=== 게시글 좋아요
+
+operation::posts/post-likes[snippets='http-request,path-parameters,request-headers,http-response,response-fields,curl-request']
+
+[[resources_post_unlikes]]
+=== 게시글 좋아요 취소
+
+operation::posts/post-unlikes[snippets='http-request,path-parameters,request-headers,http-response,response-fields,curl-request']
