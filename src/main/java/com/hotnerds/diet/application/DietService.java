@@ -63,7 +63,7 @@ public class DietService {
     }
 
     @Transactional
-    protected Diet findOrCreate(LocalDate mealDate, MealTime mealTime, User user) {
+    public Diet findOrCreate(LocalDate mealDate, MealTime mealTime, User user) {
         Diet diet = dietRepository.findByMealDateAndMealTimeAndUser(mealDate, mealTime, user)
                 .orElseGet(() -> Diet.builder()
                         .mealDate(mealDate)
