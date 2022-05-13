@@ -9,6 +9,9 @@
 - [Yup](https://github.com/Sangyups)
 - [AjiC](https://github.com/jungin0507)
 
+## 개발 요구사항
+- https://www.notion.so/Helenee-d3440ee7fdb74f9cb8f2ad5cb1fef596
+
 ## 💻기술 스택
 
 ![Untitled](assets/img/Untitled.png)
